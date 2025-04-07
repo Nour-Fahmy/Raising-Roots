@@ -121,7 +121,7 @@ themeToggle.addEventListener("click", () => {
   localStorage.setItem("theme", isDark ? "dark" : "light");
 
   // Change the theme toggle icon
-  themeToggle.textContent = isDark ? "☀️" : "🌙";
+  themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 });
 
 // Load theme preference from localStorage on page load
@@ -129,27 +129,10 @@ window.addEventListener("DOMContentLoaded", () => {
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") {
     document.body.classList.add("dark-theme");
-    themeToggle.textContent = "☀️";
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
   } else {
-    themeToggle.textContent = "🌙";
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
   }
-});
-
-// =================== Back Button Logic ===================
-
-const backButtons = document.querySelectorAll(".back-button");
-
-// Add event listeners to all back buttons
-backButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    // Show the channel selector
-    document.querySelector('#channel-selector').classList.remove('hidden');
-
-    // Hide all channels when back button is clicked
-    document.querySelector('#community-section').classList.add('hidden');
-    document.querySelector('#expert-section').classList.add('hidden');
-    document.querySelector('#dm-section').classList.add('hidden');
-  });
 });
 
 // Go back to the channel selector when clicking the back button

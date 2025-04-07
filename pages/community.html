@@ -7,69 +7,90 @@
   <title>Raising Roots - Community</title>
   <link rel="stylesheet" href="../assets/css/styles.css" />
   <link rel="stylesheet" href="../assets/css/community.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
-
-  <header>
-    <h1>Raising Roots Community</h1>
-    <p>Connect, share, and grow together.</p>
-    <button id="theme-toggle" aria-label="Toggle Theme">🌙</button>
+  <header class="main-header">
+    <div class="header-content">
+      <h1>Raising Roots Community</h1>
+      <p>Connect, share, and grow together.</p>
+    </div>
+    <button id="theme-toggle" aria-label="Toggle Theme">
+      <i class="fas fa-moon"></i>
+    </button>
   </header>
 
   <main class="community-container">
-
-    <!-- 🔘 Channel Selector Section (Visible by Default) -->
+    <!-- Channel Selector Section -->
     <section id="channel-selector" class="channel-options">
-      <h2>Choose a Chat Channel 💬</h2>
-      <button onclick="selectChannel('community')">🌱 Open Chat</button>
-      <button onclick="selectChannel('expert')">👩‍⚕️ Expert Chat</button>
-      <button onclick="selectChannel('dm')">💌 Direct Message</button>
+      <h2><i class="fas fa-comments"></i> Choose a Chat Channel</h2>
+      <div class="channel-buttons">
+        <button class="channel-btn" onclick="selectChannel('community')">
+          <i class="fas fa-users"></i>
+          <span>Community Chat</span>
+        </button>
+        <button class="channel-btn" onclick="selectChannel('expert')">
+          <i class="fas fa-user-md"></i>
+          <span>Expert Advice</span>
+        </button>
+        <button class="channel-btn" onclick="selectChannel('dm')">
+          <i class="fas fa-envelope"></i>
+          <span>Direct Message</span>
+        </button>
+      </div>
     </section>
 
-    <!-- 🌱 Open Chat Section -->
+    <!-- Community Chat Section -->
     <section id="community-section" class="chat-section hidden">
-
-      <button class="back-button" onclick="goBackToChannels()">← Back</button>
-
-
-      <h2>🌱 Community Chat</h2>
+      <div class="chat-header">
+        <button class="back-button" onclick="goBackToChannels()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h2><i class="fas fa-users"></i> Community Chat</h2>
+      </div>
       <div class="chat-box">
         <div class="messages" id="community-messages"></div>
         <div class="chat-input">
           <input type="text" id="community-input" placeholder="Type your message..." />
-          <button onclick="sendMessage('community')">Send</button>
+          <button onclick="sendMessage('community')">
+            <i class="fas fa-paper-plane"></i>
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- 👩‍⚕️ Expert Chat Section -->
+    <!-- Expert Chat Section -->
     <section id="expert-section" class="expert-section hidden">
-
-      <button class="back-button" onclick="goBackToChannels()">← Back</button>
-
-
-
-      <h2>👩‍⚕️ Expert Advice</h2>
+      <div class="chat-header">
+        <button class="back-button" onclick="goBackToChannels()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h2><i class="fas fa-user-md"></i> Expert Advice</h2>
+      </div>
       <div class="expert-box">
         <div class="messages" id="expert-messages"></div>
         <div class="chat-input">
           <input type="text" id="expert-input" placeholder="Ask an expert..." />
-          <button onclick="sendMessage('expert')">Send</button>
+          <button onclick="sendMessage('expert')">
+            <i class="fas fa-paper-plane"></i>
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- 💌 DM Section Placeholder -->
+    <!-- DM Section -->
     <section id="dm-section" class="chat-section hidden">
-
-      <button class="back-button" onclick="goBackToChannels()">← Back</button>
-
-
-
-      <h2>💌 Direct Message</h2>
-      <p>This feature is coming soon! 🚧</p>
+      <div class="chat-header">
+        <button class="back-button" onclick="goBackToChannels()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h2><i class="fas fa-envelope"></i> Direct Message</h2>
+      </div>
+      <div class="coming-soon">
+        <i class="fas fa-tools"></i>
+        <p>This feature is coming soon!</p>
+      </div>
     </section>
-
   </main>
 
   <script src="../assets/js/community.js"></script>
