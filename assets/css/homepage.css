@@ -55,9 +55,9 @@ body {
     position: absolute;
     top: 100%;
     left: 0;
-    right: 0; /* Make dropdown span full width */
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 2rem;
+    right: 0;
+    background-color: transparent;
+    padding: 1rem;
     display: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transform-origin: top;
@@ -75,23 +75,81 @@ body {
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
+    gap: 1rem;
 }
 
+/* Common dropdown item styles */
 .dropdown a {
     display: block;
-    padding: 1rem;
-    color: #333;
+    background-color: #fff;
+    border: 2px solid #d3bd9a;
+    border-radius: 28% 72% 34% 66% / 87% 40% 60% 13%;
+    padding: 15px 20px;
+    width: 250px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #674f04;
     text-decoration: none;
-    font-size: 1.1rem;
-    transition: all 0.3s;
-    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    margin: 0 auto;
 }
 
 .dropdown a:hover {
-    background-color: rgb(94, 56, 41);
-    color: rgb(238, 238, 216);
-    transform: translateX(10px);
+    background-color: #d3bd9a;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Specific styles for Baby Care items */
+.dropdown .care-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropdown .care-item h3 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.dropdown .care-item p {
+    margin: 0;
+    font-size: 0.8em;
+    font-weight: normal;
+}
+
+/* Styles for other dropdown items */
+.dropdown a:not(.care-item) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .dropdown {
+        padding: 0.5rem;
+    }
+    
+    .dropdown a {
+        width: 200px;
+        padding: 10px 15px;
+        font-size: 1em;
+    }
+    
+    .dropdown .care-item h3 {
+        font-size: 1em;
+    }
+    
+    .dropdown .care-item p {
+        font-size: 0.75em;
+    }
 }
 
 .nav-right {
@@ -120,7 +178,7 @@ body {
 /* Hero Section Styles */
 .hero {
     height: 60vh;
-    background-image: url('imgs/Img1.jpeg');
+    background-image: url('../images/Img1.jpeg');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -328,11 +386,17 @@ body {
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
 }
 
 .flashcard:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
 }
 
 .flashcard i {
@@ -351,6 +415,7 @@ body {
     color: #666;
     font-size: 1.1rem;
     line-height: 1.6;
+    margin-bottom: 1rem;
 }
 
 /* Responsive styles for flashcards */
@@ -369,7 +434,7 @@ body {
 /* Second Hero Section Styles */
 .second-hero {
     height: 60vh;
-    background-image: url('imgs/Img2.jpeg');
+    background-image: url('../images/Img2.jpeg');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -438,4 +503,21 @@ body {
     .second-hero p {
         font-size: 1rem;
     }
+}
+
+/* Add this to your existing CSS */
+.flashcard-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--sage);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.flashcard-link:hover {
+    background-color: var(--dusty-rose);
+    transform: translateY(-2px);
 } 
