@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raising Roots Shop</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styling */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #333
+            ;
+            color: white;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px; /* Adjust height as needed */
+            margin-right: 10px;
+        }
+
+        .logo a {
+            text-decoration: none;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .navigation ul {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navigation ul li {
+            display: inline;
+        }
+
+        .navigation ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .navigation ul li a:hover {
+            background-color: white;
+            color: black;
+            border-radius: 5px;
+        }
+
+        /* Shop Section */
+        .shop-section {
+            text-align: center;
+            margin-top: 50px;
+            flex-grow: 1;
+        }
+
+        .shop-options {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .shop-option {
+            text-decoration: none;
+        }
+
+        .shop-box {
+            width: 250px;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid black;
+            background-color: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px;
+        }
+
+        .shop-box img {
+            max-width: 90%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .shop-box:hover {
+            background-color: #f0f0f0;
+            box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Footer Styling */
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 5px;
+            font-size: 13px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="logo">
+            <img src="D:\raising roots web development project\kids-animation.gif\Screenshot_2025-04-07_074351-removebg-preview.png" alt="Logo">
+            <a href="#">Raising Roots</a>
+        </div>
+        <nav class="navigation">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="community.html">Community</a></li>
+                <li><a href="about-us.html">About Us</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="cart.html">Cart</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Shop Section -->
+    <div class="shop-section">
+        <h1>Welcome to the Raising Roots Shop</h1>
+        <p>Select a category to explore our products:</p>
+        <div class="shop-options">
+            <a href="adult-products.html" class="shop-option">
+                <div class="shop-box">
+                    <img src="D:\raising roots web development project\kids-animation.gif\3d-smiley-woman-doing-dance-moves.png" alt="Adult Products Image">
+                    <p>Adult Products</p>
+                </div>
+            </a>
+            <a href="kids-products.html" class="shop-option">
+                <div class="shop-box">
+                    <img src="D:\raising roots web development project\kids-animation.gif\3d-cartoon-back-school-removebg-preview.png" alt="Kids Animation">
+                    <p>Kids Products</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Raising Roots. All rights reserved.</p>
+        <p>
+            <a href="about-us.html">About Us</a> |
+            <a href="https://facebook.com" target="_blank">Facebook</a> |
+            <a href="https://instagram.com" target="_blank">Instagram</a> |
+            <a href="https://twitter.com" target="_blank">Twitter</a>
+        </p>
+        <p>
+            Download our app:
+            <a href="https://play.google.com/store">Google Play</a> |
+            <a href="https://www.apple.com/app-store/">App Store</a>
+        </p>
+    </footer>
+
+</body>
+</html>
