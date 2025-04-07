@@ -36,25 +36,6 @@ This project is actively being developed. Stay tuned for updates!
 
 ---
 
-## 🤝 How to Contribute
-
-We welcome contributions from developers, designers, and parenting experts!
-
-1. Fork the repo
-2. Create a new branch (`feature/your-feature`)
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
----
-
-## 📫 Contact
-
-Have questions or ideas? Reach us at:  
-📧 raisingroots@support.com  
-📸 [Instagram](https://instagram.com/raisingroots) | 🐦 [Twitter](https://twitter.com/raisingroots)
-
----
 
 ## 📄 License
 
