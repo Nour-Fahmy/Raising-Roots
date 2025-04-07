@@ -1,0 +1,241 @@
+/* Community Page Styling */
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  header h1 {
+    color: #9caf88;
+    font-size: 2.5rem;
+  }
+  
+  header p {
+    font-size: 1.2rem;
+    color: rgb(101, 143, 160);
+  }
+  
+  .community-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 0 20px;
+  }
+  
+  .chat-section, .expert-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border: 2px solid #9caf88;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(101, 143, 160, 0.2);
+  }
+  
+  .chat-section h2, .expert-section h2 {
+    color: #c4717b;
+    margin-bottom: 10px;
+  }
+  
+  .chat-box, .expert-box {
+    border: 1px solid #c4717b;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fdfcfa;
+  }
+  
+  .messages {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  
+  .message {
+    padding: 8px;
+    background-color: #e9f0ed;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .message.expert {
+    background-color: #f0e4e6;
+    border-left: 5px solid #c4717b;
+  }
+  
+  .chat-input {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .chat-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #9caf88;
+    border-radius: 8px;
+  }
+  
+  .chat-input button {
+    padding: 8px 16px;
+    background-color: rgb(101, 143, 160);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .chat-input button:hover {
+    background-color: #50667a;
+  }
+  
+  a {
+    color: rgb(101, 143, 160);
+    text-decoration: underline;
+  }
+  
+
+/* Community Page Styling  -- typing animations styles*/
+
+  .typing {
+    font-style: italic;
+    color: #666;
+    opacity: 0.7;
+    animation: blink 1s steps(1) infinite;
+  }
+  
+  @keyframes blink {
+    0%, 50%, 100% {
+      opacity: 0.7;
+    }
+    25%, 75% {
+      opacity: 0.2;
+    }
+  }
+  
+
+
+  /* Dark Theme Styling */
+body.dark-theme {
+  background-color: #2e2e2e;
+  color: white;
+}
+
+body.dark-theme header h1 {
+  color: #c4717b;
+}
+
+body.dark-theme header p {
+  color: #9caf88;
+}
+
+body.dark-theme .chat-section,
+body.dark-theme .expert-section {
+  background-color: #333;
+  border-color: #9caf88;
+}
+
+body.dark-theme .chat-box,
+body.dark-theme .expert-box {
+  background-color: #444;
+  border-color: #c4717b;
+}
+
+body.dark-theme .message {
+  background-color: #555;
+  color: white;
+}
+
+body.dark-theme .message.expert {
+  background-color: #664850;
+  border-left: 5px solid #c4717b;
+}
+
+body.dark-theme .chat-input input {
+  background-color: #666;
+  color: white;
+  border-color: #9caf88;
+}
+
+body.dark-theme .chat-input button {
+  background-color: #9caf88;
+}
+
+
+
+#theme-toggle {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 999;
+}
+
+
+
+
+/* =================== Channel Selector Styles =================== */
+.channel-options {
+  text-align: center;
+  padding: 30px;
+  border: 2px dashed #9caf88;
+  border-radius: 15px;
+  background-color: #fdfcfa;
+}
+
+.channel-options h2 {
+  font-size: 1.5rem;
+  color: #c4717b;
+  margin-bottom: 20px;
+}
+
+.channel-options button {
+  display: inline-block;
+  margin: 10px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #9caf88;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.channel-options button:hover {
+  background-color: #7e9470;
+}
+
+.hidden {
+  display: none;
+}
+
+
+
+
+/* =================== back button style =================== */
+
+
+.back-button {
+  background-color: #9caf88;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  margin: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #88a674;
+}
+
+body.dark-theme .back-button {
+  background-color: #c4717b;
+}
+
+body.dark-theme .back-button:hover {
+  background-color: #b15f6a;
+}
