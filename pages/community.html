@@ -19,6 +19,8 @@
   </header>
 
   <main class="community-container">
+    <!-- Chat Channels Container -->
+    <div class="chat-channels-container">
     <!-- Channel Selector Section -->
     <section id="channel-selector" class="channel-options">
       <h2>Choose a Chat Channel 💬</h2>
@@ -74,9 +76,130 @@
         <button class="back-button" onclick="goBackToChannels()">← Back</button>
         <h2>💌 Direct Message</h2>
       </div>
-      <div class="coming-soon">
-        <i class="fas fa-tools"></i>
-        <p>This feature is coming soon! 🚧</p>
+        <div class="dm-container">
+          <!-- User List -->
+          <div class="user-list">
+            <div class="search-users">
+              <input type="text" placeholder="Search users..." onkeyup="searchUsers(this.value)">
+            </div>
+            <div class="users">
+              <div class="user-item active" onclick="selectUser(this, 'Sarah Johnson')">
+                <img src="../images/default-avatar.png" alt="Sarah Johnson">
+                <div class="user-info">
+                  <h4>Sarah Johnson</h4>
+                  <p class="status online">Online</p>
+                </div>
+              </div>
+              <div class="user-item" onclick="selectUser(this, 'Dr. Emily Chen')">
+                <img src="../images/default-avatar.png" alt="Dr. Emily Chen">
+                <div class="user-info">
+                  <h4>Dr. Emily Chen</h4>
+                  <p class="status">Last seen 5m ago</p>
+                </div>
+              </div>
+              <div class="user-item" onclick="selectUser(this, 'Mike Wilson')">
+                <img src="../images/default-avatar.png" alt="Mike Wilson">
+                <div class="user-info">
+                  <h4>Mike Wilson</h4>
+                  <p class="status">Last seen 1h ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Chat Area -->
+          <div class="dm-chat">
+            <div class="chat-placeholder">
+              <i class="fas fa-comments"></i>
+              <p>Select a user to start chatting</p>
+            </div>
+            <div class="chat-messages hidden">
+              <div class="messages" id="dm-messages"></div>
+              <div class="chat-input">
+                <input type="text" id="dm-input" placeholder="Type your message..." />
+                <button onclick="sendDMMessage()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Community Posts Section -->
+    <section id="community-posts" class="posts-section">
+      <div class="posts-header">
+        <h2>Community Posts 📝</h2>
+        <button class="create-post-btn" onclick="showCreatePostForm()">
+          <i class="fas fa-plus"></i> Create Post
+        </button>
+      </div>
+
+      <!-- Create Post Form (Hidden by default) -->
+      <div id="create-post-form" class="create-post-form hidden">
+        <form onsubmit="submitPost(event)">
+          <div class="form-group">
+            <label for="post-title">Title</label>
+            <input type="text" id="post-title" required placeholder="Enter post title">
+          </div>
+          <div class="form-group">
+            <label for="post-content">Content</label>
+            <textarea id="post-content" required placeholder="Share your thoughts..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="post-category">Category</label>
+            <select id="post-category" required>
+              <option value="">Select a category</option>
+              <option value="parenting-tips">Parenting Tips</option>
+              <option value="questions">Questions</option>
+              <option value="experiences">Experiences</option>
+              <option value="advice">Advice</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="submit-btn">Post</button>
+            <button type="button" class="cancel-btn" onclick="hideCreatePostForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Posts Filter -->
+      <div class="posts-filter">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="search-posts" placeholder="Search posts...">
+        </div>
+        <select id="category-filter" onchange="filterPosts()">
+          <option value="all">All Categories</option>
+          <option value="parenting-tips">Parenting Tips</option>
+          <option value="questions">Questions</option>
+          <option value="experiences">Experiences</option>
+          <option value="advice">Advice</option>
+        </select>
+      </div>
+
+      <!-- Posts Grid -->
+      <div class="posts-grid" id="posts-container">
+        <!-- Sample Post (will be populated dynamically) -->
+        <article class="post-card">
+          <div class="post-header">
+            <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
+            <div class="post-info">
+              <h3>Tips for Better Sleep Training</h3>
+              <div class="post-meta">
+                <span class="author">Sarah Johnson</span>
+                <span class="date">2 hours ago</span>
+                <span class="category">Parenting Tips</span>
+              </div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Here are some effective sleep training methods that worked for my 6-month-old...</p>
+          </div>
+          <div class="post-actions">
+            <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
+            <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
+            <button class="action-btn"><i class="fas fa-share"></i> Share</button>
+          </div>
+        </article>
       </div>
     </section>
   </main>
