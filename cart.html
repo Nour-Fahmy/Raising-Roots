@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boy Toys - Raising Roots</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Tint&display=swap" rel="stylesheet">
+
+  <style>
+    /* General Styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
+      padding-top: 60px;
+    }
+
+    /* Header Styling */
+    .main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .main-header .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .main-header .logo img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .main-header .logo a {
+      text-decoration: none;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .navigation ul {
+      list-style: none;
+      display: flex;
+      gap: 15px;
+      margin: 0;
+      padding: 0;
+      padding-right: 40px;
+    }
+
+    .navigation ul li {
+      display: inline;
+    }
+
+    .navigation ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      padding: 8px 12px;
+      transition: all 0.3s ease;
+    }
+
+    .navigation ul li a:hover {
+      background-color: white;
+      color: black;
+      border-radius: 5px;
+    }
+
+    .return-btn {
+      position: absolute;
+      top: 80px;
+      left: 20px;
+      padding: 8px 15px;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+      background-color: white;
+      color: black;
+      border: 2px solid black;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .return-btn:hover {
+      background-color: black;
+      color: white;
+      box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+      transform: scale(1.05);
+    }
+
+    .footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: auto;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .bungee-tint {
+      font-family: "Bungee Tint", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+  </style>
+</head>
+<body>
+
+
+    <header class="main-header">
+        <div class="logo">
+          <img src="D:\raising roots web development project\kids-animation.gif\Screenshot_2025-04-07_074351-removebg-preview.png" alt="Logo">
+          <a href="#">Raising Roots</a>
+        </div>
+        <nav class="navigation">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="about-us.html">About Us</a></li>
+            <li><a href="raising-roots.html">Shop</a></li>
+            <li><a href="cart.html">Cart</a></li>
+          </ul>
+        </nav>
+      </header>
+      
+      <a href="raising-roots.html" class="return-btn">← Back</a>
+
+      <main>
+        <h1>Your Cart</h1>
+        <div id="cart-container" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div>
+        <p style="font-size: 1.5rem; font-weight: bold;">Total: $<span id="cart-total">0.00</span></p>
+        <button id="checkout-btn" style="padding: 10px 20px; font-size: 1rem; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;">Checkout</button>
+      </main>
+
+      <footer class="footer">
+        <p>&copy; 2025 Raising Roots. All rights reserved.</p>
+        <p>
+          <a href="about-us.html">About Us</a> |
+          <a href="#">Facebook</a> |
+          <a href="#">Instagram</a> |
+          <a href="#">Twitter</a>
+        </p>
+        <p>
+          Download our app:
+          <a href="#">Google Play</a> |
+          <a href="#">App Store</a>
+        </p>
+      </footer>
+
+      <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartContainer = document.getElementById('cart-container');
+        const cartTotal = document.getElementById('cart-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        function updateCartUI() {
+            cartContainer.innerHTML = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const itemCard = document.createElement('div');
+                itemCard.style.cssText = `
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    border: 2px solid #ccc;
+                    border-radius: 10px;
+                    padding: 15px;
+                    width: 200px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    transition: transform 0.3s ease;
+                `;
+                itemCard.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}" style="width: 100px; height: 100px; border-radius: 10px; margin-bottom: 10px;">
+                    <h3 style="font-size: 1.2rem; margin: 5px 0;">${item.name}</h3>
+                    <p style="font-size: 1rem; color: green; font-weight: bold;">$${item.price.toFixed(2)}</p>
+                    <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                        <button class="decrement-btn" data-index="${index}" style="padding: 5px 10px; background-color: red; color: white; border: none; border-radius: 5px; cursor: pointer;">-</button>
+                        <span style="font-size: 1rem;">${item.quantity}</span>
+                        <button class="increment-btn" data-index="${index}" style="padding: 5px 10px; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer;">+</button>
+                    </div>
+                `;
+                itemCard.addEventListener('mouseover', () => {
+                    itemCard.style.transform = 'scale(1.05)';
+                });
+                itemCard.addEventListener('mouseout', () => {
+                    itemCard.style.transform = 'scale(1)';
+                });
+                cartContainer.appendChild(itemCard);
+                total += item.price * item.quantity;
+            });
+
+            cartTotal.textContent = total.toFixed(2);
+
+            // Add event listeners to increment and decrement buttons
+            document.querySelectorAll('.increment-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.getAttribute('data-index');
+                    cart[index].quantity += 1;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartUI();
+                });
+            });
+
+            document.querySelectorAll('.decrement-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.getAttribute('data-index');
+                    if (cart[index].quantity > 1) {
+                        cart[index].quantity -= 1;
+                    } else {
+                        cart.splice(index, 1);
+                    }
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartUI();
+                });
+            });
+
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.getAttribute('data-index');
+                    cart.splice(index, 1);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartUI();
+                });
+            });
+        }
+
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const receipt = cart.map(item => `${item.name} (x${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}`).join('\n');
+            const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
+
+            const confirmation = confirm(`Receipt:\n\n${receipt}\n\nTotal: $${total}\n\nDo you want to proceed to payment?`);
+            if (confirmation) {
+                alert('Payment successful! Thank you for your purchase.');
+                cart = [];
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartUI();
+            } else {
+                alert('Checkout canceled.');
+            }
+        });
+
+        updateCartUI();
+      </script>
+</body>
+</html>
