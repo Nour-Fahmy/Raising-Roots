@@ -1,13 +1,87 @@
 // =================== community.js ===================
 
+// Profile Functions
+function showProfileMenu() {
+  const profileMenu = document.createElement('div');
+  profileMenu.className = 'profile-menu';
+  profileMenu.innerHTML = `
+    <div class="profile-menu-header">
+      <img src="../images/default-avatar.png" alt="Profile" class="profile-pic">
+      <div class="profile-info">
+        <h3>Current User</h3>
+        <p>user@example.com</p>
+      </div>
+    </div>
+    <div class="profile-menu-options">
+      <a href="#" onclick="editProfile(); return false;"><i class="fas fa-user-edit"></i> Edit Profile</a>
+      <a href="#" onclick="viewSavedPosts(); return false;"><i class="fas fa-bookmark"></i> Saved Posts</a>
+      <a href="#" onclick="viewSettings(); return false;"><i class="fas fa-cog"></i> Settings</a>
+      <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  `;
+  
+  // Remove existing menu if any
+  const existingMenu = document.querySelector('.profile-menu');
+  if (existingMenu) {
+    existingMenu.remove();
+  }
+  
+  // Add new menu
+  document.querySelector('.header-actions').appendChild(profileMenu);
+  
+  // Close menu when clicking outside
+  document.addEventListener('click', function closeMenu(e) {
+    if (!e.target.closest('.profile-link') && !e.target.closest('.profile-menu')) {
+      profileMenu.remove();
+      document.removeEventListener('click', closeMenu);
+    }
+  });
+}
+
+function editProfile() {
+  // TODO: Implement profile editing
+  alert('Profile editing coming soon!');
+}
+
+function viewSavedPosts() {
+  showSavedPosts();
+}
+
+function viewSettings() {
+  // TODO: Implement settings
+  alert('Settings coming soon!');
+}
+
+function logout() {
+  // TODO: Implement logout
+  alert('Logout functionality coming soon!');
+}
+
+// Function to show community posts (home)
+function showCommunityPosts() {
+  // Hide all sections
+  document.querySelector('#community-section').classList.add('hidden');
+  document.querySelector('#expert-section').classList.add('hidden');
+  document.querySelector('#dm-section').classList.add('hidden');
+  document.querySelector('#saved-posts-section').classList.add('hidden');
+  
+  // Show community posts
+  document.querySelector('#community-posts').classList.remove('hidden');
+  
+  // Update active state in sidebar
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector('.nav-item[onclick="showCommunityPosts()"]').classList.add('active');
+}
+
 // Function to select and display the active channel
 function selectChannel(channel) {
-  // Show the correct channel section and hide others
-  document.querySelector('#channel-selector').classList.add('hidden');
-  
-  // Hide the community posts section
+  // Hide all sections
   document.querySelector('#community-posts').classList.add('hidden');
+  document.querySelector('#saved-posts-section').classList.add('hidden');
   
+  // Show the correct channel section and hide others
   const channels = ['community', 'expert', 'dm'];  // Channel names
   channels.forEach(ch => {
     // Hide all channels
@@ -20,6 +94,12 @@ function selectChannel(channel) {
       channelSection.classList.add('hidden');
     }
   });
+  
+  // Update active state in sidebar
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector(`.nav-item[onclick="selectChannel('${channel}')"]`).classList.add('active');
 }
 
 // Function to send a message
@@ -109,40 +189,37 @@ function generateExpertReply() {
   return replies[Math.floor(Math.random() * replies.length)];
 }
 
-// Load messages when the page loads
+// Load messages and show community posts when the page loads
 window.onload = function() {
-    loadMessages();
-    
-    // Check if we should show the expert section based on URL hash
-    if (window.location.hash === '#expert-section') {
-        selectChannel('expert');
-    }
+  loadMessages();
+  showCommunityPosts();
+  
+  // Check if we should show the expert section based on URL hash
+  if (window.location.hash === '#expert-section') {
+    selectChannel('expert');
+  }
 };
 
 // =================== Theme Toggle Logic ===================
 
-const themeToggle = document.getElementById("theme-toggle");
-
-themeToggle.addEventListener("click", () => {
-  // Toggle the dark theme class on the body
-  document.body.classList.toggle("dark-theme");
-
-  const isDark = document.body.classList.contains("dark-theme");
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-
-  // Change the theme toggle icon
-  themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-});
-
-// Load theme preference from localStorage on page load
-window.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark-theme");
+document.addEventListener('DOMContentLoaded', () => {
+  const themeToggle = document.getElementById('theme-toggle');
+  
+  // Load saved theme
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
     themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
   } else {
     themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
   }
+
+  // Theme toggle click handler
+  themeToggle.addEventListener('click', () => {
+    const isDark = document.body.classList.toggle('dark-theme');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+  });
 });
 
 // Go back to the channel selector when clicking the back button
@@ -290,10 +367,7 @@ function selectUser(userElement, username) {
   // Add active class to selected user
   userElement.classList.add('active');
   
-  // Set current user
-  currentUser = username;
-  
-  // Show chat interface
+  // Show chat messages
   document.querySelector('.chat-placeholder').classList.add('hidden');
   document.querySelector('.chat-messages').classList.remove('hidden');
   
@@ -307,95 +381,86 @@ function searchUsers(query) {
   
   users.forEach(user => {
     const username = user.querySelector('h4').textContent.toLowerCase();
-    if (username.includes(query)) {
-      user.style.display = 'flex';
-    } else {
-      user.style.display = 'none';
-    }
+    user.style.display = username.includes(query) ? 'flex' : 'none';
   });
 }
 
 function loadDMMessages(username) {
-  const messagesContainer = document.getElementById('dm-messages');
-  messagesContainer.innerHTML = '';
+  const container = document.getElementById('dm-messages');
+  container.innerHTML = ''; // Clear existing messages
   
-  // Initialize messages array for this user if it doesn't exist
-  if (!dmMessages[username]) {
-    dmMessages[username] = [
-      {
-        sender: username,
-        content: 'Hi there! How can I help you today?',
-        time: '10:30 AM'
-      }
-    ];
-  }
+  // Load messages from localStorage
+  const key = `dm-${username}`;
+  const stored = JSON.parse(localStorage.getItem(key)) || [];
   
-  // Display messages
-  dmMessages[username].forEach(message => {
-    const messageElement = createMessageElement(message);
-    messagesContainer.appendChild(messageElement);
+  // Render messages
+  stored.forEach(msgHTML => {
+    const messageDiv = document.createElement("div");
+    messageDiv.classList.add("message");
+    messageDiv.innerHTML = msgHTML;
+    container.appendChild(messageDiv);
   });
   
   // Scroll to bottom
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  container.scrollTop = container.scrollHeight;
 }
 
 function sendDMMessage() {
-  if (!currentUser) return;
-  
   const input = document.getElementById('dm-input');
-  const message = input.value.trim();
+  const text = input.value.trim();
+  if (text === '') return;
   
-  if (message) {
-    // Add message to array
-    if (!dmMessages[currentUser]) {
-      dmMessages[currentUser] = [];
-    }
+  const activeUser = document.querySelector('.user-item.active');
+  if (!activeUser) return;
+  
+  const username = activeUser.querySelector('h4').textContent;
+  const container = document.getElementById('dm-messages');
+  
+  // Create and append message
+  const messageDiv = createMessageElement({
+    content: text,
+    sender: 'You',
+    time: new Date().toLocaleTimeString()
+  });
+  container.appendChild(messageDiv);
+  
+  // Save message
+  const key = `dm-${username}`;
+  let stored = JSON.parse(localStorage.getItem(key)) || [];
+  stored.push(messageDiv.innerHTML);
+  localStorage.setItem(key, JSON.stringify(stored));
+  
+  // Clear input and scroll to bottom
+  input.value = '';
+  container.scrollTop = container.scrollHeight;
+  
+  // Simulate reply after a delay
+  setTimeout(() => {
+    const reply = getRandomReply();
+    const replyDiv = createMessageElement({
+      content: reply,
+      sender: username,
+      time: new Date().toLocaleTimeString()
+    });
+    container.appendChild(replyDiv);
     
-    const newMessage = {
-      sender: 'You',
-      content: message,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
+    // Save reply
+    stored.push(replyDiv.innerHTML);
+    localStorage.setItem(key, JSON.stringify(stored));
     
-    dmMessages[currentUser].push(newMessage);
-    
-    // Add message to UI
-    const messagesContainer = document.getElementById('dm-messages');
-    const messageElement = createMessageElement(newMessage);
-    messagesContainer.appendChild(messageElement);
-    
-    // Clear input
-    input.value = '';
-    
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    
-    // Simulate reply after 1 second
-    setTimeout(() => {
-      const reply = {
-        sender: currentUser,
-        content: getRandomReply(),
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      
-      dmMessages[currentUser].push(reply);
-      const replyElement = createMessageElement(reply);
-      messagesContainer.appendChild(replyElement);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }, 1000);
-  }
+    container.scrollTop = container.scrollHeight;
+  }, 1000);
 }
 
 function createMessageElement(message) {
   const div = document.createElement('div');
-  div.className = `message ${message.sender === 'You' ? 'sent' : ''}`;
+  div.classList.add('message');
+  if (message.sender === 'You') div.classList.add('sent');
   
   div.innerHTML = `
-    <img src="../images/default-avatar.png" alt="${message.sender}" class="user-avatar">
     <div class="message-content">
-      <p>${message.content}</p>
-      <span class="message-time">${message.time}</span>
+      <strong>${message.sender}:</strong> ${message.content}
+      <div class="message-time">${message.time}</div>
     </div>
   `;
   
@@ -404,16 +469,12 @@ function createMessageElement(message) {
 
 function getRandomReply() {
   const replies = [
-    "That's a great question!",
-    "I understand your concern.",
-    "Let me help you with that.",
+    "That's great to hear!",
+    "I understand how you feel.",
+    "Let me think about that...",
     "Thanks for sharing!",
-    "I'm here to help!",
-    "That's interesting!",
-    "I see what you mean.",
-    "Let's discuss this further."
+    "I'm here to help!"
   ];
-  
   return replies[Math.floor(Math.random() * replies.length)];
 }
 
@@ -421,5 +482,109 @@ function getRandomReply() {
 document.getElementById('dm-input')?.addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
     sendDMMessage();
+  }
+});
+
+// Save/Unsave Post Functionality
+function toggleSavePost(button) {
+  const postCard = button.closest('.post-card');
+  const postTitle = postCard.querySelector('h3').textContent;
+  const postContent = postCard.querySelector('.post-content p').textContent;
+  const postAuthor = postCard.querySelector('.author').textContent;
+  const postDate = postCard.querySelector('.date').textContent;
+  const postCategory = postCard.querySelector('.category').textContent;
+
+  // Create a unique key for the post (could use title+author+date)
+  const postKey = `${postTitle}|${postAuthor}|${postDate}`;
+
+  // Get saved posts from localStorage
+  let savedPosts = JSON.parse(localStorage.getItem('savedPosts')) || {};
+
+  const icon = button.querySelector('i');
+  if (savedPosts[postKey]) {
+    // Unsave
+    delete savedPosts[postKey];
+    icon.classList.remove('fas');
+    icon.classList.add('far');
+    button.innerHTML = '<i class="far fa-bookmark"></i> Save';
+  } else {
+    // Save
+    savedPosts[postKey] = {
+      title: postTitle,
+      content: postContent,
+      author: postAuthor,
+      date: postDate,
+      category: postCategory
+    };
+    icon.classList.remove('far');
+    icon.classList.add('fas');
+    button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+  }
+  localStorage.setItem('savedPosts', JSON.stringify(savedPosts));
+}
+
+function showSavedPosts() {
+  // Hide all sections
+  document.querySelector('#community-posts').classList.add('hidden');
+  document.querySelector('#community-section').classList.add('hidden');
+  document.querySelector('#expert-section').classList.add('hidden');
+  document.querySelector('#dm-section').classList.add('hidden');
+  
+  // Show saved posts section
+  document.querySelector('#saved-posts-section').classList.remove('hidden');
+  
+  // Update active state in sidebar
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector('.nav-item[onclick="showSavedPosts()"]').classList.add('active');
+
+  // Load saved posts
+  const container = document.getElementById('saved-posts-container');
+  container.innerHTML = '';
+  const savedPosts = JSON.parse(localStorage.getItem('savedPosts')) || {};
+  const keys = Object.keys(savedPosts);
+  if (keys.length === 0) {
+    container.innerHTML = '<p style="padding:2rem; text-align:center; color:#888;">No saved posts yet.</p>';
+    return;
+  }
+  keys.reverse().forEach(key => {
+    const post = savedPosts[key];
+    const article = document.createElement('article');
+    article.className = 'post-card';
+    article.innerHTML = `
+      <div class="post-header">
+        <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
+        <div class="post-info">
+          <h3>${post.title}</h3>
+          <div class="post-meta">
+            <span class="author">${post.author}</span>
+            <span class="date">${post.date}</span>
+            <span class="category">${post.category}</span>
+          </div>
+        </div>
+      </div>
+      <div class="post-content">
+        <p>${post.content}</p>
+      </div>
+      <div class="post-actions">
+        <button class="action-btn" onclick="likePost(this)"><i class="fas fa-heart"></i> Like</button>
+        <button class="action-btn" onclick="showComments(this)"><i class="fas fa-comment"></i> Comment</button>
+        <button class="action-btn" onclick="sharePost(this)"><i class="fas fa-share"></i> Share</button>
+        <button class="action-btn" onclick="toggleSavePost(this)"><i class="fas fa-bookmark"></i> Saved</button>
+      </div>
+    `;
+    container.appendChild(article);
+  });
+}
+
+// Initialize profile menu on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const profileLink = document.querySelector('.profile-link');
+  if (profileLink) {
+    profileLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showProfileMenu();
+    });
   }
 });
