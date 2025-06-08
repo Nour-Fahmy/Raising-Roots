@@ -34,8 +34,29 @@ body {
     background: var(--background-color);
     border-radius: 20px;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
+    overflow: auto;
     position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-color) var(--background-color);
+}
+
+/* Webkit scrollbar styles (Chrome, Safari, Edge) */
+.split-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.split-container::-webkit-scrollbar-track {
+    background: var(--background-color);
+    border-radius: 4px;
+}
+
+.split-container::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+.split-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
 }
 
 .forms-container {
@@ -70,6 +91,28 @@ body {
     flex-direction: column;
     justify-content: center;
     position: relative;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-color) var(--background-color);
+}
+
+/* Webkit scrollbar styles for form container */
+.form-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.form-container::-webkit-scrollbar-track {
+    background: var(--background-color);
+    border-radius: 3px;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 3px;
+}
+
+.form-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
 }
 
 .form {
@@ -321,38 +364,170 @@ button[type="submit"]:active {
 }
 
 @media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
     .split-container {
         height: auto;
         min-height: 100vh;
+        border-radius: 0;
     }
-    
+
+    .forms-container {
+        flex-direction: column;
+    }
+
+    .form-side {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .login-side, .signup-side {
+        left: 0;
+        right: 0;
+    }
+
+    .sliding-overlay {
+        display: none;
+    }
+
     .form-container {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
     }
-    
+
     .form {
         max-width: 100%;
     }
-    
+
+    .form-subtitle {
+        font-size: 1rem;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
     .form-group {
         margin-bottom: 0.8rem;
     }
-    
+
     input, select {
         padding: 0.7rem;
-        margin-bottom: 0.6rem;
+        font-size: 0.9rem;
     }
-    
+
     .gender-options {
-        flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .gender-option {
-        padding: 0.5rem;
+        padding: 0.6rem;
     }
-    
+
     button[type="submit"] {
         padding: 0.8rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    .form-container {
+        padding: 1.5rem 1rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+    }
+
+    input, select {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .gender-option {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    button[type="submit"] {
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 1366px) {
+    .split-container {
+        width: 95%;
+        height: 600px;
+        margin: 1rem auto;
+    }
+
+    .form-container {
+        padding: 2rem;
+    }
+
+    .form {
+        max-width: 320px;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
+    .form-subtitle {
+        font-size: 1rem;
+    }
+
+    .overlay-panel {
+        padding: 2rem;
+    }
+
+    .overlay-panel h2 {
+        font-size: 2rem;
+    }
+
+    .overlay-panel p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .split-container {
+        height: 550px;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+    }
+
+    .form {
+        max-width: 300px;
+    }
+
+    h2 {
+        font-size: 1.6rem;
+    }
+
+    .overlay-panel {
+        padding: 1.5rem;
+    }
+
+    .overlay-panel h2 {
+        font-size: 1.8rem;
     }
 } 
