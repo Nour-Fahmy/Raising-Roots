@@ -1,0 +1,86 @@
+<!-- =================== community.html =================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Raising Roots - Community</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/community.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <h1>Raising Roots Community</h1>
+      <p>Connect, share, and grow together.</p>
+    </div>
+    <button id="theme-toggle" aria-label="Toggle Theme">🌙</button>
+  </header>
+
+  <main class="community-container">
+    <!-- Channel Selector Section -->
+    <section id="channel-selector" class="channel-options">
+      <h2>Choose a Chat Channel 💬</h2>
+      <div class="channel-buttons">
+        <button class="channel-btn" onclick="selectChannel('community')">
+          <i class="fas fa-users"></i>
+          <span>Community Chat</span>
+        </button>
+        <button class="channel-btn" onclick="selectChannel('expert')">
+          <i class="fas fa-user-md"></i>
+          <span>Expert Advice</span>
+        </button>
+        <button class="channel-btn" onclick="selectChannel('dm')">
+          <i class="fas fa-envelope"></i>
+          <span>Direct Message</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Community Chat Section -->
+    <section id="community-section" class="chat-section hidden">
+      <div class="chat-header">
+        <button class="back-button" onclick="goBackToChannels()">← Back</button>
+        <h2>🌱 Community Chat</h2>
+      </div>
+      <div class="chat-box">
+        <div class="messages" id="community-messages"></div>
+        <div class="chat-input">
+          <input type="text" id="community-input" placeholder="Type your message..." />
+          <button onclick="sendMessage('community')">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Expert Chat Section -->
+    <section id="expert-section" class="expert-section hidden">
+      <div class="chat-header">
+        <button class="back-button" onclick="goBackToChannels()">← Back</button>
+        <h2>👩‍⚕️ Expert Advice</h2>
+      </div>
+      <div class="expert-box">
+        <div class="messages" id="expert-messages"></div>
+        <div class="chat-input">
+          <input type="text" id="expert-input" placeholder="Ask an expert..." />
+          <button onclick="sendMessage('expert')">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DM Section -->
+    <section id="dm-section" class="chat-section hidden">
+      <div class="chat-header">
+        <button class="back-button" onclick="goBackToChannels()">← Back</button>
+        <h2>💌 Direct Message</h2>
+      </div>
+      <div class="coming-soon">
+        <i class="fas fa-tools"></i>
+        <p>This feature is coming soon! 🚧</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/community.js"></script>
+</body>
+</html>
