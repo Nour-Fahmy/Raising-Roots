@@ -1,0 +1,12 @@
+{
+  "name": "raising-roots",
+  "version": "1.0.0",
+  "description": "Raising Roots Parenting Support Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+} 

@@ -1,162 +1,3 @@
-/* Reset and Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.6;
-    min-height: 200vh; /* Added to make the page scrollable */
-}
-
-/* Navigation Bar Styles */
-.navbar {
-    position: absolute; /* Changed from relative to absolute */
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: transparent; /* Changed from rgba(255, 255, 255, 0.9) to transparent */
-    z-index: 1000;
-}
-
-.logo img {
-    height: 60px;
-    width: auto;
-}
-
-.nav-center {
-    display: flex;
-    gap: 2rem;
-}
-
-.nav-item {
-    position: relative;
-}
-
-.nav-link {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.8rem 1.5rem;
-    font-size: 1.2rem;
-    transition: color 0.3s;
-}
-
-.nav-link:hover {
-    color: #c4717b; /* Changed hover color to yellow for better visibility */
-}
-
-/* Enhanced Dropdown Styles */
-.dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: transparent;
-    padding: 1rem;
-    display: none;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transform-origin: top;
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
-}
-
-.nav-item:hover .dropdown {
-    display: block;
-    transform: scaleY(1);
-}
-
-.dropdown-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-/* Common dropdown item styles */
-.dropdown a {
-    display: block;
-    background-color: #fff;
-    border: 2px solid #d3bd9a;
-    border-radius: 28% 72% 34% 66% / 87% 40% 60% 13%;
-    padding: 15px 20px;
-    width: 250px;
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #674f04;
-    text-decoration: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    text-align: center;
-    margin: 0 auto;
-}
-
-.dropdown a:hover {
-    background-color: #d3bd9a;
-    color: #fff;
-    transform: scale(1.05);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Specific styles for Baby Care items */
-.dropdown .care-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.dropdown .care-item h3 {
-    margin: 0;
-    font-size: 1.1em;
-}
-
-.dropdown .care-item p {
-    margin: 0;
-    font-size: 0.8em;
-    font-weight: normal;
-}
-
-/* Styles for other dropdown items */
-.dropdown a:not(.care-item) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 20px;
-}
-
-/* Responsive adjustments */
-@media screen and (max-width: 768px) {
-    .dropdown {
-        padding: 0.5rem;
-    }
-    
-    .dropdown a {
-        width: 200px;
-        padding: 10px 15px;
-        font-size: 1em;
-    }
-    
-    .dropdown .care-item h3 {
-        font-size: 1em;
-    }
-    
-    .dropdown .care-item p {
-        font-size: 0.75em;
-    }
-}
-
-.nav-right {
-    display: flex;
-    gap: 1rem;
-}
-
 .login-btn, .signup-btn {
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -178,7 +19,7 @@ body {
 /* Hero Section Styles */
 .hero {
     height: 60vh;
-    background-image: url('../images/Img1.jpeg');
+    /* background-image: url('../assets/images/Img1.jpeg'); - removed */
     background-size: cover;
     background-position: center;
     display: flex;
@@ -204,49 +45,68 @@ body {
     z-index: 1;
     max-width: 800px;
     padding: 0 2rem;
+    margin: 0 auto;
+    margin-top: 6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin-bottom: 1rem;
     color: white;
-    white-space: nowrap; /* Prevent text from wrapping by default */
+    white-space: nowrap;
+    text-align: center;
+    font-weight: 600;
 }
 
 .hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
     color: white;
-    white-space: nowrap; /* Prevent text from wrapping by default */
+    white-space: nowrap;
+    text-align: left;
+    max-width: 600px;
+    margin-left: -35px;
+    margin-right: auto;
+    display: block;
 }
 
 /* Responsive styles for smaller screens */
 @media screen and (max-width: 768px) {
     .hero h1 {
-        font-size: 2.5rem;
-        white-space: normal; /* Allow text to wrap on smaller screens */
+        font-size: 2rem;
+        white-space: normal;
     }
 
     .hero p {
-        font-size: 1.1rem;
-        white-space: normal; /* Allow text to wrap on smaller screens */
+        font-size: 1rem;
+        white-space: normal;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 1rem;
     }
 }
 
 @media screen and (max-width: 480px) {
     .hero h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .hero p {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 }
 
 .hero-buttons {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     justify-content: center;
+    margin-top: 1rem;
 }
 
 .btn {
@@ -386,17 +246,11 @@ body {
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
 }
 
 .flashcard:hover {
     transform: translateY(-10px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
+    box-shadow: 0 8px 15px rgb(101, 143, 160);
 }
 
 .flashcard i {
@@ -415,7 +269,6 @@ body {
     color: #666;
     font-size: 1.1rem;
     line-height: 1.6;
-    margin-bottom: 1rem;
 }
 
 /* Responsive styles for flashcards */
@@ -455,21 +308,28 @@ body {
 .second-hero-content {
     position: relative;
     z-index: 1;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
     width: 100%;
+    height: 100%;
 }
 
 .second-hero-text {
-    max-width: 600px;
+    position: absolute;
+    left: 15%;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 500px;
     color: white;
+    text-align: left;
+    padding-left: 0;
 }
 
 .second-hero h2 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
     color: white;
+    text-align: left;
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .second-hero p {
@@ -477,6 +337,10 @@ body {
     margin-bottom: 2rem;
     color: white;
     line-height: 1.6;
+    text-align: left;
+    padding-left: 0;
+    margin-left: 0;
+    text-indent: 0;
 }
 
 .second-hero .btn {
@@ -503,21 +367,5 @@ body {
     .second-hero p {
         font-size: 1rem;
     }
-}
-
-/* Add this to your existing CSS */
-.flashcard-link {
-    display: inline-block;
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: var(--sage);
-    color: white;
-    text-decoration: none;
-    border-radius: var(--border-radius);
-    transition: var(--transition);
-}
-
-.flashcard-link:hover {
-    background-color: var(--dusty-rose);
-    transform: translateY(-2px);
+    
 } 
