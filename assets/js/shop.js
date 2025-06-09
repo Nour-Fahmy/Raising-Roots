@@ -213,6 +213,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle cart visibility
     cartIcon.addEventListener('click', () => {
         cartContainer.classList.add('active');
+        // Reset payment method to cash and hide credit card fields
+        document.querySelector('input[name="payment"][value="cash"]').checked = true;
+        document.querySelector('.credit-card-fields').style.display = 'none';
     });
 
     closeCart.addEventListener('click', () => {
@@ -373,6 +376,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update cart count and total
         cartCount.textContent = count;
         totalPrice.textContent = `EGP ${total.toFixed(2)}`;
+
+        // Calculate and display estimated delivery date
+        const deliveryDate = new Date();
+        deliveryDate.setDate(deliveryDate.getDate() + 3); // Add 3 days
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.querySelector('.delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', options);
     }
 
     // Initialize cart
