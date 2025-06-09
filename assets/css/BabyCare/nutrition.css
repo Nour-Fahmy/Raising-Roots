@@ -1,0 +1,169 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f0e8; /* First color */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background-color: #d3bd9a; /* Second color */
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    color: #fff;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Main Content Styling */
+main {
+    padding: 120px 20px 40px;
+    text-align: center;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.nutrition-intro {
+    margin-bottom: 40px;
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+.nutrition-intro h2 {
+    color: #674f04;
+    font-size: 1.8em;
+}
+
+.nutrition-intro p {
+    font-size: 1.1em;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.nutrition-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.nutrition-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 280px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeIn 1.4s ease-in-out;
+}
+
+.nutrition-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card-image {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+}
+
+.breastfeeding-img {
+    background-color: #eacda3; /* Placeholder color */
+}
+
+.formula-img {
+    background-color: #d6eaff; /* Placeholder color */
+}
+
+.solids-img {
+    background-color: #e8f5e9; /* Placeholder color */
+}
+
+.recipes-img {
+    background-color: #fff8e1; /* Placeholder color */
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.card-content h3 {
+    color: #674f04;
+    margin-top: 0;
+}
+
+.card-content p {
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.card-button {
+    display: inline-block;
+    background-color: #d3bd9a;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 500;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.card-button:hover {
+    background-color: #674f04;
+    transform: scale(1.05);
+}
+
+footer {
+    background-color: #d3bd9a;
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    color: #fff;
+    margin-top: 50px;
+}
+
+footer h3 {
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes top-to-bottom {
+    from {
+        transform: translateY(-48px);
+    }
+    to {
+        transform: translateY(0);
+    }
+}

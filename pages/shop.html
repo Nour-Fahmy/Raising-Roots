@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raising Roots Shop</title>
+    <link rel="stylesheet" href="../assets/css/NavFoot.css">
+    <link rel="stylesheet" href="../assets/css/shop.css">
+    <!-- Add Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .navbar {
+            background-color: rgb(94, 56, 41) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="homepage.html" class="logo">
+                <img src="../images/LogoIcon.png" alt="Home">
+            </a>
+        </div>
+        
+        <div class="nav-center">
+            <div class="nav-item">
+                <a href="BabyCare/Baby.html" class="nav-link">Baby Care</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Daily Care</h4>
+                            <a href="BabyCare/nutrition.html">Feeding Guide</a>
+                            <a href="BabyCare/sleep.html">Sleep Schedule</a>
+                            <a href="BabyCare/health.html">Diapering Tips</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Health & Safety</h4>
+                            <a href="#">First Aid</a>
+                            <a href="#">Baby-Proofing</a>
+                            <a href="#">Common Concerns</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Development</h4>
+                            <a href="#">Milestones</a>
+                            <a href="#">Activities</a>
+                            <a href="#">Learning</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="community.html" class="nav-link">Community</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Connect</h4>
+                            <a href="community.html">Find Local Groups</a>
+                            <a href="#">Discussion Forums</a>
+                            <a href="#">Parent Meetups</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Share & Learn</h4>
+                            <a href="#">Success Stories</a>
+                            <a href="#">Tips & Tricks</a>
+                            <a href="#">Photo Gallery</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Events</h4>
+                            <a href="#">Upcoming Events</a>
+                            <a href="#">Workshops</a>
+                            <a href="#">Playgroups</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="community.html#expert-section" class="nav-link">Expert Advice</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Consultations</h4>
+                            <a href="#">Book an Expert</a>
+                            <a href="#">Video Calls</a>
+                            <a href="#">Chat Support</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Resources</h4>
+                            <a href="#">Articles</a>
+                            <a href="#">Research</a>
+                            <a href="#">Guidelines</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Learn</h4>
+                            <a href="#">Webinars</a>
+                            <a href="#">Q&A Sessions</a>
+                            <a href="#">Expert Blog</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="shop.html" class="nav-link">Marketplace</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Essential Care</h4>
+                            <a href="#">Feeding</a>
+                            <a href="#">Diapering</a>
+                            <a href="#">Bath & Skincare</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Clothing & Gear</h4>
+                            <a href="#">Clothing</a>
+                            <a href="#">Strollers</a>
+                            <a href="#">Car Seats</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Play & Learn</h4>
+                            <a href="#">Toys</a>
+                            <a href="#">Books</a>
+                            <a href="#">Educational</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <div class="cart-icon">
+                Cart
+                <span class="cart-count">0</span>
+            </div>
+            <a href="login.html" class="login-btn">Login</a>
+            <a href="login.html" class="signup-btn">Sign Up</a>
+        </div>
+    </nav>
+
+    <!-- Shop Content -->
+    <div class="shop-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <ul class="category-list">
+                <li class="category-item">
+                    <button class="category-button active" data-category="adult">
+                        <i class="fas fa-user"></i>
+                        Adult Products
+                    </button>
+                </li>
+                <li class="category-item">
+                    <button class="category-button" data-category="kids">
+                        <i class="fas fa-baby"></i>
+                        Kids Products
+                    </button>
+                    <ul class="subcategory-list">
+                        <li class="subcategory-item">
+                            <button class="subcategory-button" data-subcategory="boys">
+                                <i class="fas fa-mars"></i>
+                                Boys Products
+                            </button>
+                            <ul class="sub-subcategory-list">
+                                <li class="sub-subcategory-item">
+                                    <button class="sub-subcategory-button" data-sub-subcategory="boys-fashion">
+                                        <i class="fas fa-tshirt"></i>
+                                        Fashion
+                                    </button>
+                                </li>
+                                <li class="sub-subcategory-item">
+                                    <button class="sub-subcategory-button" data-sub-subcategory="boys-toys">
+                                        <i class="fas fa-gamepad"></i>
+                                        Toys
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="subcategory-item">
+                            <button class="subcategory-button" data-subcategory="girls">
+                                <i class="fas fa-venus"></i>
+                                Girls Products
+                            </button>
+                            <ul class="sub-subcategory-list">
+                                <li class="sub-subcategory-item">
+                                    <button class="sub-subcategory-button" data-sub-subcategory="girls-fashion">
+                                        <i class="fas fa-tshirt"></i>
+                                        Fashion
+                                    </button>
+                                </li>
+                                <li class="sub-subcategory-item">
+                                    <button class="sub-subcategory-button" data-sub-subcategory="girls-toys">
+                                        <i class="fas fa-gamepad"></i>
+                                        Toys
+                                    </button>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="subcategory-item">
+                            <button class="subcategory-button" data-subcategory="feeding">
+                                <i class="fas fa-utensils"></i>
+                                Feeding
+                            </button>
+                        </li>
+                        <li class="subcategory-item">
+                            <button class="subcategory-button" data-subcategory="health">
+                                <i class="fas fa-heartbeat"></i>
+                                Health & Care
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Adult Products -->
+            <div class="category-section active" id="adult-products">
+                <h2>Adult Products</h2>
+                <div class="products-grid">
+                    <!-- Product Card 1 -->
+                    <div class="product-card" data-product-id="adult-stroller">
+                        <img src="../images/stroller.png" alt="Adult Product 1" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">Stroller</h3>
+                            <p class="product-description">Comfortable and lightweight stroller with adjustable handle and storage basket.</p>
+                            <p class="product-price">EGP 29.99</p>
+                            <p class="stock-info">In Stock: 15</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                    <!-- Product Card 2 -->
+                    <div class="product-card" data-product-id="adult-baby-holder">
+                        <img src="../images/baby_holder.png" alt="Adult Product 2" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">Baby Holder</h3>
+                            <p class="product-description">Ergonomic baby carrier with multiple carrying positions and adjustable straps.</p>
+                            <p class="product-price">EGP 49.99</p>
+                            <p class="stock-info">In Stock: 10</p>
+                            <button class="add-to-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kids Products Sections -->
+            <section class="category-section" id="kids-section">
+                <!-- Boys Products -->
+                <div class="category-section" id="boys-products">
+                    <h2>Boys Products</h2>
+                    <div class="subcategories">
+                        <div class="subcategory active" data-category="boys-fashion">
+                            <i class="fas fa-tshirt"></i>
+                            <span>Fashion</span>
+                        </div>
+                        <div class="subcategory" data-category="boys-toys">
+                            <i class="fas fa-gamepad"></i>
+                            <span>Toys</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boys Fashion -->
+                <div class="sub-subcategory-section active" id="boys-fashion-section">
+                    <h2 class="category-title">Boys Fashion</h2>
+                    <div class="products-grid">
+                        <div class="product-card" data-product-id="boys-fashion-outfit">
+                            <img src="../images/Beach_set.png" alt="Boys Fashion 1" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Boys Casual Outfit</h3>
+                                <p class="product-description">Comfortable cotton blend casual outfit for everyday wear.</p>
+                                <p class="product-price">EGP 29.99</p>
+                                <p class="stock-info">In Stock: 20</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product-id="boys-formal-wear">
+                            <img src="../images/boy_formal_set.png" alt="Boys Fashion 2" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Boys Formal Wear</h3>
+                                <p class="product-description">Stylish formal wear perfect for special occasions.</p>
+                                <p class="product-price">EGP 39.99</p>
+                                <p class="stock-info">In Stock: 12</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boys Toys -->
+                <div class="sub-subcategory-section" id="boys-toys-section">
+                    <h2 class="category-title">Boys Toys</h2>
+                    <div class="products-grid">
+                        <div class="product-card" data-product-id="boys-lion-doll">
+                            <img src="../images/lion_doll.png" alt="Boys Toys 1" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Lion doll</h3>
+                                <p class="product-description">Soft and cuddly lion plush toy, perfect for playtime.</p>
+                                <p class="product-price">EGP 24.99</p>
+                                <p class="stock-info">In Stock: 25</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product-id="boys-spiderman-gun">
+                            <img src="../images/spiderman_game.png" alt="Boys Toys 2" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Spiderman Gun</h3>
+                                <p class="product-description">Interactive Spiderman-themed water gun for outdoor fun.</p>
+                                <p class="product-price">EGP 19.99</p>
+                                <p class="stock-info">In Stock: 18</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Girls Products -->
+                <div class="category-section" id="girls-products">
+                    <h2>Girls Products</h2>
+                    <div class="subcategories">
+                        <div class="subcategory" data-category="girls-fashion">
+                            <i class="fas fa-tshirt"></i>
+                            <span>Fashion</span>
+                        </div>
+                        <div class="subcategory" data-category="girls-toys">
+                            <i class="fas fa-gamepad"></i>
+                            <span>Toys</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Girls Fashion -->
+                <div class="sub-subcategory-section" id="girls-fashion-section">
+                    <h2 class="category-title">Girls Fashion</h2>
+                    <div class="products-grid">
+                        <div class="product-card" data-product-id="girls-casual-outfit">
+                            <img src="../images/black_whie_girl_dress.png" alt="Girls Fashion 1" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Girls Casual Outfit</h3>
+                                <p class="product-description">Comfortable and stylish casual outfit for everyday wear.</p>
+                                <p class="product-price">EGP 29.99</p>
+                                <p class="stock-info">In Stock: 22</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product-id="girls-party-dress">
+                            <img src="../images/sunshine_dress.png" alt="Girls Fashion 2" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Girls Party Dress</h3>
+                                <p class="product-description">Beautiful party dress with matching accessories.</p>
+                                <p class="product-price">EGP 34.99</p>
+                                <p class="stock-info">In Stock: 15</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Girls Toys -->
+                <div class="sub-subcategory-section" id="girls-toys-section">
+                    <h2 class="category-title">Girls Toys</h2>
+                    <div class="products-grid">
+                        <div class="product-card" data-product-id="girls-doll">
+                            <img src="../images/girl_doll.png" alt="Girls Toys 1" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Girl Doll</h3>
+                                <p class="product-description">Interactive doll with multiple outfits and accessories.</p>
+                                <p class="product-price">EGP 24.99</p>
+                                <p class="stock-info">In Stock: 20</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product-id="girls-house-cubes">
+                            <img src="../images/house_cube.png" alt="Girls Toys 2" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Girl House cubes</h3>
+                                <p class="product-description">Creative building blocks set for constructing doll houses.</p>
+                                <p class="product-price">EGP 29.99</p>
+                                <p class="stock-info">In Stock: 16</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feeding Products -->
+                <div class="subcategory-section" id="feeding-section">
+                    <h2 class="category-title">Feeding Products</h2>
+                    <div class="products-grid">
+                        <div class="product-card" data-product-id="feeding-carrot-jam">
+                            <img src="../images/carrot_jam.png" alt="Feeding Product 1" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Carrot Jam</h3>
+                                <p class="product-description">Natural carrot jam made with organic ingredients.</p>
+                                <p class="product-price">EGP 19.99</p>
+                                <p class="stock-info">In Stock: 30</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product-id="feeding-strawberry-jam">
+                            <img src="../images/strawberry_jam.png" alt="Feeding Product 2" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Strawberry Jam</h3>
+                                <p class="product-description">Delicious strawberry jam made with fresh fruits.</p>
+                                <p class="product-price">EGP 89.99</p>
+                                <p class="stock-info">In Stock: 25</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health & Care Products -->
+                <div class="subcategory-section" id="health-section">
+                    <h2 class="category-title">Health & Care Products</h2>
+                    <div class="products-grid">
+                        <div class="product-card" data-product-id="health-baby-diaper">
+                            <img src="../images/baby_diaper.png" alt="Health Product 1" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Baby Diaber</h3>
+                                <p class="product-description">Gentle and effective baby diaper for sensitive skin.</p>
+                                <p class="product-price">EGP 39.99</p>
+                                <p class="stock-info">In Stock: 40</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                        <div class="product-card" data-product-id="health-baby-powder">
+                            <img src="../images/baby_powder.png" alt="Health Product 2" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-title">Baby Powder</h3>
+                                <p class="product-description">Hypoallergenic baby powder for sensitive skin.</p>
+                                <p class="product-price">EGP 29.99</p>
+                                <p class="stock-info">In Stock: 35</p>
+                                <button class="add-to-cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Shopping Cart -->
+        <div class="cart-container">
+            <div class="cart-header">
+                <h2>Shopping Cart</h2>
+                <button class="close-cart"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items">
+                <!-- Cart items will be loaded here -->
+            </div>
+            <div class="cart-footer">
+                <div class="total-price-container">
+                    <span>Total:</span>
+                    <span class="total-price">EGP 0.00</span>
+                </div>
+                <div class="delivery-date-container">
+                    <span>Estimated Delivery:</span>
+                    <span class="delivery-date">-</span>
+                </div>
+                <button class="checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+
+        <!-- Checkout Form Modal -->
+        <div class="checkout-modal">
+            <div class="checkout-content">
+                <div class="checkout-header">
+                    <h2>Checkout Information</h2>
+                    <button class="close-checkout"><i class="fas fa-times"></i></button>
+                </div>
+                <form id="checkout-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required maxlength="11">
+                        <span class="error-message" id="phoneError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apartment">Apartment/Home Number</label>
+                        <input type="number" id="apartment" name="apartment">
+                        <span class="error-message" id="apartmentError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <div class="payment-options">
+                            <label class="radio-label">
+                                <input type="radio" name="payment" value="cash" checked>
+                                Cash on Delivery
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="payment" value="card">
+                                Credit Card
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group credit-card-fields" style="display: none;">
+                        <label>Credit Card Details</label>
+                        <div class="form-row">
+                            <div class="form-group card-number">
+                                <label for="cardNumber">Card Number</label>
+                                <input type="text" id="cardNumber" name="cardNumber" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}" required>
+                                <span class="error-message" id="cardNumberError"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardName">Name on Card</label>
+                            <input type="text" id="cardName" name="cardName" required>
+                            <span class="error-message" id="cardNameError"></span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group expiry-cvv">
+                                <label for="expiryDate">Expiry Date (MM/YY)</label>
+                                <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                                <span class="error-message" id="expiryDateError"></span>
+                            </div>
+                            <div class="form-group expiry-cvv">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" name="cvv" placeholder="XXX" maxlength="3" required>
+                                <span class="error-message" id="cvvError"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="place-order-btn">Place Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="orderSuccessMessage" class="order-success-message" style="display: none;">
+        <i class="fas fa-check-circle"></i>
+        <p>Order placed successfully!</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Raising Roots. All rights reserved.</p>
+        <p>
+        <a href="about-us.html">About Us</a> |
+          <a href="#">Facebook</a> |
+          <a href="#">Instagram</a> |
+          <a href="#">Twitter</a>
+        </p>
+        <p>
+          Download our app:
+          <a href="#">Google Play</a> |
+          <a href="#">App Store</a>
+        </p>
+      </footer>
+    
+
+    <!-- JavaScript -->
+    <script src="../assets/js/shop.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Raising Roots</title>
+    <link rel="stylesheet" href="../assets/css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Simple Navigation with Logo and Title -->
+    <nav class="simple-nav">
+        <div class="nav-content">
+            <a href="../pages/homepage.html" class="logo">
+                <img src="../images/LogoIcon.png" alt="Raising Roots">
+            </a>
+            <h1 class="nav-title">Profile</h1>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="../images/default-avatar.png" alt="Profile Picture" id="profilePicture">
+                <button class="change-avatar-btn" onclick="document.getElementById('avatarInput').click()">
+                    <i class="fas fa-camera"></i>
+                </button>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none">
+            </div>
+            <h2 id="username">Loading...</h2>
+            <p id="userEmail">Loading...</p>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-section">
+                <h2>Account Information</h2>
+                <div class="info-display">
+                    <div class="info-item">
+                        <label>Display Name</label>
+                        <p id="displayNameDisplay">Loading...</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Email</label>
+                        <p id="emailDisplay">Loading...</p>
+                    </div>
+                </div>
+                <form id="profileForm" class="edit-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="displayName">Display Name</label>
+                        <input type="text" id="displayName" name="displayName">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" readonly>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="save-btn">Save Changes</button>
+                        <button type="button" class="cancel-btn" onclick="toggleEdit('profile')">Cancel</button>
+                    </div>
+                </form>
+                <button class="edit-btn" onclick="toggleEdit('profile')">Edit Information</button>
+            </div>
+
+            <div class="profile-section">
+                <h2>Baby Information</h2>
+                <div class="info-display">
+                    <div class="info-item">
+                        <label>Baby's Name</label>
+                        <p id="babyNameDisplay">Loading...</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Baby's Gender</label>
+                        <p id="babyGenderDisplay">Loading...</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Birth Date</label>
+                        <p id="birthDateDisplay">Loading...</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Age</label>
+                        <p id="ageDisplay">Loading...</p>
+                    </div>
+                </div>
+                <form id="babyForm" class="edit-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="babyName">Baby's Name</label>
+                        <input type="text" id="babyName" name="babyName">
+                    </div>
+                    <div class="form-group">
+                        <label>Baby's Gender</label>
+                        <div class="gender-options">
+                            <label class="gender-option">
+                                <input type="radio" name="babyGender" value="male">
+                                <span>Boy</span>
+                            </label>
+                            <label class="gender-option">
+                                <input type="radio" name="babyGender" value="female">
+                                <span>Girl</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="birthDate">Birth Date</label>
+                        <input type="date" id="birthDate" name="birthDate">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="save-btn">Update Baby Info</button>
+                        <button type="button" class="cancel-btn" onclick="toggleEdit('baby')">Cancel</button>
+                    </div>
+                </form>
+                <button class="edit-btn" onclick="toggleEdit('baby')">Edit Baby Info</button>
+            </div>
+
+            <div class="profile-section">
+                <h2>Security</h2>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword">
+                    </div>
+                    <button type="submit" class="save-btn">Change Password</button>
+                </form>
+                <div class="logout-section">
+                    <button id="logoutBtn" class="logout-btn" onclick="handleLogout(event)">Logout</button>
+                </div>
+            </div>
+
+            <div class="profile-section danger-zone">
+                <h2>Danger Zone</h2>
+                <button id="deleteAccount" class="delete-btn">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/profile.js"></script>
+</body>
+</html> 
