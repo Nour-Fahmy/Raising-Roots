@@ -12,73 +12,278 @@
 <body>
   <header class="main-header">
     <div class="header-content">
-      <h1>Raising Roots Community</h1>
-      <p>Connect, share, and grow together.</p>
+      <a href="homepage.html" class="logo">
+        <img src="../images/LogoIcon.png" alt="Raising Roots">
+      </a>
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search in Raising Roots...">
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" aria-label="Toggle Theme">🌙</button>
+        <a href="#" class="profile-link" onclick="showProfileMenu(); return false;">
+          <img src="../images/default-avatar.png" alt="Profile" class="profile-pic">
+        </a>
+      </div>
     </div>
-    <button id="theme-toggle" aria-label="Toggle Theme">🌙</button>
   </header>
 
   <main class="community-container">
-    <!-- Channel Selector Section -->
-    <section id="channel-selector" class="channel-options">
-      <h2>Choose a Chat Channel 💬</h2>
-      <div class="channel-buttons">
-        <button class="channel-btn" onclick="selectChannel('community')">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" onclick="showCommunityPosts()">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" onclick="selectChannel('community')">
           <i class="fas fa-users"></i>
           <span>Community Chat</span>
-        </button>
-        <button class="channel-btn" onclick="selectChannel('expert')">
+        </a>
+        <a href="#" class="nav-item" onclick="selectChannel('expert')">
           <i class="fas fa-user-md"></i>
           <span>Expert Advice</span>
-        </button>
-        <button class="channel-btn" onclick="selectChannel('dm')">
+        </a>
+        <a href="#" class="nav-item" onclick="selectChannel('dm')">
           <i class="fas fa-envelope"></i>
           <span>Direct Message</span>
-        </button>
-      </div>
-    </section>
+        </a>
+        <a href="#" class="nav-item" onclick="showSavedPosts()">
+          <i class="fas fa-bookmark"></i>
+          <span>Saved</span>
+        </a>
+      </nav>
+    </aside>
 
-    <!-- Community Chat Section -->
-    <section id="community-section" class="chat-section hidden">
-      <div class="chat-header">
-        <button class="back-button" onclick="goBackToChannels()">← Back</button>
-        <h2>🌱 Community Chat</h2>
-      </div>
-      <div class="chat-box">
-        <div class="messages" id="community-messages"></div>
-        <div class="chat-input">
-          <input type="text" id="community-input" placeholder="Type your message..." />
-          <button onclick="sendMessage('community')">Send</button>
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Community Posts Section (Default View) -->
+      <section id="community-posts" class="posts-section">
+        <div class="posts-header">
+          <h2>Community Posts 📝</h2>
+          <button class="create-post-btn" onclick="showCreatePostForm()">
+            <i class="fas fa-plus"></i> Create Post
+          </button>
         </div>
-      </div>
-    </section>
 
-    <!-- Expert Chat Section -->
-    <section id="expert-section" class="expert-section hidden">
-      <div class="chat-header">
-        <button class="back-button" onclick="goBackToChannels()">← Back</button>
-        <h2>👩‍⚕️ Expert Advice</h2>
-      </div>
-      <div class="expert-box">
-        <div class="messages" id="expert-messages"></div>
-        <div class="chat-input">
-          <input type="text" id="expert-input" placeholder="Ask an expert..." />
-          <button onclick="sendMessage('expert')">Send</button>
+        <!-- Create Post Form (Hidden by default) -->
+        <div id="create-post-form" class="create-post-form hidden">
+          <form onsubmit="submitPost(event)">
+            <div class="form-group">
+              <label for="post-title">Title</label>
+              <input type="text" id="post-title" required placeholder="Enter post title">
+            </div>
+            <div class="form-group">
+              <label for="post-content">Content</label>
+              <textarea id="post-content" required placeholder="Share your thoughts..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="post-category">Category</label>
+              <select id="post-category" required>
+                <option value="">Select a category</option>
+                <option value="parenting-tips">Parenting Tips</option>
+                <option value="questions">Questions</option>
+                <option value="experiences">Experiences</option>
+                <option value="advice">Advice</option>
+              </select>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="submit-btn">Post</button>
+              <button type="button" class="cancel-btn" onclick="hideCreatePostForm()">Cancel</button>
+            </div>
+          </form>
         </div>
-      </div>
-    </section>
 
-    <!-- DM Section -->
-    <section id="dm-section" class="chat-section hidden">
-      <div class="chat-header">
-        <button class="back-button" onclick="goBackToChannels()">← Back</button>
-        <h2>💌 Direct Message</h2>
-      </div>
-      <div class="coming-soon">
-        <i class="fas fa-tools"></i>
-        <p>This feature is coming soon! 🚧</p>
-      </div>
-    </section>
+        <!-- Posts Grid -->
+        <div class="posts-grid" id="posts-container">
+          <!-- Sample Post 1 -->
+          <article class="post-card">
+            <div class="post-header">
+              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
+              <div class="post-info">
+                <h3>Tips for Better Sleep Training</h3>
+                <div class="post-meta">
+                  <span class="author">Sarah Johnson</span>
+                  <span class="date">2 hours ago</span>
+                  <span class="category">Parenting Tips</span>
+                </div>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>Here are some effective sleep training methods that worked for my 6-month-old. We started with a consistent bedtime routine and gradually reduced night feedings. The key was staying consistent and patient. Would love to hear your experiences!</p>
+            </div>
+            <div class="post-actions">
+              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
+              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
+              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
+              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
+            </div>
+          </article>
+
+          <!-- Sample Post 2 -->
+          <article class="post-card">
+            <div class="post-header">
+              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
+              <div class="post-info">
+                <h3>First Time Mom - Need Advice!</h3>
+                <div class="post-meta">
+                  <span class="author">Emily Parker</span>
+                  <span class="date">5 hours ago</span>
+                  <span class="category">Questions</span>
+                </div>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>Hi everyone! I'm a first-time mom to a beautiful 2-month-old baby girl. I'm looking for advice on introducing solid foods. When did you start? What were your baby's first foods? Any tips on making this transition smooth?</p>
+            </div>
+            <div class="post-actions">
+              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
+              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
+              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
+              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
+            </div>
+          </article>
+
+          <!-- Sample Post 3 -->
+          <article class="post-card">
+            <div class="post-header">
+              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
+              <div class="post-info">
+                <h3>Our Baby's First Steps! 🎉</h3>
+                <div class="post-meta">
+                  <span class="author">Michael Chen</span>
+                  <span class="date">1 day ago</span>
+                  <span class="category">Experiences</span>
+                </div>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>Today was a milestone day! Our little one took their first steps! It's amazing to see how quickly they grow and develop. To all the parents out there, cherish every moment - they grow up so fast! What was your baby's first milestone?</p>
+            </div>
+            <div class="post-actions">
+              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
+              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
+              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
+              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
+            </div>
+          </article>
+
+          <!-- Sample Post 4 -->
+          <article class="post-card">
+            <div class="post-header">
+              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
+              <div class="post-info">
+                <h3>Dealing with Teething</h3>
+                <div class="post-meta">
+                  <span class="author">Lisa Thompson</span>
+                  <span class="date">3 days ago</span>
+                  <span class="category">Advice</span>
+                </div>
+              </div>
+            </div>
+            <div class="post-content">
+              <p>My 8-month-old is teething and it's been quite challenging. Here are some remedies that helped us: cold teething rings, gentle gum massage, and lots of cuddles! What worked for your little ones during teething?</p>
+            </div>
+            <div class="post-actions">
+              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
+              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
+              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
+              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Community Chat Section -->
+      <section id="community-section" class="chat-section hidden">
+        <div class="chat-header">
+          <h2>🌱 Community Chat</h2>
+        </div>
+        <div class="chat-box">
+          <div class="messages" id="community-messages"></div>
+          <div class="chat-input">
+            <input type="text" id="community-input" placeholder="Type your message..." />
+            <button onclick="sendMessage('community')">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Expert Chat Section -->
+      <section id="expert-section" class="expert-section hidden">
+        <div class="chat-header">
+          <h2>👩‍⚕️ Expert Advice</h2>
+        </div>
+        <div class="expert-box">
+          <div class="messages" id="expert-messages"></div>
+          <div class="chat-input">
+            <input type="text" id="expert-input" placeholder="Ask an expert..." />
+            <button onclick="sendMessage('expert')">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DM Section -->
+      <section id="dm-section" class="chat-section hidden">
+        <div class="chat-header">
+          <h2>💌 Direct Message</h2>
+        </div>
+        <div class="dm-container">
+          <!-- User List -->
+          <div class="user-list">
+            <div class="search-users">
+              <input type="text" placeholder="Search users..." onkeyup="searchUsers(this.value)">
+            </div>
+            <div class="users">
+              <div class="user-item active" onclick="selectUser(this, 'Sarah Johnson')">
+                <img src="../images/default-avatar.png" alt="Sarah Johnson">
+                <div class="user-info">
+                  <h4>Sarah Johnson</h4>
+                  <p class="status online">Online</p>
+                </div>
+              </div>
+              <div class="user-item" onclick="selectUser(this, 'Dr. Emily Chen')">
+                <img src="../images/default-avatar.png" alt="Dr. Emily Chen">
+                <div class="user-info">
+                  <h4>Dr. Emily Chen</h4>
+                  <p class="status">Last seen 5m ago</p>
+                </div>
+              </div>
+              <div class="user-item" onclick="selectUser(this, 'Mike Wilson')">
+                <img src="../images/default-avatar.png" alt="Mike Wilson">
+                <div class="user-info">
+                  <h4>Mike Wilson</h4>
+                  <p class="status">Last seen 1h ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Chat Area -->
+          <div class="dm-chat">
+            <div class="chat-placeholder">
+              <i class="fas fa-comments"></i>
+              <p>Select a user to start chatting</p>
+            </div>
+            <div class="chat-messages hidden">
+              <div class="messages" id="dm-messages"></div>
+              <div class="chat-input">
+                <input type="text" id="dm-input" placeholder="Type your message..." />
+                <button onclick="sendDMMessage()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Saved Posts Section -->
+      <section id="saved-posts-section" class="posts-section hidden">
+        <div class="posts-header">
+          <h2>Saved Posts <i class="fas fa-bookmark"></i></h2>
+        </div>
+        <div class="posts-grid" id="saved-posts-container">
+          <!-- Saved posts will be loaded here by JS -->
+        </div>
+      </section>
+    </div>
   </main>
 
   <script src="../assets/js/community.js"></script>
