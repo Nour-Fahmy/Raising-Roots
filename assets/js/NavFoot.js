@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadNavigation() {
+    console.log('loadNavigation function called.'); // Added for debugging
     const navPlaceholder = document.getElementById('nav-placeholder');
     if (!navPlaceholder) return;
 
@@ -36,8 +37,8 @@ async function loadNavigation() {
     const navHtml = `
         <nav class="navbar">
             <div class="nav-left">
-                <a href="/pages/homepage.html" class="logo">
-                    <img src="/images/LogoIcon.png" alt="Home">
+                <a href="homepage.html" class="logo">
+                    <img src="../images/LogoIcon.png" alt="Home">
                 </a>
             </div>
             
@@ -138,21 +139,21 @@ async function loadNavigation() {
                 ${isLoggedIn ? `
                     <div class="profile-dropdown">
                         <button class="profile-btn">
-                            <img src="${userData?.profilePicture || '/images/default-avatar.png'}" 
+                            <img src="${userData?.profilePicture || '../images/default-avatar.png'}" 
                                  alt="Profile" 
                                  class="profile-img">
                             <span>${userData?.username || 'Profile'}</span>
                         </button>
                         <div class="dropdown-content">
-                            <a href="/pages/profile.html">View Profile</a>
-                            <a href="/pages/profile.html#baby-info">Baby's Profile</a>
-                            <a href="/pages/shop.html">My Orders</a>
+                            <a href="profile.html">View Profile</a>
+                            <a href="profile.html#baby-info">Baby's Profile</a>
+                            <a href="shop.html">My Orders</a>
                             <a href="#" onclick="window.handleLogout(event)">Logout</a>
                         </div>
                     </div>
                 ` : `
-                    <a href="/pages/login.html" class="login-btn">Login</a>
-                    <a href="/pages/login.html" class="signup-btn">Sign Up</a>
+                    <a href="login.html" class="login-btn">Login</a>
+                    <a href="signup.html" class="signup-btn">Sign Up</a>
                 `}
             </div>
         </nav>
