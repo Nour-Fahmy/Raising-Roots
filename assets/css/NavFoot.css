@@ -12,13 +12,13 @@ body {
 
 /* Navigation Bar Styles */
 .navbar {
-    position: absolute; /* Changed from relative to absolute */
+    position: absolute; 
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color: transparent; /* Changed from rgba(255, 255, 255, 0.9) to transparent */
+    background-color: transparent; 
     z-index: 1000;
 }
 
@@ -49,10 +49,9 @@ body {
 }
 
 .nav-link:hover {
-    color: #c4717b; /* Changed hover color to yellow for better visibility */
+    color: #c4717b; 
 }
 
-/* Enhanced Dropdown Styles */
 .dropdown {
     position: fixed;
     top: 80px;
