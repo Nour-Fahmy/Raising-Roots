@@ -262,4 +262,70 @@ function updateRecentActivity() {
             </div>
         `).join('');
     }
-} 
+}
+
+// Category Selection Logic
+document.addEventListener('DOMContentLoaded', function() {
+    const productCategory = document.getElementById('productCategory');
+    const subcategoryGroup = document.getElementById('subcategoryGroup');
+    const subSubcategoryGroup = document.getElementById('subSubcategoryGroup');
+    const productSubcategory = document.getElementById('productSubcategory');
+    const productSubSubcategory = document.getElementById('productSubSubcategory');
+
+    // Handle main category selection
+    productCategory.addEventListener('change', function() {
+        const selectedCategory = this.value;
+        
+        // Reset subcategory and sub-subcategory
+        productSubcategory.value = '';
+        productSubSubcategory.value = '';
+        
+        if (selectedCategory === 'kids') {
+            subcategoryGroup.style.display = 'block';
+            subSubcategoryGroup.style.display = 'none';
+        } else {
+            subcategoryGroup.style.display = 'none';
+            subSubcategoryGroup.style.display = 'none';
+        }
+    });
+
+    // Handle subcategory selection
+    productSubcategory.addEventListener('change', function() {
+        const selectedSubcategory = this.value;
+        
+        // Reset sub-subcategory
+        productSubSubcategory.value = '';
+        
+        if (selectedSubcategory === 'boys' || selectedSubcategory === 'girls') {
+            subSubcategoryGroup.style.display = 'block';
+        } else {
+            subSubcategoryGroup.style.display = 'none';
+        }
+    });
+
+    // Filter sub-subcategory options based on selected subcategory
+    productSubcategory.addEventListener('change', function() {
+        const selectedSubcategory = this.value;
+        const subSubcategoryOptions = productSubSubcategory.options;
+        
+        // Hide all options first
+        for (let i = 0; i < subSubcategoryOptions.length; i++) {
+            subSubcategoryOptions[i].style.display = 'none';
+        }
+        
+        // Show relevant options based on subcategory
+        if (selectedSubcategory === 'boys') {
+            for (let i = 0; i < subSubcategoryOptions.length; i++) {
+                if (subSubcategoryOptions[i].value.startsWith('boys-')) {
+                    subSubcategoryOptions[i].style.display = '';
+                }
+            }
+        } else if (selectedSubcategory === 'girls') {
+            for (let i = 0; i < subSubcategoryOptions.length; i++) {
+                if (subSubcategoryOptions[i].value.startsWith('girls-')) {
+                    subSubcategoryOptions[i].style.display = '';
+                }
+            }
+        }
+    });
+}); 

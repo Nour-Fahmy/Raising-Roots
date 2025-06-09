@@ -178,9 +178,28 @@
                             <label for="productCategory"><i class="fas fa-list"></i> Category</label>
                             <select id="productCategory" required>
                                 <option value="">Select Category</option>
-                                <option value="products">Baby Products</option>
-                                <option value="clothing">Clothing</option>
-                                <option value="toys">Toys</option>
+                                <option value="adult">Adult Products</option>
+                                <option value="kids">Kids Products</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="subcategoryGroup" style="display: none;">
+                            <label for="productSubcategory"><i class="fas fa-list"></i> Subcategory</label>
+                            <select id="productSubcategory">
+                                <option value="">Select Subcategory</option>
+                                <option value="boys">Boys Products</option>
+                                <option value="girls">Girls Products</option>
+                                <option value="feeding">Feeding</option>
+                                <option value="health">Health & Care</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="subSubcategoryGroup" style="display: none;">
+                            <label for="productSubSubcategory"><i class="fas fa-list"></i> Sub-subcategory</label>
+                            <select id="productSubSubcategory">
+                                <option value="">Select Sub-subcategory</option>
+                                <option value="boys-fashion">Fashion</option>
+                                <option value="boys-toys">Toys</option>
+                                <option value="girls-fashion">Fashion</option>
+                                <option value="girls-toys">Toys</option>
                             </select>
                         </div>
                         <div class="form-actions">
@@ -199,9 +218,16 @@
                         </div>
                         <select id="categoryFilter" class="filter-select">
                             <option value="all">All Categories</option>
-                            <option value="products">Baby Products</option>
-                            <option value="clothing">Clothing</option>
-                            <option value="toys">Toys</option>
+                            <option value="adult">Adult Products</option>
+                            <option value="kids">Kids Products</option>
+                            <option value="boys">Boys Products</option>
+                            <option value="girls">Girls Products</option>
+                            <option value="feeding">Feeding</option>
+                            <option value="health">Health & Care</option>
+                            <option value="boys-fashion">Boys Fashion</option>
+                            <option value="boys-toys">Boys Toys</option>
+                            <option value="girls-fashion">Girls Fashion</option>
+                            <option value="girls-toys">Girls Toys</option>
                         </select>
                     </div>
                     <div class="product-grid" id="productsGrid">
