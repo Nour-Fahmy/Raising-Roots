@@ -153,7 +153,7 @@ async function loadNavigation() {
                     </div>
                 ` : `
                     <a href="login.html" class="login-btn">Login</a>
-                    <a href="signup.html" class="signup-btn">Sign Up</a>
+                    <a href="login.html" class="signup-btn">Sign Up</a>
                 `}
             </div>
         </nav>
