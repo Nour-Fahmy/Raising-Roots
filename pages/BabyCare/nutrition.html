@@ -3,31 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nutrition Page</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- External CSS file link -->
+    <title>Nutrition Guide - Raising Roots</title>
+    <link rel="stylesheet" href="../../assets/css/NavFoot.css">
     <link rel="stylesheet" href="../../assets/css/BabyCare/nutrition.css">
+    <style>
+        .navbar {
+            background-color: rgb(94, 56, 41) !important;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Infant Nutrition Guide</h1>
-    </header>
-    
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="../homepage.html" class="logo">
+                <img src="../../images/LogoIcon.png" alt="Home">
+            </a>
+        </div>
+        
+        <div class="nav-center">
+            <div class="nav-item">
+                <a href="./Baby.html" class="nav-link">Baby Care</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Daily Care</h4>
+                            <a href="./nutrition.html">Feeding Guide</a>
+                            <a href="./sleep.html">Sleep Schedule</a>
+                            <a href="./health.html">Diapering Tips</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Health & Safety</h4>
+                            <a href="#">First Aid</a>
+                            <a href="#">Baby-Proofing</a>
+                            <a href="#">Common Concerns</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Development</h4>
+                            <a href="#">Milestones</a>
+                            <a href="#">Activities</a>
+                            <a href="#">Learning</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="../community.html" class="nav-link">Community</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Connect</h4>
+                            <a href="../community.html">Find Local Groups</a>
+                            <a href="#">Discussion Forums</a>
+                            <a href="#">Parent Meetups</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Share & Learn</h4>
+                            <a href="#">Success Stories</a>
+                            <a href="#">Tips & Tricks</a>
+                            <a href="#">Photo Gallery</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Events</h4>
+                            <a href="#">Upcoming Events</a>
+                            <a href="#">Workshops</a>
+                            <a href="#">Playgroups</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">Expert Advice</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Consultations</h4>
+                            <a href="#">Book an Expert</a>
+                            <a href="#">Video Calls</a>
+                            <a href="#">Chat Support</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Resources</h4>
+                            <a href="#">Articles</a>
+                            <a href="#">Research</a>
+                            <a href="#">Guidelines</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Learn</h4>
+                            <a href="#">Webinars</a>
+                            <a href="#">Q&A Sessions</a>
+                            <a href="#">Expert Blog</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">Marketplace</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Essential Care</h4>
+                            <a href="#">Feeding</a>
+                            <a href="#">Diapering</a>
+                            <a href="#">Bath & Skincare</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Clothing & Gear</h4>
+                            <a href="#">Clothing</a>
+                            <a href="#">Strollers</a>
+                            <a href="#">Car Seats</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Play & Learn</h4>
+                            <a href="#">Toys</a>
+                            <a href="#">Books</a>
+                            <a href="#">Educational</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <a href="../pages/BabyCare/login.html" class="login-btn">Login</a>
+            <a href="../pages/BabyCare/login.html" class="signup-btn">Sign Up</a>
+        </div>
+    </nav>
+
     <main>
         <div class="nutrition-intro">
-            <h2>Supporting Your Baby's Healthy Development</h2>
-            <p>Discover expert guidance on feeding options for your baby's growth and development from newborn to toddler stages.</p>
+            <h2>Baby Nutrition Guide</h2>
+            <p>Essential information about feeding your baby, from breastfeeding to introducing solid foods.</p>
         </div>
         
         <div class="nutrition-cards">
             <div class="nutrition-card">
                 <div class="card-image breastfeeding-img"></div>
                 <div class="card-content">
-                    <h3>Breastfeeding</h3>
-                    <p>Tips and advice on successful breastfeeding, common challenges, and benefits for both mother and baby.</p>
-                    <a href="#breastfeeding" class="card-button">Learn More</a>
+                    <h3>Breastfeeding Basics</h3>
+                    <p>Learn about proper latching, feeding schedules, and common breastfeeding challenges.</p>
+                    <a href="#breastfeeding-basics" class="card-button">Learn More</a>
                 </div>
             </div>
             
@@ -35,7 +150,7 @@
                 <div class="card-image formula-img"></div>
                 <div class="card-content">
                     <h3>Formula Feeding</h3>
-                    <p>Information on types of baby formulas, when to switch, feeding schedules, and preparation techniques.</p>
+                    <p>Guidance on choosing and preparing formula, feeding schedules, and bottle feeding techniques.</p>
                     <a href="#formula-feeding" class="card-button">Learn More</a>
                 </div>
             </div>
@@ -44,25 +159,93 @@
                 <div class="card-image solids-img"></div>
                 <div class="card-content">
                     <h3>Introducing Solids</h3>
-                    <p>A comprehensive guide on when and how to start introducing solid foods, with month-by-month recommendations.</p>
+                    <p>When and how to start solid foods, including purees, finger foods, and baby-led weaning.</p>
                     <a href="#introducing-solids" class="card-button">Learn More</a>
                 </div>
             </div>
-            
-            <div class="nutrition-card">
-                <div class="card-image recipes-img"></div>
-                <div class="card-content">
-                    <h3>Baby Food Recipes</h3>
-                    <p>Easy, healthy, and safe recipes for babies at different stages, from first purées to finger foods and beyond.</p>
-                    <a href="#baby-food-recipes" class="card-button">Learn More</a>
-                </div>
-            </div>
         </div>
+
+        <!-- Bookmarked Sections -->
+        <section id="breastfeeding-basics" class="content-section">
+            <h2>Breastfeeding Basics</h2>
+            <div class="section-content">
+                <h3>Getting Started with Breastfeeding</h3>
+                <p>Breastfeeding is a natural way to feed your baby, but it can take time to learn. Here are some essential tips:</p>
+                <ul>
+                    <li>Find a comfortable position for both you and your baby</li>
+                    <li>Ensure proper latching technique</li>
+                    <li>Feed on demand in the early weeks</li>
+                    <li>Stay hydrated and maintain a healthy diet</li>
+                </ul>
+                <h3>Common Challenges</h3>
+                <p>Many mothers face challenges while breastfeeding. Here's how to handle them:</p>
+                <ul>
+                    <li>Sore nipples - Use lanolin cream and ensure proper positioning</li>
+                    <li>Low milk supply - Nurse frequently and stay hydrated</li>
+                    <li>Engorgement - Use warm compresses and gentle massage</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="formula-feeding" class="content-section">
+            <h2>Formula Feeding Guide</h2>
+            <div class="section-content">
+                <h3>Choosing the Right Formula</h3>
+                <p>There are several types of formula available:</p>
+                <ul>
+                    <li>Standard cow's milk-based formula</li>
+                    <li>Soy-based formula</li>
+                    <li>Hypoallergenic formula</li>
+                    <li>Specialized formulas for specific needs</li>
+                </ul>
+                <h3>Preparing and Storing Formula</h3>
+                <p>Follow these guidelines for safe formula preparation:</p>
+                <ul>
+                    <li>Always wash your hands before preparation</li>
+                    <li>Use clean, sterilized bottles</li>
+                    <li>Follow the package instructions exactly</li>
+                    <li>Store prepared formula properly</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="introducing-solids" class="content-section">
+            <h2>Introducing Solid Foods</h2>
+            <div class="section-content">
+                <h3>When to Start Solids</h3>
+                <p>Most babies are ready for solid foods around 6 months. Look for these signs:</p>
+                <ul>
+                    <li>Can sit up with support</li>
+                    <li>Shows interest in food</li>
+                    <li>Can hold head steady</li>
+                    <li>Has lost the tongue-thrust reflex</li>
+                </ul>
+                <h3>First Foods to Try</h3>
+                <p>Start with these simple, single-ingredient foods:</p>
+                <ul>
+                    <li>Iron-fortified single-grain cereal</li>
+                    <li>Pureed vegetables (sweet potato, carrots)</li>
+                    <li>Pureed fruits (banana, avocado)</li>
+                    <li>Pureed meats</li>
+                </ul>
+            </div>
+        </section>
     </main>
     
-    <footer>
-        <h3>Consult with your pediatrician before making changes to your baby's diet</h3>
-        <p>© 2025 Infant Nutrition Guide - All Rights Reserved</p>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Raising Roots. All rights reserved.</p>
+        <p>
+            <a href="../about-us.html">About Us</a> |
+            <a href="#">Facebook</a> |
+            <a href="#">Instagram</a> |
+            <a href="#">Twitter</a>
+        </p>
+        <p>
+            Download our app:
+            <a href="#">Google Play</a> |
+            <a href="#">App Store</a>
+        </p>
     </footer>
 </body>
 </html>

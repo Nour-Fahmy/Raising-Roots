@@ -38,46 +38,107 @@ main {
 
 /* Baby Care Section */
 .baby-care {
+    padding: 120px 20px 40px;
     text-align: center;
-    margin: 20px 0;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.baby-care h2 {
+.baby-intro {
+    margin-bottom: 40px;
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+.baby-intro h2 {
+    color: #674f04;
     font-size: 1.8em;
-    color: #a28f70; /* Third color */
 }
 
-.care-container {
-    display: flex; /* Change to row layout */
-    flex-wrap: wrap; /* Allow wrapping if needed */
-    justify-content: center; /* Center buttons horizontally */
-    gap: 30px; /* Space between buttons */
-    padding: 40px; /* Add padding */
-    margin-top: 170px; /* Move buttons further down */
+.baby-intro p {
+    font-size: 1.1em;
+    max-width: 700px;
+    margin: 0 auto;
 }
 
-.care-item {
+.baby-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.baby-card {
     background-color: #fff;
-    border: 2px solid #d3bd9a; /* Soft contrast border */
-    border-radius: 28% 72% 34% 66% / 87% 40% 60% 13%; /* Custom shape */
-    padding: 20px 30px; /* Button padding */
-    width: 300px; /* Button width */
-    font-size: 1.2em; /* Font size */
-    font-weight: 600;
-    color: #674f04; /* Fourth color */
-    text-align: center;
-    text-decoration: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 280px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeIn 1.4s ease-in-out;
     cursor: pointer;
-    display: inline-block;
 }
 
-.care-item:hover {
+.baby-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card-image {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+}
+
+.nutrition-img {
+    background-image: url('../../images/BabyCare/nutrition.png');
+    background-color: #eacda3;
+}
+
+.sleep-img {
+    background-image: url('../../images/BabyCare/sleep.png');
+    background-color: #d6eaff;
+}
+
+.health-img {
+    background-image: url('../../images/BabyCare/health.png');
+    background-color: #e8f5e9;
+}
+
+.safety-img {
+    background-image: url('../../images/BabyCare/safety.png');
+    background-color: #fff8e1;
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.card-content h3 {
+    color: #674f04;
+    margin-top: 0;
+}
+
+.card-content p {
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+.card-button {
+    display: inline-block;
     background-color: #d3bd9a;
     color: #fff;
-    transform: scale(1.1); /* Slightly increase hover scale */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 500;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.card-button:hover {
+    background-color: #674f04;
+    transform: scale(1.05);
 }
 
 /* Animations */
@@ -109,6 +170,30 @@ main {
 .container-bottom-to-up {
     overflow: hidden;
     margin: 0px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .baby-care {
+        padding: 100px 15px 30px;
+    }
+
+    .baby-intro h2 {
+        font-size: 1.5em;
+    }
+
+    .baby-intro p {
+        font-size: 1em;
+    }
+
+    .baby-cards {
+        gap: 20px;
+    }
+
+    .baby-card {
+        width: 100%;
+        max-width: 320px;
+    }
 }
 
 

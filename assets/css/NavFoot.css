@@ -187,6 +187,36 @@ body {
 .nav-right {
     display: flex;
     gap: 1rem;
+    align-items: center;
+}
+
+.login-btn, .signup-btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.login-btn {
+    color: white;
+    border: 2px solid white;
+}
+
+.login-btn:hover {
+    background-color: white;
+    color: rgb(94, 56, 41);
+}
+
+.signup-btn {
+    background-color: white;
+    color: rgb(94, 56, 41);
+    border: 2px solid white;
+}
+
+.signup-btn:hover {
+    background-color: transparent;
+    color: white;
 }
 
 /* Profile Dropdown Styles */
@@ -292,9 +322,17 @@ body {
     background-color: rgb(94, 56, 41);
     color: white;
     text-align: center;
-    padding: 10px;
+    padding: 20px 0;
     margin-top: auto;
     font-size: 14px;
+    width: 100%;
+    position: relative;
+    left: 0;
+    right: 0;
+}
+
+.footer p {
+    margin: 10px 0;
 }
 
 .footer a {
@@ -302,9 +340,11 @@ body {
     text-decoration: none;
     font-weight: bold;
     margin: 0 10px;
+    transition: color 0.3s ease;
 }
 
 .footer a:hover {
+<<<<<<< HEAD
     text-decoration: underline;
 }
 
@@ -355,4 +395,7 @@ body {
     .dropdown-inner {
         grid-template-columns: 1fr;
     }
+=======
+    color: #ffd700;
+>>>>>>> 1ed07e4af0d55db0ba87d5c6b326286064d8adeb
 }
