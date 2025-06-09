@@ -328,4 +328,257 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-}); 
+});
+
+// Expert Applications Management
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize expert applications functionality
+    initExpertApplications();
+});
+
+function initExpertApplications() {
+    const searchInput = document.getElementById('searchApplications');
+    const statusFilter = document.getElementById('applicationStatus');
+    const applicationsGrid = document.querySelector('.applications-grid');
+
+    // Search functionality
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filterApplications(searchTerm, statusFilter.value);
+    });
+
+    // Status filter functionality
+    statusFilter.addEventListener('change', function(e) {
+        const status = e.target.value;
+        filterApplications(searchInput.value.toLowerCase(), status);
+    });
+
+    // Handle application actions
+    applicationsGrid.addEventListener('click', function(e) {
+        const target = e.target;
+        
+        // Approve application
+        if (target.classList.contains('approve-btn') || target.closest('.approve-btn')) {
+            const card = target.closest('.application-card');
+            handleApplicationAction(card, 'approve');
+        }
+        
+        // Reject application
+        if (target.classList.contains('reject-btn') || target.closest('.reject-btn')) {
+            const card = target.closest('.application-card');
+            handleApplicationAction(card, 'reject');
+        }
+        
+        // View details
+        if (target.classList.contains('view-btn') || target.closest('.view-btn')) {
+            const card = target.closest('.application-card');
+            viewApplicationDetails(card);
+        }
+    });
+}
+
+function filterApplications(searchTerm, status) {
+    const applications = document.querySelectorAll('.application-card');
+    
+    applications.forEach(card => {
+        const expertName = card.querySelector('.expert-details h3').textContent.toLowerCase();
+        const specialty = card.querySelector('.specialty').textContent.toLowerCase();
+        const currentStatus = card.querySelector('.application-status').textContent.toLowerCase();
+        
+        const matchesSearch = expertName.includes(searchTerm) || specialty.includes(searchTerm);
+        const matchesStatus = status === 'all' || currentStatus === status;
+        
+        card.style.display = matchesSearch && matchesStatus ? 'block' : 'none';
+    });
+}
+
+function handleApplicationAction(card, action) {
+    const expertName = card.querySelector('.expert-details h3').textContent;
+    const statusElement = card.querySelector('.application-status');
+    const actionButtons = card.querySelector('.application-actions');
+    
+    // Show confirmation dialog
+    const confirmMessage = action === 'approve' 
+        ? `Are you sure you want to approve ${expertName}'s application?`
+        : `Are you sure you want to reject ${expertName}'s application?`;
+    
+    if (confirm(confirmMessage)) {
+        // Update UI
+        statusElement.textContent = action === 'approve' ? 'Approved' : 'Rejected';
+        statusElement.className = `application-status ${action === 'approve' ? 'approved' : 'rejected'}`;
+        
+        // Disable action buttons
+        actionButtons.querySelectorAll('.btn').forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        });
+        
+        // TODO: Send API request to update application status
+        // sendApplicationStatusUpdate(card.dataset.applicationId, action);
+        
+        // Show success message
+        showNotification(`${expertName}'s application has been ${action}d successfully!`, 'success');
+    }
+}
+
+function viewApplicationDetails(card) {
+    const expertName = card.querySelector('.expert-details h3').textContent;
+    const specialty = card.querySelector('.specialty').textContent;
+    const qualifications = Array.from(card.querySelectorAll('.qualification-section li')).map(li => li.textContent);
+    const experience = Array.from(card.querySelectorAll('.experience-section li')).map(li => li.textContent);
+    
+    // Create modal content
+    const modalContent = `
+        <div class="modal-content">
+            <h2>${expertName}</h2>
+            <p class="specialty">${specialty}</p>
+            
+            <div class="modal-section">
+                <h3>Qualifications</h3>
+                <ul>
+                    ${qualifications.map(q => `<li>${q}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="modal-section">
+                <h3>Experience</h3>
+                <ul>
+                    ${experience.map(e => `<li>${e}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="modal-section">
+                <h3>Documents</h3>
+                <div class="document-links">
+                    ${Array.from(card.querySelectorAll('.document-link')).map(link => 
+                        `<a href="${link.href}" target="_blank">${link.innerHTML}</a>`
+                    ).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Show modal
+    showModal(modalContent);
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+function showModal(content) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-overlay">
+            <div class="modal-container">
+                ${content}
+                <button class="modal-close">&times;</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking close button or overlay
+    modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+    modal.querySelector('.modal-overlay').addEventListener('click', (e) => {
+        if (e.target === modal.querySelector('.modal-overlay')) {
+            modal.remove();
+        }
+    });
+}
+
+// Add modal styles
+const modalStyles = `
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 5px;
+    color: white;
+    z-index: 1001;
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.success {
+    background-color: #28a745;
+}
+
+.notification.error {
+    background-color: #dc3545;
+}
+
+.notification.info {
+    background-color: #17a2b8;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+`;
+
+// Add styles to document
+const styleSheet = document.createElement('style');
+styleSheet.textContent = modalStyles;
+document.head.appendChild(styleSheet); 
