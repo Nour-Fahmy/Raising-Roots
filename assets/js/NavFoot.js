@@ -94,41 +94,41 @@ async function loadNavigation() {
                     </div>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">Expert Advice</a>
+                    <a href="./community.html#expert-section" class="nav-link">Expert Advice</a>
                     <div class="dropdown">
                         <div class="dropdown-inner">
                             <div class="dropdown-section">
                                 <h4>Consultations</h4>
-                                <a href="#">Book an Expert</a>
-                                <a href="#">Video Calls</a>
-                                <a href="#">Chat Support</a>
+                                <a href="./community.html#expert-section">Book an Expert</a>
+                                <a href="./community.html#expert-section">Video Calls</a>
+                                <a href="./community.html#expert-section">Chat Support</a>
                             </div>
                             <div class="dropdown-section">
                                 <h4>Resources</h4>
-                                <a href="#">Articles</a>
-                                <a href="#">Research</a>
-                                <a href="#">Guidelines</a>
+                                <a href="./community.html#expert-section">Articles</a>
+                                <a href="./community.html#expert-section">Research</a>
+                                <a href="./community.html#expert-section">Guidelines</a>
                             </div>
                             <div class="dropdown-section">
                                 <h4>Learn</h4>
-                                <a href="#">Webinars</a>
-                                <a href="#">Q&A Sessions</a>
-                                <a href="#">Expert Blog</a>
+                                <a href="./community.html#expert-section">Webinars</a>
+                                <a href="./community.html#expert-section">Q&A Sessions</a>
+                                <a href="./community.html#expert-section">Expert Blog</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">Marketplace</a>
+                    <a href="./shop.html" class="nav-link">Marketplace</a>
                     <div class="dropdown">
                         <div class="dropdown-inner">
                             <div class="dropdown-section">
                                 <h4>Marketplace</h4>
-                                <a href="../pages/shop.html">Shop All Products</a>
-                                <a href="../pages/shop.html?category=baby-care">Baby Care</a>
-                                <a href="../pages/shop.html?category=toys">Toys & Games</a>
-                                <a href="../pages/shop.html?category=clothing">Clothing</a>
-                                <a href="../pages/shop.html?category=feeding">Feeding</a>
+                                <a href="./shop.html">Shop All Products</a>
+                                <a href="./shop.html?category=baby-care">Baby Care</a>
+                                <a href="./shop.html?category=toys">Toys & Games</a>
+                                <a href="./shop.html?category=clothing">Clothing</a>
+                                <a href="./shop.html?category=feeding">Feeding</a>
                             </div>
                         </div>
                     </div>
@@ -231,10 +231,10 @@ window.handleLogout = async function(e) {
         // Even if server logout fails, we've already cleared the token
         // so we can proceed with redirect
         console.log('Logging out and redirecting to homepage...');
-        window.location.href = '/pages/homepage.html';
+        window.location.href = '../pages/homepage.html';
     } catch (error) {
         console.error('Error during logout:', error);
         // Still redirect to homepage even if server logout fails
-        window.location.href = '/pages/homepage.html';
+        window.location.href = '../pages/homepage.html';
     }
 } 

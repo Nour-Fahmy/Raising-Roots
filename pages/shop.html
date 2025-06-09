@@ -17,31 +17,112 @@
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="logo">
-            <a href="homepage.html">
-                <img src="../images/LogoIcon.png" alt="Raising Roots Logo">
+        <div class="nav-left">
+            <a href="homepage.html" class="logo">
+                <img src="../images/LogoIcon.png" alt="Home">
             </a>
         </div>
+        
         <div class="nav-center">
             <div class="nav-item">
                 <a href="BabyCare/Baby.html" class="nav-link">Baby Care</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Daily Care</h4>
+                            <a href="BabyCare/nutrition.html">Feeding Guide</a>
+                            <a href="BabyCare/sleep.html">Sleep Schedule</a>
+                            <a href="BabyCare/health.html">Diapering Tips</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Health & Safety</h4>
+                            <a href="#">First Aid</a>
+                            <a href="#">Baby-Proofing</a>
+                            <a href="#">Common Concerns</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Development</h4>
+                            <a href="#">Milestones</a>
+                            <a href="#">Activities</a>
+                            <a href="#">Learning</a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="nav-item">
                 <a href="community.html" class="nav-link">Community</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Connect</h4>
+                            <a href="community.html">Find Local Groups</a>
+                            <a href="#">Discussion Forums</a>
+                            <a href="#">Parent Meetups</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Share & Learn</h4>
+                            <a href="#">Success Stories</a>
+                            <a href="#">Tips & Tricks</a>
+                            <a href="#">Photo Gallery</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Events</h4>
+                            <a href="#">Upcoming Events</a>
+                            <a href="#">Workshops</a>
+                            <a href="#">Playgroups</a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="nav-item">
                 <a href="community.html#expert-section" class="nav-link">Expert Advice</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Consultations</h4>
+                            <a href="community.html#expert-section">Book an Expert</a>
+                            <a href="community.html#expert-section">Video Calls</a>
+                            <a href="community.html#expert-section">Chat Support</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Resources</h4>
+                            <a href="community.html#expert-section">Articles</a>
+                            <a href="community.html#expert-section">Research</a>
+                            <a href="community.html#expert-section">Guidelines</a>
+                        </div>
+                        <div class="dropdown-section">
+                            <h4>Learn</h4>
+                            <a href="community.html#expert-section">Webinars</a>
+                            <a href="community.html#expert-section">Q&A Sessions</a>
+                            <a href="community.html#expert-section">Expert Blog</a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="nav-item">
-                <a href="shop.html" class="nav-link">Market Place</a>
+                <a href="shop.html" class="nav-link">Marketplace</a>
+                <div class="dropdown">
+                    <div class="dropdown-inner">
+                        <div class="dropdown-section">
+                            <h4>Marketplace</h4>
+                            <a href="shop.html">Shop All Products</a>
+                            <a href="shop.html?category=baby-care">Baby Care</a>
+                            <a href="shop.html?category=toys">Toys & Games</a>
+                            <a href="shop.html?category=clothing">Clothing</a>
+                            <a href="shop.html?category=feeding">Feeding</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        
         <div class="nav-right">
             <div class="cart-icon">
-                Cart
+                <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count">0</span>
             </div>
-            <a href="login.html" class="nav-link">Login</a>
+            <a href="login.html" class="login-btn">Login</a>
+            <a href="login.html" class="signup-btn">Sign Up</a>
         </div>
     </nav>
 

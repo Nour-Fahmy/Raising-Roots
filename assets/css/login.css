@@ -246,7 +246,33 @@ h2 {
     font-weight: 500;
 }
 
-input, select {
+.password-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0.8rem;
+}
+
+.password-container input {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+.toggle-password:hover {
+    color: var(--accent-color);
+}
+
+/* Update existing input styles to work with password container */
+input {
     width: 100%;
     padding: 0.8rem;
     margin-bottom: 0.8rem;
