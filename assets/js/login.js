@@ -106,125 +106,93 @@ document.addEventListener('DOMContentLoaded', function() {
 // Handle signup form submission
 signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+  
     const username = document.getElementById('signupUsername').value;
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
     const babyName = document.getElementById('signupBabyName').value;
     const babyGender = document.querySelector('input[name="babyGender"]:checked')?.value;
     const birthDate = document.getElementById('signupBirthDate').value;
-    const role = determineRole(email);
-    
+  
     try {
-        // Validate username
-        if (username.length < 3) {
-            alert('Username must be at least 3 characters long!');
-            return;
-        }
-
-        // Validate email
-        if (!isValidEmail(email)) {
-            alert('Please enter a valid email address!');
-            return;
-        }
-
-        // Validate password
-        if (!isValidPassword(password)) {
-            alert('Password must contain at least 8 characters, including uppercase, lowercase, numbers, and special characters!');
-            return;
-        }
-
-        // Validate baby name
-        if (babyName.length < 2) {
-            alert('Please enter a valid baby name!');
-            return;
-        }
-
-        // Validate baby gender
-        if (!babyGender) {
-            alert('Please select a baby gender!');
-            return;
-        }
-
-        // Validate birth date
-        if (!birthDate) {
-            alert('Please select a birth date!');
-            return;
-        }
-
-        // Calculate age
-        const age = calculateAge(birthDate);
-        if (age < 0) {
-            alert('Birth date cannot be in the future!');
-            return;
-        }
-
-        // Check if user already exists
-        if (users.find(user => user.email === email || user.username === username)) {
-            alert('User with this email or username already exists!');
-            return;
-        }
-
-        // Add new user to array
-        users.push({ 
-            username, 
-            email, 
-            password, 
-            role,
-            babyName,
-            babyGender,
-            birthDate
-        });
-        
-        alert(`Signup successful! You have been registered as a ${role}. Please login.`);
-        console.log('Current users:', users);
-        showForm('login');
-        signupForm.reset();
+      // Validate inputs (basic frontend validation)
+      if (!username || !email || !password || !babyName || !babyGender || !birthDate) {
+        alert('Please fill in all fields!');
+        return;
+      }
+  
+      const response = await fetch('http://localhost:3000/api/v1/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          babyName,
+          babyGender,
+          birthDate
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        alert(data.message || 'Signup failed!');
+        return;
+      }
+  
+      alert('Signup successful! Please log in.');
+      signupForm.reset();
+      showForm('login'); // switch to login form if using a sliding overlay
+  
     } catch (error) {
-        console.error('Signup error:', error);
-        // Show error message to user
+      console.error('Signup error:', error);
+      alert('An error occurred while signing up.');
     }
-});
+  });
+  
 
 // Handle login form submission
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
+
     try {
-        // Validate email format
-        if (!isValidEmail(email)) {
-            alert('Please enter a valid email address!');
+        const response = await fetch('http://localhost:3000/api/v1/users/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.message || 'Login failed!');
             return;
         }
 
-        // Find user by email
-        const user = users.find(u => u.email === email);
+        // Save token in localStorage
+        localStorage.setItem('token', data.token);
+
+        alert(`Welcome ${data.user.username}!`);
         
-        if (!user) {
-            alert('No account found with this email!');
-            return;
-        }
-
-        // Check password
-        if (user.password !== password) {
-            alert('Incorrect password!');
-            return;
-        }
-
-        // Successful login
-        if (user.role === 'admin') {
-            alert(`Welcome Admin! Your baby ${user.babyName} is ${formatAgeDisplay(calculateAge(user.birthDate))}.`);
-            // Redirect to admin dashboard
-            window.location.href = '../admin/index.html';
+        // Redirect based on role
+        if (data.user.role === 'admin') {
+            window.location.href = '../pages/admin/index.html';
         } else {
-            alert(`Welcome! Your baby ${user.babyName} is ${formatAgeDisplay(calculateAge(user.birthDate))}.`);
-            // Redirect to user dashboard
-            window.location.href = '../homepage/index.html';
+            window.location.href = '../pages/homepage.html';
         }
-        loginForm.reset();
+
     } catch (error) {
         console.error('Login error:', error);
-        // Show error message to user
+        alert('An error occurred while logging in.');
     }
+
+    loginForm.reset();
 }); 

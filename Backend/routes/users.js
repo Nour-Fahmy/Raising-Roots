@@ -98,5 +98,16 @@ router.post('/login', async (req, res) => {
   }
 });
 
+//hena ana b test el auth middleware
+const authenticateToken = require('../middleware/auth');
+
+router.get('/profile', authenticateToken, (req, res) => {
+  res.status(200).json({
+    message: 'You are authenticated!',
+    user: req.user
+  });
+});
+
+
 
 module.exports = router;
