@@ -182,6 +182,9 @@ function handleFilter(sectionId, filterValue) {
         case 'orders':
             filterOrders(filterValue);
             break;
+        case 'expert-applications':
+            fetchApplications();
+            break;
     }
 }
 
@@ -337,91 +340,150 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initExpertApplications() {
+    const applicationsSection = document.getElementById('expert-applications');
+    if (!applicationsSection) return;
+
+    // Ensure the applications-grid exists or create it if not
+    let expertApplicationsGrid = document.getElementById('applicationsContainer');
+    if (!expertApplicationsGrid) {
+        expertApplicationsGrid = document.createElement('div');
+        expertApplicationsGrid.id = 'applicationsContainer';
+        expertApplicationsGrid.className = 'applications-grid';
+        applicationsSection.appendChild(expertApplicationsGrid);
+    }
+
+    // Fetch applications from the backend
+    fetchApplications();
+
+    // Attach event listeners for search and filter
     const searchInput = document.getElementById('searchApplications');
     const statusFilter = document.getElementById('applicationStatus');
-    const applicationsGrid = document.querySelector('.applications-grid');
 
-    // Search functionality
-    searchInput.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        filterApplications(searchTerm, statusFilter.value);
-    });
-
-    // Status filter functionality
-    statusFilter.addEventListener('change', function(e) {
-        const status = e.target.value;
-        filterApplications(searchInput.value.toLowerCase(), status);
-    });
-
-    // Handle application actions
-    applicationsGrid.addEventListener('click', function(e) {
-        const target = e.target;
-        
-        // Approve application
-        if (target.classList.contains('approve-btn') || target.closest('.approve-btn')) {
-            const card = target.closest('.application-card');
-            handleApplicationAction(card, 'approve');
-        }
-        
-        // Reject application
-        if (target.classList.contains('reject-btn') || target.closest('.reject-btn')) {
-            const card = target.closest('.application-card');
-            handleApplicationAction(card, 'reject');
-        }
-        
-        // View details
-        if (target.classList.contains('view-btn') || target.closest('.view-btn')) {
-            const card = target.closest('.application-card');
-            viewApplicationDetails(card);
-        }
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', () => fetchApplications());
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', () => fetchApplications());
+    }
 }
 
-function filterApplications(searchTerm, status) {
-    const applications = document.querySelectorAll('.application-card');
-    
-    applications.forEach(card => {
-        const expertName = card.querySelector('.expert-details h3').textContent.toLowerCase();
-        const specialty = card.querySelector('.specialty').textContent.toLowerCase();
-        const currentStatus = card.querySelector('.application-status').textContent.toLowerCase();
-        
-        const matchesSearch = expertName.includes(searchTerm) || specialty.includes(searchTerm);
-        const matchesStatus = status === 'all' || currentStatus === status;
-        
-        card.style.display = matchesSearch && matchesStatus ? 'block' : 'none';
-    });
+async function fetchApplications() {
+    const expertApplicationsGrid = document.getElementById('applicationsContainer');
+    if (!expertApplicationsGrid) return;
+
+    expertApplicationsGrid.innerHTML = '<p style="text-align: center; padding: 20px;">Loading applications...</p>';
+
+    try {
+        const searchTerm = document.getElementById('searchApplications')?.value.toLowerCase() || '';
+        const statusFilter = document.getElementById('applicationStatus')?.value || 'all';
+
+        const response = await fetch('http://localhost:3000/api/v1/experts');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const applications = await response.json();
+
+        const filteredApplications = applications.filter(app => {
+            const matchesSearch = app.name.toLowerCase().includes(searchTerm) || app.email.toLowerCase().includes(searchTerm);
+            const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
+
+        if (filteredApplications.length === 0) {
+            expertApplicationsGrid.innerHTML = '<p style="text-align: center; padding: 20px;">No applications found.</p>';
+            return;
+        }
+
+        expertApplicationsGrid.innerHTML = filteredApplications.map(app => {
+            console.log('Raw app.cvFile from Backend:', app.cvFile);
+            const filename = app.cvFile.split('/').pop();
+            console.log('Extracted filename:', filename);
+            return `
+            <div class="application-card" data-application-id="${app._id}">
+                <div class="application-header">
+                    <div class="expert-info">
+                        <div class="expert-details">
+                            <h3>${app.name}</h3>
+                            <p class="application-email">${app.email}</p>
+                            <p class="application-number">${app.number}</p>
+                        </div>
+                    </div>
+                    <div class="application-status ${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</div>
+                </div>
+                <div class="application-content">
+                    <div class="documents-section">
+                        <h4><i class="fas fa-file-alt"></i> Documents</h4>
+                        <div class="document-links">
+                            <a href="http://localhost:3000/uploads/cvs/${filename}" target="_blank" class="document-link"><i class="fas fa-file-pdf"></i> View CV</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="application-actions">
+                    <button class="btn approve-btn" onclick="handleApplicationAction(this, 'approved')" ${app.status !== 'pending' ? 'disabled' : ''}><i class="fas fa-check"></i> Approve</button>
+                    <button class="btn reject-btn" onclick="handleApplicationAction(this, 'rejected')" ${app.status !== 'pending' ? 'disabled' : ''}><i class="fas fa-times"></i> Reject</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Error fetching applications:', error);
+        expertApplicationsGrid.innerHTML = '<p style="text-align: center; padding: 20px; color: red;">Error loading applications.</p>';
+    }
 }
 
-function handleApplicationAction(card, action) {
+async function handleApplicationAction(button, status) {
+    const card = button.closest('.application-card');
+    const applicationId = card.dataset.applicationId;
     const expertName = card.querySelector('.expert-details h3').textContent;
-    const statusElement = card.querySelector('.application-status');
-    const actionButtons = card.querySelector('.application-actions');
-    
-    // Show confirmation dialog
-    const confirmMessage = action === 'approve' 
+
+    if (!applicationId) {
+        showNotification('Application ID not found.', 'error');
+        return;
+    }
+
+    const confirmMessage = status === 'approved'
         ? `Are you sure you want to approve ${expertName}'s application?`
         : `Are you sure you want to reject ${expertName}'s application?`;
-    
+
     if (confirm(confirmMessage)) {
-        // Update UI
-        statusElement.textContent = action === 'approve' ? 'Approved' : 'Rejected';
-        statusElement.className = `application-status ${action === 'approve' ? 'approved' : 'rejected'}`;
-        
-        // Disable action buttons
-        actionButtons.querySelectorAll('.btn').forEach(btn => {
-            btn.disabled = true;
-            btn.style.opacity = '0.5';
-        });
-        
-        // TODO: Send API request to update application status
-        // sendApplicationStatusUpdate(card.dataset.applicationId, action);
-        
-        // Show success message
-        showNotification(`${expertName}'s application has been ${action}d successfully!`, 'success');
+        try {
+            const response = await fetch(`http://localhost:3000/api/v1/experts/${applicationId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update application status.');
+            }
+
+            // Update UI
+            const statusElement = card.querySelector('.application-status');
+            statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            statusElement.className = `application-status ${status}`;
+
+            // Disable buttons after action
+            card.querySelectorAll('.approve-btn, .reject-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            });
+
+            showNotification(`${expertName}'s application has been ${status} successfully!`, 'success');
+
+        } catch (error) {
+            console.error('Error updating application status:', error);
+            showNotification(`Failed to update ${expertName}'s application: ${error.message}`, 'error');
+        }
     }
 }
 
 function viewApplicationDetails(card) {
+    // This function can be simplified or removed as per new requirements if not needed
+    // For now, it will remain as is, but might display old details if not updated
     const expertName = card.querySelector('.expert-details h3').textContent;
     const specialty = card.querySelector('.specialty').textContent;
     const qualifications = Array.from(card.querySelectorAll('.qualification-section li')).map(li => li.textContent);
@@ -498,7 +560,7 @@ function showModal(content) {
     });
 }
 
-// Add modal styles
+// Add modal and notification styles
 const modalStyles = `
 .modal {
     position: fixed;
@@ -506,6 +568,10 @@ const modalStyles = `
     left: 0;
     width: 100%;
     height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 1000;
 }
 
@@ -515,7 +581,7 @@ const modalStyles = `
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -581,4 +647,4 @@ const modalStyles = `
 // Add styles to document
 const styleSheet = document.createElement('style');
 styleSheet.textContent = modalStyles;
-document.head.appendChild(styleSheet); 
+document.head.appendChild(styleSheet);

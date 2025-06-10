@@ -25,6 +25,14 @@ if (!fs.existsSync(uploadsDir)) {
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve static files from the 'pages' directory
+app.use(express.static(path.join(__dirname, '../pages')));
+
+// Serve other static assets
+app.use('/assets', express.static(path.join(__dirname, '../assets')));
+app.use('/images', express.static(path.join(__dirname, '../images')));
+app.use('/components', express.static(path.join(__dirname, '../components')));
+
 // 5. Connect to MongoDB using Mongoose
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -42,8 +50,10 @@ app.get('/api/v1/ping', (req, res) => {
 
 // User routes
 const userRoutes = require('./routes/users');
+const expertApplicationRoutes = require('./routes/expertApplications');
 // const expertRoutes = require('./routes/experts'); // Removed expert routes
 app.use(`${process.env.API_URL}/users`, userRoutes);
+app.use(`${process.env.API_URL}/experts`, expertApplicationRoutes);
 // app.use(`${process.env.API_URL}/experts`, expertRoutes); // Removed expert routes
 
 // Error handling middleware

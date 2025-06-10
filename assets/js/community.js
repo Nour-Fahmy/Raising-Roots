@@ -107,6 +107,41 @@ window.onload = function() {
   if (window.location.hash === '#expert-section') {
     selectChannel('expert');
   }
+
+  // Add expert form event listener here to ensure DOM is ready
+  const expertForm = document.getElementById('expert-application-form');
+  if (expertForm) {
+    console.log('Expert application form found. Attaching event listener.');
+    expertForm.addEventListener('submit', async function(event) {
+      console.log('Form submission detected.');
+      event.preventDefault(); // Prevent default form submission
+      console.log('Default submission prevented.');
+      const formData = new FormData(expertForm);
+      try {
+        const response = await fetch('/api/v1/experts/apply', {
+          method: 'POST',
+          body: formData
+        });
+        if (response.ok) {
+          console.log('Application submitted successfully to backend.');
+          expertForm.reset();
+          document.getElementById('expert-application-success').classList.remove('hidden');
+          setTimeout(() => {
+            document.getElementById('expert-application-success').classList.add('hidden');
+          }, 4000);
+        } else {
+          const errorData = await response.json();
+          console.error('Backend error:', errorData);
+          alert(`There was an error submitting your application: ${errorData.message || 'Please try again.'}`);
+        }
+      } catch (error) {
+        console.error('Network or fetch error:', error);
+        alert('There was a network error submitting your application. Please check your connection and try again.');
+      }
+    });
+  } else {
+    console.log('Expert application form element not found.');
+  }
 };
 
 // Function to show community posts (home)
@@ -629,3 +664,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// Show Expert Application Section
+function showExpertApplicationSection() {
+  // Hide all main sections
+  document.querySelector('#community-posts').classList.add('hidden');
+  document.querySelector('#community-section').classList.add('hidden');
+  document.querySelector('#expert-section').classList.add('hidden');
+  document.querySelector('#dm-section').classList.add('hidden');
+  document.querySelector('#saved-posts-section').classList.add('hidden');
+  // Show expert application section
+  document.querySelector('#expert-application-section').classList.remove('hidden');
+  // Update active state in sidebar
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector('.nav-item[onclick="showExpertApplicationSection()"]')?.classList.add('active');
+}
