@@ -42,9 +42,9 @@ app.get('/api/v1/ping', (req, res) => {
 
 // User routes
 const userRoutes = require('./routes/users');
-const expertRoutes = require('./routes/experts');
+// const expertRoutes = require('./routes/experts'); // Removed expert routes
 app.use(`${process.env.API_URL}/users`, userRoutes);
-app.use(`${process.env.API_URL}/experts`, expertRoutes);
+// app.use(`${process.env.API_URL}/experts`, expertRoutes); // Removed expert routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -56,10 +56,5 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 7. Export the app so server.js can use it
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
 
 module.exports = app;
