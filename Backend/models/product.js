@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
+const Counter = require('./counter');
 
 const productSchema = new mongoose.Schema({
+
+  productId: {
+    type: Number,
+    unique: true,
+    immutable: true
+  },
   name: {
     type: String,
     required: [true, 'Product name is required'],
@@ -29,6 +36,20 @@ const productSchema = new mongoose.Schema({
   }
 });
 
+// Pre-save hook to auto-increment productId
+productSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'productId' },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    this.productId = counter.seq;
+  }
+  next();
+});
+
 const Product = mongoose.model('Product', productSchema);
+
 
 module.exports = Product;
