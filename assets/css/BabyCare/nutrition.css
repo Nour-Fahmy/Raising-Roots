@@ -31,12 +31,13 @@ header h1 {
 
 /* Main Content Styling */
 main {
-    padding: 120px 20px 40px;
+    padding: 100px 20px 40px;
     text-align: center;
     max-width: 1200px;
-    width: 100%;
+    margin: 0 auto;
 }
 
+/* Nutrition Section */
 .nutrition-intro {
     margin-bottom: 40px;
     animation: fadeIn 1.2s ease-in-out;
@@ -69,6 +70,7 @@ main {
     width: 280px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: fadeIn 1.4s ease-in-out;
+    cursor: pointer;
 }
 
 .nutrition-card:hover {
@@ -83,15 +85,18 @@ main {
 }
 
 .breastfeeding-img {
-    background-color: #eacda3; /* Placeholder color */
+    background-image: url('../../images/BabyCare/breastfeeding.png');
+    background-color: #eacda3;
 }
 
 .formula-img {
-    background-color: #d6eaff; /* Placeholder color */
+    background-image: url('../../images/BabyCare/formula.png');
+    background-color: #d6eaff;
 }
 
 .solids-img {
-    background-color: #e8f5e9; /* Placeholder color */
+    background-image: url('../../images/BabyCare/solids.png');
+    background-color: #e8f5e9;
 }
 
 .recipes-img {
@@ -165,5 +170,29 @@ footer p {
     }
     to {
         transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    main {
+        padding: 80px 15px 30px;
+    }
+
+    .nutrition-intro h2 {
+        font-size: 1.5em;
+    }
+
+    .nutrition-intro p {
+        font-size: 1em;
+    }
+
+    .nutrition-cards {
+        gap: 20px;
+    }
+
+    .nutrition-card {
+        width: 100%;
+        max-width: 320px;
     }
 }

@@ -31,12 +31,13 @@ header h1 {
 
 /* Main Content Styling */
 main {
-    padding: 120px 20px 40px;
+    padding: 100px 20px 40px;
     text-align: center;
     max-width: 1200px;
-    width: 100%;
+    margin: 0 auto;
 }
 
+/* Health Section */
 .health-intro {
     margin-bottom: 40px;
     animation: fadeIn 1.2s ease-in-out;
@@ -69,6 +70,7 @@ main {
     width: 280px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: fadeIn 1.4s ease-in-out;
+    cursor: pointer;
 }
 
 .health-card:hover {
@@ -82,20 +84,19 @@ main {
     background-position: center;
 }
 
-.vaccinations-img {
-    background-color: #eacda3; /* Placeholder color */
+.checkups-img {
+    background-image: url('../../images/BabyCare/checkups.png');
+    background-color: #eacda3;
 }
 
-.illnesses-img {
-    background-color: #d6eaff; /* Placeholder color */
+.vaccines-img {
+    background-image: url('../../images/BabyCare/vaccines.png');
+    background-color: #d6eaff;
 }
 
-.milestones-img {
-    background-color: #e8f5e9; /* Placeholder color */
-}
-
-.skincare-img {
-    background-color: #fff8e1; /* Placeholder color */
+.common-illnesses-img {
+    background-image: url('../../images/BabyCare/illnesses.png');
+    background-color: #e8f5e9;
 }
 
 .card-content {
@@ -156,5 +157,29 @@ footer p {
     }
     to {
         opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    main {
+        padding: 80px 15px 30px;
+    }
+
+    .health-intro h2 {
+        font-size: 1.5em;
+    }
+
+    .health-intro p {
+        font-size: 1em;
+    }
+
+    .health-cards {
+        gap: 20px;
+    }
+
+    .health-card {
+        width: 100%;
+        max-width: 320px;
     }
 }

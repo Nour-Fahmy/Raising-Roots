@@ -103,64 +103,260 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Handle signup form submission
-signupForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-  
-    const username = document.getElementById('signupUsername').value;
-    const email = document.getElementById('signupEmail').value;
-    const password = document.getElementById('signupPassword').value;
-    const babyName = document.getElementById('signupBabyName').value;
-    const babyGender = document.querySelector('input[name="babyGender"]:checked')?.value;
-    const birthDate = document.getElementById('signupBirthDate').value;
-  
-    try {
-      // Validate inputs (basic frontend validation)
-      if (!username || !email || !password || !babyName || !babyGender || !birthDate) {
-        alert('Please fill in all fields!');
-        return;
-      }
-  
-      const response = await fetch('http://localhost:3000/api/v1/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          babyName,
-          babyGender,
-          birthDate
-        })
-      });
-  
-      const data = await response.json();
-  
-      if (!response.ok) {
-        alert(data.message || 'Signup failed!');
-        return;
-      }
-  
-      alert('Signup successful! Please log in.');
-      signupForm.reset();
-      showForm('login'); // switch to login form if using a sliding overlay
-  
-    } catch (error) {
-      console.error('Signup error:', error);
-      alert('An error occurred while signing up.');
+// Validation functions
+function showError(inputId, message) {
+    const input = document.getElementById(inputId);
+    const errorElement = document.getElementById(`${inputId}Error`);
+    
+    input.classList.add('input-error');
+    input.classList.remove('input-success');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+}
+
+function showSuccess(inputId) {
+    const input = document.getElementById(inputId);
+    const errorElement = document.getElementById(`${inputId}Error`);
+    
+    input.classList.remove('input-error');
+    input.classList.add('input-success');
+    errorElement.style.display = 'none';
+}
+
+function clearError(inputId) {
+    const input = document.getElementById(inputId);
+    const errorElement = document.getElementById(`${inputId}Error`);
+    
+    input.classList.remove('input-error', 'input-success');
+    errorElement.style.display = 'none';
+}
+
+function showFormFeedback(formId, message, isError = true) {
+    const feedbackElement = document.getElementById(`${formId}Feedback`);
+    feedbackElement.textContent = message;
+    feedbackElement.className = `form-feedback ${isError ? 'feedback-error' : 'feedback-success'}`;
+    feedbackElement.style.display = 'block';
+}
+
+function clearFormFeedback(formId) {
+    const feedbackElement = document.getElementById(`${formId}Feedback`);
+    feedbackElement.style.display = 'none';
+}
+
+// Username validation
+function validateUsername(username) {
+    if (!username) {
+        return 'Username is required';
     }
-  });
-  
+    if (username.length < 3) {
+        return 'Username must be at least 3 characters long';
+    }
+    if (username.length > 20) {
+        return 'Username must be less than 20 characters';
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        return 'Username can only contain letters, numbers, and underscores';
+    }
+    return '';
+}
 
-// Handle login form submission
-loginForm.addEventListener('submit', async (e) => {
+// Email validation
+function validateEmail(email) {
+    if (!email) {
+        return 'Email is required';
+    }
+    if (!isValidEmail(email)) {
+        return 'Please enter a valid email address';
+    }
+    return '';
+}
+
+// Password validation
+function validatePassword(password) {
+    if (!password) {
+        return 'Password is required';
+    }
+    if (password.length < 8) {
+        return 'Password must be at least 8 characters long';
+    }
+    if (!isValidPassword(password)) {
+        return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
+    }
+    return '';
+}
+
+// Baby name validation
+function validateBabyName(name) {
+    if (!name) {
+        return 'Baby name is required';
+    }
+    if (name.length < 2) {
+        return 'Baby name must be at least 2 characters long';
+    }
+    if (name.length > 50) {
+        return 'Baby name must be less than 50 characters';
+    }
+    return '';
+}
+
+// Birth date validation
+function validateBirthDate(date) {
+    if (!date) {
+        return 'Birth date is required';
+    }
+    const birthDate = new Date(date);
+    const today = new Date();
+    if (birthDate > today) {
+        return 'Birth date cannot be in the future';
+    }
+    const age = calculateAge(date);
+    if (age > 2) {
+        return 'Baby age cannot be more than 2 years';
+    }
+    return '';
+}
+
+// Password strength checker
+function checkPasswordStrength(password) {
+    const strengthBar = document.getElementById('passwordStrengthBar');
+    let strength = 0;
+    
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    strengthBar.className = 'password-strength-bar';
+    if (strength <= 2) {
+        strengthBar.classList.add('strength-weak');
+    } else if (strength <= 4) {
+        strengthBar.classList.add('strength-medium');
+    } else {
+        strengthBar.classList.add('strength-strong');
+    }
+}
+
+// Add event listeners for real-time validation
+document.addEventListener('DOMContentLoaded', function() {
+    // Login form validation
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    
+    loginEmail.addEventListener('input', () => {
+        const error = validateEmail(loginEmail.value);
+        if (error) {
+            showError('loginEmail', error);
+        } else {
+            showSuccess('loginEmail');
+        }
+    });
+    
+    loginPassword.addEventListener('input', () => {
+        const error = validatePassword(loginPassword.value);
+        if (error) {
+            showError('loginPassword', error);
+        } else {
+            showSuccess('loginPassword');
+        }
+    });
+    
+    // Signup form validation
+    const signupUsername = document.getElementById('signupUsername');
+    const signupEmail = document.getElementById('signupEmail');
+    const signupPassword = document.getElementById('signupPassword');
+    const signupBabyName = document.getElementById('signupBabyName');
+    const signupBirthDate = document.getElementById('signupBirthDate');
+    
+    signupUsername.addEventListener('input', () => {
+        const error = validateUsername(signupUsername.value);
+        if (error) {
+            showError('signupUsername', error);
+        } else {
+            showSuccess('signupUsername');
+        }
+    });
+    
+    signupEmail.addEventListener('input', () => {
+        const error = validateEmail(signupEmail.value);
+        if (error) {
+            showError('signupEmail', error);
+        } else {
+            showSuccess('signupEmail');
+        }
+    });
+    
+    signupPassword.addEventListener('input', () => {
+        const error = validatePassword(signupPassword.value);
+        if (error) {
+            showError('signupPassword', error);
+        } else {
+            showSuccess('signupPassword');
+        }
+        checkPasswordStrength(signupPassword.value);
+    });
+    
+    signupBabyName.addEventListener('input', () => {
+        const error = validateBabyName(signupBabyName.value);
+        if (error) {
+            showError('signupBabyName', error);
+        } else {
+            showSuccess('signupBabyName');
+        }
+    });
+    
+    signupBirthDate.addEventListener('input', () => {
+        const error = validateBirthDate(signupBirthDate.value);
+        if (error) {
+            showError('signupBirthDate', error);
+        } else {
+            showSuccess('signupBirthDate');
+        }
+        updateAgeDisplay();
+    });
+});
+
+// Function to get redirect URL from query parameters
+function getRedirectUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('redirect') || 'homepage.html';
+}
+
+// Function to handle successful login
+async function handleSuccessfulLogin(userData) {
+    // Store the token in localStorage
+    localStorage.setItem('token', userData.token);
+    
+    // Get redirect URL
+    const redirectUrl = getRedirectUrl();
+    
+    // Redirect to the appropriate page
+    window.location.href = redirectUrl;
+}
+
+// Login form submission
+loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
-
+    
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-
+    
+    // Clear previous feedback
+    clearFormFeedback('login');
+    
+    // Validate inputs
+    const emailError = validateEmail(email);
+    if (emailError) {
+        showError('loginEmail', emailError);
+        return;
+    }
+    
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        showError('loginPassword', passwordError);
+        return;
+    }
+    
     try {
         const response = await fetch('http://localhost:3000/api/v1/users/login', {
             method: 'POST',
@@ -169,32 +365,97 @@ loginForm.addEventListener('submit', async (e) => {
             },
             body: JSON.stringify({ email, password })
         });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            alert(data.message || 'Login failed!');
-            return;
-        }
-
-        // Save token in localStorage
-        localStorage.setItem('token', data.token);
-
-        alert(`Welcome ${data.user.username}!`);
         
-        // Redirect based on role
-        if (data.user.role === 'admin') {
-            window.location.href = '../pages/admin/index.html';
+        const data = await response.json();
+        
+        if (response.ok) {
+            await handleSuccessfulLogin(data);
         } else {
-            window.location.href = '../pages/homepage.html';
+            showFormFeedback('login', data.message || 'Login failed. Please try again.');
         }
-
     } catch (error) {
         console.error('Login error:', error);
-        alert('An error occurred while logging in.');
+        showFormFeedback('login', 'An error occurred. Please try again.');
     }
+});
 
-    loginForm.reset();
+// Signup form submission
+signupForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('signupUsername').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const babyName = document.getElementById('signupBabyName').value;
+    const babyGender = document.querySelector('input[name="babyGender"]:checked')?.value;
+    const birthDate = document.getElementById('signupBirthDate').value;
+    
+    // Clear previous feedback
+    clearFormFeedback('signup');
+    
+    // Validate all inputs
+    const usernameError = validateUsername(username);
+    if (usernameError) {
+        showError('signupUsername', usernameError);
+        return;
+    }
+    
+    const emailError = validateEmail(email);
+    if (emailError) {
+        showError('signupEmail', emailError);
+        return;
+    }
+    
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        showError('signupPassword', passwordError);
+        return;
+    }
+    
+    const babyNameError = validateBabyName(babyName);
+    if (babyNameError) {
+        showError('signupBabyName', babyNameError);
+        return;
+    }
+    
+    if (!babyGender) {
+        showError('signupBabyGender', 'Please select baby gender');
+        return;
+    }
+    
+    const birthDateError = validateBirthDate(birthDate);
+    if (birthDateError) {
+        showError('signupBirthDate', birthDateError);
+        return;
+    }
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/v1/users/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username,
+                email,
+                password,
+                babyName,
+                babyGender,
+                birthDate
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            await handleSuccessfulLogin(data);
+        } else {
+            showFormFeedback('signup', data.message || 'Signup failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Signup error:', error);
+        showFormFeedback('signup', 'An error occurred. Please try again.');
+    }
 });
 
 // Function to toggle password visibility

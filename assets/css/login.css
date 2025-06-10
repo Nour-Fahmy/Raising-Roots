@@ -234,8 +234,8 @@ h2 {
 }
 
 .form-group {
-    margin-bottom: 1rem;
     position: relative;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
@@ -556,4 +556,90 @@ button[type="submit"]:active {
     .overlay-panel h2 {
         font-size: 1.8rem;
     }
+}
+
+/* Form Validation Styles */
+.input-error {
+    border-color: var(--error-color) !important;
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.input-success {
+    border-color: var(--success-color) !important;
+}
+
+.success-message {
+    color: var(--success-color);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+/* Password strength indicator */
+.password-strength {
+    height: 4px;
+    margin-top: 0.5rem;
+    border-radius: 2px;
+    background-color: #ddd;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-weak {
+    background-color: var(--error-color);
+    width: 33.33%;
+}
+
+.strength-medium {
+    background-color: #ffa500;
+    width: 66.66%;
+}
+
+.strength-strong {
+    background-color: var(--success-color);
+    width: 100%;
+}
+
+/* Form feedback container */
+.form-feedback {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    display: none;
+}
+
+.feedback-error {
+    background-color: rgba(255, 0, 0, 0.1);
+    border: 1px solid var(--error-color);
+    color: var(--error-color);
+}
+
+.feedback-success {
+    background-color: rgba(0, 255, 0, 0.1);
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+}
+
+/* Input focus states */
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+}
+
+/* Disabled state for submit button */
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 } 

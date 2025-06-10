@@ -125,113 +125,44 @@
         </div>
         
         <div class="nav-right">
-            <a href="../pages/BabyCare/login.html" class="login-btn">Login</a>
-            <a href="../pages/BabyCare/login.html" class="signup-btn">Sign Up</a>
+            <!-- Profile content will be loaded here by JavaScript -->
         </div>
     </nav>
 
     <main>
         <div class="health-intro">
             <h2>Baby Health Guide</h2>
-            <p>Essential information about keeping your baby healthy and safe.</p>
+            <p>Essential information about keeping your baby healthy and addressing common health concerns.</p>
         </div>
         
         <div class="health-cards">
             <div class="health-card">
-                <div class="card-image vaccinations-img"></div>
+                <div class="card-image checkups-img"></div>
+                <div class="card-content">
+                    <h3>Regular Checkups</h3>
+                    <p>Understanding your baby's health checkup schedule and what to expect.</p>
+                    <a href="#" class="card-button">Learn More</a>
+                </div>
+            </div>
+            
+            <div class="health-card">
+                <div class="card-image vaccines-img"></div>
                 <div class="card-content">
                     <h3>Vaccinations</h3>
-                    <p>Information on recommended vaccines, schedules, and the importance of immunization.</p>
-                    <a href="#vaccinations" class="card-button">Learn More</a>
+                    <p>Important information about your baby's vaccination schedule and safety.</p>
+                    <a href="#" class="card-button">Learn More</a>
                 </div>
             </div>
             
             <div class="health-card">
-                <div class="card-image illnesses-img"></div>
+                <div class="card-image common-illnesses-img"></div>
                 <div class="card-content">
                     <h3>Common Illnesses</h3>
-                    <p>Guidance on managing common baby ailments like colds, ear infections, and rashes.</p>
-                    <a href="#common-illnesses" class="card-button">Learn More</a>
-                </div>
-            </div>
-            
-            <div class="health-card">
-                <div class="card-image skincare-img"></div>
-                <div class="card-content">
-                    <h3>Baby Skincare</h3>
-                    <p>Tips on caring for sensitive baby skin, including diaper rashes, eczema, and dry skin.</p>
-                    <a href="#baby-skincare" class="card-button">Learn More</a>
+                    <p>How to recognize and handle common baby illnesses and when to seek help.</p>
+                    <a href="#" class="card-button">Learn More</a>
                 </div>
             </div>
         </div>
-
-        <!-- Bookmarked Sections -->
-        <section id="vaccinations" class="content-section">
-            <h2>Vaccination Schedule</h2>
-            <div class="section-content">
-                <h3>Important Vaccines</h3>
-                <p>Essential vaccines for your baby's health:</p>
-                <ul>
-                    <li>Hepatitis B (Birth)</li>
-                    <li>DTaP (2, 4, 6 months)</li>
-                    <li>Hib (2, 4, 6 months)</li>
-                    <li>Polio (2, 4, 6 months)</li>
-                    <li>MMR (12-15 months)</li>
-                </ul>
-                <h3>Vaccine Safety</h3>
-                <p>Understanding vaccine safety and importance:</p>
-                <ul>
-                    <li>Vaccines are thoroughly tested</li>
-                    <li>Side effects are usually mild</li>
-                    <li>Protection against serious diseases</li>
-                    <li>Follow recommended schedule</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="common-illnesses" class="content-section">
-            <h2>Common Baby Illnesses</h2>
-            <div class="section-content">
-                <h3>Recognizing Symptoms</h3>
-                <p>Common signs of illness in babies:</p>
-                <ul>
-                    <li>Fever (100.4°F or higher)</li>
-                    <li>Changes in feeding patterns</li>
-                    <li>Unusual crying or fussiness</li>
-                    <li>Changes in sleep patterns</li>
-                </ul>
-                <h3>When to Call the Doctor</h3>
-                <p>Seek medical attention if your baby:</p>
-                <ul>
-                    <li>Has a high fever</li>
-                    <li>Shows signs of dehydration</li>
-                    <li>Has difficulty breathing</li>
-                    <li>Shows unusual behavior</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="baby-skincare" class="content-section">
-            <h2>Baby Skincare Guide</h2>
-            <div class="section-content">
-                <h3>Daily Skincare Routine</h3>
-                <p>Essential steps for healthy baby skin:</p>
-                <ul>
-                    <li>Gentle bathing with mild soap</li>
-                    <li>Moisturizing after bath</li>
-                    <li>Diaper area care</li>
-                    <li>Sun protection</li>
-                </ul>
-                <h3>Common Skin Conditions</h3>
-                <p>Managing common skin issues:</p>
-                <ul>
-                    <li>Diaper rash - Keep area clean and dry</li>
-                    <li>Eczema - Use gentle products and moisturize</li>
-                    <li>Cradle cap - Gentle washing and brushing</li>
-                    <li>Baby acne - Usually resolves on its own</li>
-                </ul>
-            </div>
-        </section>
     </main>
     
     <!-- Footer -->
@@ -249,5 +180,8 @@
             <a href="#">App Store</a>
         </p>
     </footer>
+
+    <script src="../../assets/js/BabyCare/profile.js"></script>
+    <script src="health.js"></script>
 </body>
 </html>

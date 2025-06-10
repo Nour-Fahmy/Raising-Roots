@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { User } = require('../models/user');
+const { validateLogin } = require('../middleware/validation');
+const { loginLimiter } = require('../middleware/rateLimiter');
+const jwt = require('jsonwebtoken');
 
 // POST /api/v1/users/register
 router.post('/register', async (req, res) => {
@@ -50,52 +53,63 @@ router.post('/register', async (req, res) => {
   }
 });
 
-//hena ana b add el login route
-
-const jwt = require('jsonwebtoken');
-
 // POST /api/v1/users/login
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
+router.post('/login', loginLimiter, validateLogin, async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-    // 1. Find the user by email
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+        // 1. Find the user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ 
+                message: 'Invalid credentials',
+                errors: [{
+                    field: 'email',
+                    message: 'No account found with this email'
+                }]
+            });
+        }
+
+        // 2. Check the password
+        const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+        if (!isPasswordValid) {
+            return res.status(401).json({ 
+                message: 'Invalid credentials',
+                errors: [{
+                    field: 'password',
+                    message: 'Incorrect password'
+                }]
+            });
+        }
+
+        // 3. Generate a JWT token
+        const token = jwt.sign(
+            {
+                userId: user._id,
+                isAdmin: user.role === 'admin',
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' } // Token lasts for 1 day
+        );
+
+        // 4. Send token and basic user info
+        res.status(200).json({
+            message: 'Login successful!',
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role
+            }
+        });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ 
+            message: 'An error occurred during login',
+            error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+        });
     }
-
-    // 2. Check the password
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid password' });
-    }
-
-    // 3. Generate a JWT token
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        isAdmin: user.role === 'admin',
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' } // Token lasts for 1 day
-    );
-
-    // 4. Send token and basic user info
-    res.status(200).json({
-      message: 'Login successful!',
-      token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: err.message || 'Something went wrong' });
-  }
 });
 
 //hena ana b test el auth middleware
@@ -115,8 +129,5 @@ router.get('/profile', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Something went wrong' });
   }
 });
-
-
-
 
 module.exports = router;

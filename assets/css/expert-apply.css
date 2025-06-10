@@ -283,16 +283,45 @@ textarea:focus {
 }
 
 /* Form Validation Styles */
-input:invalid,
-select:invalid,
-textarea:invalid {
-    border-color: var(--error-color);
+input.error,
+select.error,
+textarea.error {
+    border-color: #dc3545;
+    background-color: #fff8f8;
 }
 
 .error-message {
-    color: var(--error-color);
-    font-size: 0.9rem;
-    margin-top: 0.3rem;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Success state for validated fields */
+input:valid:not(:placeholder-shown),
+select:valid:not(:placeholder-shown),
+textarea:valid:not(:placeholder-shown) {
+    border-color: #28a745;
+    background-color: #f8fff8;
+}
+
+/* Focus styles */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+    outline: none;
+}
+
+/* Required field indicator */
+label[for]::after {
+    content: " *";
+    color: #dc3545;
+}
+
+label[for]:not([required])::after {
+    content: "";
 }
 
 /* Loading State */
@@ -308,4 +337,83 @@ textarea:invalid {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Profile Picture Upload Styles */
+.profile-upload {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.profile-upload input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.preview-container {
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #ccc;
+    border-radius: 50%;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.preview-container:hover {
+    border-color: #4CAF50;
+    background-color: #f0f0f0;
+}
+
+.preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.upload-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+    color: #666;
+}
+
+.upload-placeholder i {
+    font-size: 48px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.upload-placeholder span {
+    font-size: 14px;
+    display: block;
+}
+
+/* Responsive styles for profile upload */
+@media (max-width: 768px) {
+    .preview-container {
+        width: 120px;
+        height: 120px;
+    }
+
+    .upload-placeholder i {
+        font-size: 36px;
+    }
+
+    .upload-placeholder span {
+        font-size: 12px;
+    }
 } 

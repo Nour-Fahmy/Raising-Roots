@@ -34,6 +34,10 @@ async function loadNavigation() {
         }
     }
 
+    // Get current page path
+    const currentPath = window.location.pathname;
+    const isShopPage = currentPath.includes('shop.html');
+
     const navHtml = `
         <nav class="navbar">
             <div class="nav-left">
@@ -152,8 +156,8 @@ async function loadNavigation() {
                         </div>
                     </div>
                 ` : `
-                    <a href="login.html" class="login-btn">Login</a>
-                    <a href="login.html" class="signup-btn">Sign Up</a>
+                    <a href="login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="login-btn">Login</a>
+                    <a href="login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="signup-btn">Sign Up</a>
                 `}
             </div>
         </nav>
@@ -228,13 +232,18 @@ window.handleLogout = async function(e) {
             }
         });
 
-        // Even if server logout fails, we've already cleared the token
-        // so we can proceed with redirect
-        console.log('Logging out and redirecting to homepage...');
-        window.location.href = '../pages/homepage.html';
+        // Get current page path
+        const currentPath = window.location.pathname;
+        const isShopPage = currentPath.includes('shop.html');
+
+        // Redirect based on current page
+        console.log('Logging out and redirecting...');
+        window.location.href = isShopPage ? './shop.html' : '../pages/homepage.html';
     } catch (error) {
         console.error('Error during logout:', error);
-        // Still redirect to homepage even if server logout fails
-        window.location.href = '../pages/homepage.html';
+        // Still redirect based on current page even if server logout fails
+        const currentPath = window.location.pathname;
+        const isShopPage = currentPath.includes('shop.html');
+        window.location.href = isShopPage ? './shop.html' : '../pages/homepage.html';
     }
 } 
