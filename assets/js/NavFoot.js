@@ -141,6 +141,12 @@ async function loadNavigation() {
             
             <div class="nav-right">
                 ${isLoggedIn ? `
+                    ${isShopPage ? `
+                        <div class="cart-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">0</span>
+                        </div>
+                    ` : ''}
                     <div class="profile-dropdown">
                         <button class="profile-btn">
                             <img src="${userData?.profilePicture || '../images/default-avatar.png'}" 
@@ -156,6 +162,12 @@ async function loadNavigation() {
                         </div>
                     </div>
                 ` : `
+                    ${isShopPage ? `
+                        <div class="cart-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-count">0</span>
+                        </div>
+                    ` : ''}
                     <a href="login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="login-btn">Login</a>
                     <a href="login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="signup-btn">Sign Up</a>
                 `}
