@@ -66,5 +66,8 @@ app.use((err, req, res, next) => {
     });
 });
 
+const productRoutes = require('./routes/products');
+app.use('/api/v1/products', productRoutes);
+
 
 module.exports = app;
