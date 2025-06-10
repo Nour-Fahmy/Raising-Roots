@@ -45,7 +45,9 @@ const validateExpertApplication = [
     body('termsAccepted').isBoolean().withMessage('Terms acceptance is required')
 ];
 
-// Submit expert application with file upload
+// Public Routes
+
+// Submit expert application
 router.post('/apply', rateLimiter, upload.fields([
     { name: 'profilePicture', maxCount: 1 },
     { name: 'certificates', maxCount: 5 }
@@ -79,13 +81,14 @@ router.post('/apply', rateLimiter, upload.fields([
         // Create new expert application with file data
         const expert = new Expert({
             ...req.body,
-            ...fileData
+            ...fileData,
+            status: 'pending' // Set initial status as pending
         });
         await expert.save();
 
         res.status(201).json({
             success: true,
-            message: 'Expert application submitted successfully',
+            message: 'Expert application submitted successfully. We will review your application and get back to you soon.',
             data: expert
         });
     } catch (error) {
@@ -106,8 +109,38 @@ router.post('/apply', rateLimiter, upload.fields([
     }
 });
 
-// Get all expert applications (admin only)
-router.get('/applications', async (req, res) => {
+// Check application status
+router.get('/status/:email', async (req, res) => {
+    try {
+        const expert = await Expert.findOne({ email: req.params.email });
+        if (!expert) {
+            return res.status(404).json({
+                success: false,
+                message: 'No application found with this email'
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: {
+                status: expert.status,
+                submittedAt: expert.createdAt
+            }
+        });
+    } catch (error) {
+        console.error('Error checking application status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error checking application status',
+            error: error.message
+        });
+    }
+});
+
+// Admin Routes (protected with authentication middleware)
+const adminRoutes = express.Router();
+
+// Get all expert applications
+adminRoutes.get('/applications', async (req, res) => {
     try {
         const experts = await Expert.find().sort({ createdAt: -1 });
         res.status(200).json({
@@ -125,7 +158,7 @@ router.get('/applications', async (req, res) => {
 });
 
 // Get expert application by ID
-router.get('/applications/:id', async (req, res) => {
+adminRoutes.get('/applications/:id', async (req, res) => {
     try {
         const expert = await Expert.findById(req.params.id);
         if (!expert) {
@@ -148,8 +181,8 @@ router.get('/applications/:id', async (req, res) => {
     }
 });
 
-// Update expert application status (admin only)
-router.patch('/applications/:id/status', async (req, res) => {
+// Update expert application status
+adminRoutes.patch('/applications/:id/status', async (req, res) => {
     try {
         const { status } = req.body;
         if (!['pending', 'approved', 'rejected'].includes(status)) {
@@ -187,8 +220,8 @@ router.patch('/applications/:id/status', async (req, res) => {
     }
 });
 
-// Delete expert application and associated files
-router.delete('/applications/:id', async (req, res) => {
+// Delete expert application
+adminRoutes.delete('/applications/:id', async (req, res) => {
     try {
         const expert = await Expert.findById(req.params.id);
         if (!expert) {
@@ -224,5 +257,8 @@ router.delete('/applications/:id', async (req, res) => {
         });
     }
 });
+
+// Mount admin routes
+router.use('/admin', adminRoutes);
 
 module.exports = router; 
