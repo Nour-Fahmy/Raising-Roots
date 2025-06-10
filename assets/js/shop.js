@@ -199,16 +199,23 @@ document.addEventListener('DOMContentLoaded', function() {
         adultProductsGrid.style.display = adultProductsGrid.style.display === 'none' ? 'grid' : 'grid';
     });
 
+    // Initialize cart count from localStorage if it exists
+    const cartCount = document.querySelector('.cart-count');
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+        const cart = JSON.parse(savedCart);
+        cartCount.textContent = cart.length;
+    }
+
     // Cart functionality
     const cartContainer = document.querySelector('.cart-container');
     const cartIcon = document.querySelector('.cart-icon');
     const closeCart = document.querySelector('.close-cart');
     const cartItems = document.querySelector('.cart-items');
-    const cartCount = document.querySelector('.cart-count');
     const totalPrice = document.querySelector('.total-price');
     const addToCartButtons = document.querySelectorAll('.add-to-cart');
 
-    let cart = [];
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     // Toggle cart visibility
     cartIcon.addEventListener('click', () => {
@@ -246,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const product = {
-                id: productCard.getAttribute('data-product-id'), // Use the product ID from the data-product-id attribute
+                id: productCard.getAttribute('data-product-id'),
                 title: productCard.querySelector('.product-title').textContent,
                 price: parseFloat(productCard.querySelector('.product-price').textContent.replace('EGP ', '')),
                 image: productCard.querySelector('.product-image').src,
@@ -256,18 +263,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if product already exists in cart
             const existingItem = cart.find(item => item.id === product.id);
             if (existingItem) {
-                // If item exists, increase quantity in cart (stock already decreased during initial add)
                 existingItem.quantity += 1;
             } else {
                 cart.push(product);
             }
 
+            // Save cart to localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Update cart display
             updateCart();
             cartContainer.classList.add('active');
         });
     });
 
-    // Update cart UI
+    // Function to update cart display
     function updateCart() {
         cartItems.innerHTML = '';
         let total = 0;
@@ -318,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             addToCartButton.style.cursor = '';
                         }
                     }
+                    localStorage.setItem('cart', JSON.stringify(cart));
                     updateCart();
                 }
             });
@@ -343,6 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             addToCartButton.style.cursor = 'not-allowed';
                         }
                     }
+                    localStorage.setItem('cart', JSON.stringify(cart));
                     updateCart();
                 } else {
                     alert('Not enough stock available!');
@@ -367,6 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 cart = cart.filter(cartItem => cartItem.id !== item.id);
+                localStorage.setItem('cart', JSON.stringify(cart));
                 updateCart();
             });
 
@@ -384,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('.delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', options);
     }
 
-    // Initialize cart
+    // Initialize cart display
     updateCart();
 
     // Checkout functionality
@@ -568,6 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear cart and close modals
         cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
         updateCart();
         checkoutModal.classList.remove('active');
         cartContainer.classList.remove('active');
@@ -616,4 +630,24 @@ document.addEventListener('DOMContentLoaded', function() {
             apartmentError.style.display = 'none';
         }
     });
+
+    // Add validation for apartment number
+    if (apartmentInput) {
+        apartmentInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 0) {
+                this.value = 0;
+                document.getElementById('apartmentError').textContent = 'Apartment number cannot be negative';
+            } else {
+                document.getElementById('apartmentError').textContent = '';
+            }
+        });
+
+        // Also prevent negative numbers on keypress
+        apartmentInput.addEventListener('keypress', function(e) {
+            if (e.key === '-' || e.key === 'e') {
+                e.preventDefault();
+            }
+        });
+    }
 });
