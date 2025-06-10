@@ -1,4 +1,35 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Check login status and update buttons
+    function updateButtonLinks() {
+        const token = localStorage.getItem('token');
+        const heroButton = document.querySelector('.hero-buttons .primary-btn');
+        const secondHeroButton = document.querySelector('.second-hero-text .primary-btn');
+
+        if (token) {
+            // User is logged in
+            heroButton.href = './community.html';
+            heroButton.textContent = 'Join our Community';
+            secondHeroButton.href = './shop.html';
+            secondHeroButton.textContent = 'Visit our Shop';
+        } else {
+            // User is not logged in
+            heroButton.href = '../pages/login.html';
+            heroButton.textContent = 'Create your baby\'s profile';
+            secondHeroButton.href = '../pages/login.html';
+            secondHeroButton.textContent = 'Create your baby\'s Profile';
+        }
+    }
+
+    // Initial check
+    updateButtonLinks();
+
+    // Listen for storage changes (for when user logs in/out in another tab)
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'token') {
+            updateButtonLinks();
+        }
+    });
+
     // Chat elements
     const chatButton = document.getElementById('chatButton');
     const chatArea = document.getElementById('chatArea');
