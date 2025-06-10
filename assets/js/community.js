@@ -1,61 +1,113 @@
 // =================== community.js ===================
 
 // Profile Functions
-function showProfileMenu() {
-  const profileMenu = document.createElement('div');
-  profileMenu.className = 'profile-menu';
-  profileMenu.innerHTML = `
-    <div class="profile-menu-header">
-      <img src="../images/default-avatar.png" alt="Profile" class="profile-pic">
-      <div class="profile-info">
-        <h3>Current User</h3>
-        <p>user@example.com</p>
-      </div>
-    </div>
-    <div class="profile-menu-options">
-      <a href="#" onclick="editProfile(); return false;"><i class="fas fa-user-edit"></i> Edit Profile</a>
-      <a href="#" onclick="viewSavedPosts(); return false;"><i class="fas fa-bookmark"></i> Saved Posts</a>
-      <a href="#" onclick="viewSettings(); return false;"><i class="fas fa-cog"></i> Settings</a>
-      <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </div>
-  `;
-  
-  // Remove existing menu if any
-  const existingMenu = document.querySelector('.profile-menu');
-  if (existingMenu) {
-    existingMenu.remove();
-  }
-  
-  // Add new menu
-  document.querySelector('.header-actions').appendChild(profileMenu);
-  
-  // Close menu when clicking outside
-  document.addEventListener('click', function closeMenu(e) {
-    if (!e.target.closest('.profile-link') && !e.target.closest('.profile-menu')) {
-      profileMenu.remove();
-      document.removeEventListener('click', closeMenu);
+async function loadProfileContent() {
+  const profileContainer = document.getElementById('profile-container');
+  let isLoggedIn = false;
+  let userData = null;
+
+  // Check if token exists and is valid
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        userData = await response.json();
+        isLoggedIn = true;
+      } else {
+        // If token is invalid, remove it
+        localStorage.removeItem('token');
+      }
+    } catch (error) {
+      console.error('Error verifying token:', error);
+      // If there's an error, remove the token
+      localStorage.removeItem('token');
     }
-  });
+  }
+
+  // Create profile content based on login state
+  if (isLoggedIn) {
+    profileContainer.innerHTML = `
+      <div class="profile-dropdown">
+        <button class="profile-btn">
+          <img src="${userData?.profilePicture || '../images/default-avatar.png'}" 
+               alt="Profile" 
+               class="profile-img">
+          <span>${userData?.username || 'Profile'}</span>
+        </button>
+        <div class="dropdown-content">
+          <a href="profile.html">View Profile</a>
+          <a href="profile.html#baby-info">Baby's Profile</a>
+          <a href="shop.html">My Orders</a>
+          <a href="#" onclick="handleLogout(event)">Logout</a>
+        </div>
+      </div>
+    `;
+
+    // Add event listener for profile dropdown
+    const profileBtn = profileContainer.querySelector('.profile-btn');
+    if (profileBtn) {
+      profileBtn.addEventListener('click', () => {
+        profileContainer.querySelector('.profile-dropdown').classList.toggle('active');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.profile-dropdown')) {
+          profileContainer.querySelector('.profile-dropdown')?.classList.remove('active');
+        }
+      });
+    }
+  } else {
+    profileContainer.innerHTML = `
+      <div class="auth-buttons">
+        <a href="login.html?redirect=community.html" class="login-btn">Login</a>
+        <a href="login.html?redirect=community.html" class="signup-btn">Sign Up</a>
+      </div>
+    `;
+  }
 }
 
-function editProfile() {
-  // TODO: Implement profile editing
-  alert('Profile editing coming soon!');
+// Handle logout
+async function handleLogout(e) {
+  if (e) e.preventDefault();
+  
+  try {
+    // Clear the token first to ensure immediate logout
+    localStorage.removeItem('token');
+    
+    // Try to notify the server about logout
+    const response = await fetch('http://localhost:3000/api/v1/users/logout', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    // Redirect back to community page
+    window.location.href = './community.html';
+  } catch (error) {
+    console.error('Error during logout:', error);
+    // Still redirect even if server logout fails
+    window.location.href = './community.html';
+  }
 }
 
-function viewSavedPosts() {
-  showSavedPosts();
-}
-
-function viewSettings() {
-  // TODO: Implement settings
-  alert('Settings coming soon!');
-}
-
-function logout() {
-  // TODO: Implement logout
-  alert('Logout functionality coming soon!');
-}
+// Load profile content when the page loads
+window.onload = function() {
+  loadProfileContent();
+  loadMessages();
+  showCommunityPosts();
+  
+  // Check if we should show the expert section based on URL hash
+  if (window.location.hash === '#expert-section') {
+    selectChannel('expert');
+  }
+};
 
 // Function to show community posts (home)
 function showCommunityPosts() {
@@ -188,17 +240,6 @@ function generateExpertReply() {
   ];
   return replies[Math.floor(Math.random() * replies.length)];
 }
-
-// Load messages and show community posts when the page loads
-window.onload = function() {
-  loadMessages();
-  showCommunityPosts();
-  
-  // Check if we should show the expert section based on URL hash
-  if (window.location.hash === '#expert-section') {
-    selectChannel('expert');
-  }
-};
 
 // =================== Theme Toggle Logic ===================
 

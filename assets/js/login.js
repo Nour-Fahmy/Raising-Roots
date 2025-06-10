@@ -316,27 +316,44 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Update login form submission
-loginForm.addEventListener('submit', async (e) => {
+// Function to get redirect URL from query parameters
+function getRedirectUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('redirect') || 'homepage.html';
+}
+
+// Function to handle successful login
+async function handleSuccessfulLogin(userData) {
+    // Store the token in localStorage
+    localStorage.setItem('token', userData.token);
+    
+    // Get redirect URL
+    const redirectUrl = getRedirectUrl();
+    
+    // Redirect to the appropriate page
+    window.location.href = redirectUrl;
+}
+
+// Login form submission
+loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
-    clearFormFeedback('login');
     
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
-    // Validate all fields
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
+    // Clear previous feedback
+    clearFormFeedback('login');
     
+    // Validate inputs
+    const emailError = validateEmail(email);
     if (emailError) {
         showError('loginEmail', emailError);
-    }
-    if (passwordError) {
-        showError('loginPassword', passwordError);
+        return;
     }
     
-    if (emailError || passwordError) {
-        showFormFeedback('login', 'Please fix the errors before submitting');
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        showError('loginPassword', passwordError);
         return;
     }
     
@@ -348,35 +365,23 @@ loginForm.addEventListener('submit', async (e) => {
             },
             body: JSON.stringify({ email, password })
         });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            showFormFeedback('login', data.message || 'Login failed!');
-            return;
-        }
-
-        localStorage.setItem('token', data.token);
-        showFormFeedback('login', 'Login successful! Redirecting...', false);
         
-        setTimeout(() => {
-            if (data.user.role === 'admin') {
-                window.location.href = '../pages/admin/index.html';
-            } else {
-                window.location.href = '../pages/homepage.html';
-            }
-        }, 1500);
-
+        const data = await response.json();
+        
+        if (response.ok) {
+            await handleSuccessfulLogin(data);
+        } else {
+            showFormFeedback('login', data.message || 'Login failed. Please try again.');
+        }
     } catch (error) {
         console.error('Login error:', error);
-        showFormFeedback('login', 'An error occurred while logging in.');
+        showFormFeedback('login', 'An error occurred. Please try again.');
     }
 });
 
-// Update signup form submission
-signupForm.addEventListener('submit', async (e) => {
+// Signup form submission
+signupForm.addEventListener('submit', async function(e) {
     e.preventDefault();
-    clearFormFeedback('signup');
     
     const username = document.getElementById('signupUsername').value;
     const email = document.getElementById('signupEmail').value;
@@ -385,27 +390,47 @@ signupForm.addEventListener('submit', async (e) => {
     const babyGender = document.querySelector('input[name="babyGender"]:checked')?.value;
     const birthDate = document.getElementById('signupBirthDate').value;
     
-    // Validate all fields
+    // Clear previous feedback
+    clearFormFeedback('signup');
+    
+    // Validate all inputs
     const usernameError = validateUsername(username);
+    if (usernameError) {
+        showError('signupUsername', usernameError);
+        return;
+    }
+    
     const emailError = validateEmail(email);
+    if (emailError) {
+        showError('signupEmail', emailError);
+        return;
+    }
+    
     const passwordError = validatePassword(password);
+    if (passwordError) {
+        showError('signupPassword', passwordError);
+        return;
+    }
+    
     const babyNameError = validateBabyName(babyName);
+    if (babyNameError) {
+        showError('signupBabyName', babyNameError);
+        return;
+    }
+    
+    if (!babyGender) {
+        showError('signupBabyGender', 'Please select baby gender');
+        return;
+    }
+    
     const birthDateError = validateBirthDate(birthDate);
-    
-    if (usernameError) showError('signupUsername', usernameError);
-    if (emailError) showError('signupEmail', emailError);
-    if (passwordError) showError('signupPassword', passwordError);
-    if (babyNameError) showError('signupBabyName', babyNameError);
-    if (!babyGender) showError('signupBabyGender', 'Please select a gender');
-    if (birthDateError) showError('signupBirthDate', birthDateError);
-    
-    if (usernameError || emailError || passwordError || babyNameError || !babyGender || birthDateError) {
-        showFormFeedback('signup', 'Please fix the errors before submitting');
+    if (birthDateError) {
+        showError('signupBirthDate', birthDateError);
         return;
     }
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/register', {
+        const response = await fetch('http://localhost:3000/api/v1/users/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -419,24 +444,17 @@ signupForm.addEventListener('submit', async (e) => {
                 birthDate
             })
         });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            showFormFeedback('signup', data.message || 'Signup failed!');
-            return;
-        }
-
-        showFormFeedback('signup', 'Signup successful! Please log in.', false);
-        signupForm.reset();
         
-        setTimeout(() => {
-            showForm('login');
-        }, 1500);
-
+        const data = await response.json();
+        
+        if (response.ok) {
+            await handleSuccessfulLogin(data);
+        } else {
+            showFormFeedback('signup', data.message || 'Signup failed. Please try again.');
+        }
     } catch (error) {
         console.error('Signup error:', error);
-        showFormFeedback('signup', 'An error occurred while signing up.');
+        showFormFeedback('signup', 'An error occurred. Please try again.');
     }
 });
 
