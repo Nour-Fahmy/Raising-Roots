@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = 'homepage.html';
             return;
         }
-
+        
         // Load user data if token is valid
         await loadUserData();
 
@@ -113,12 +113,15 @@ async function loadUserData() {
         console.log('Raw user data from server:', userData);
         
         // Update profile header
-        const username = userData.data?.username || userData.username;
-        const email = userData.data?.email || userData.email;
-        const babyName = userData.data?.babyName || userData.babyName;
-        const babyGender = userData.data?.babyGender || userData.babyGender;
-        const birthDate = userData.data?.birthDate || userData.birthDate;
-        const profilePicture = userData.data?.profilePicture || userData.profilePicture;
+        const user = userData.user || userData;
+
+const username = user.username || 'Not set';
+const email = user.email || 'Not set';
+const babyName = user.babyName || 'Not set';
+const babyGender = user.babyGender || 'Not set';
+const birthDate = user.birthDate || null;
+const profilePicture = user.profilePicture || null;
+
 
         console.log('Processed user data:', {
             username,

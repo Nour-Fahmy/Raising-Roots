@@ -101,12 +101,21 @@ router.post('/login', async (req, res) => {
 //hena ana b test el auth middleware
 const authenticateToken = require('../middleware/auth');
 
-router.get('/profile', authenticateToken, (req, res) => {
-  res.status(200).json({
-    message: 'You are authenticated!',
-    user: req.user
-  });
+router.get('/profile', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('-passwordHash');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
 });
+
 
 
 
