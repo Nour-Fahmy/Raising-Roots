@@ -215,7 +215,134 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalPrice = document.querySelector('.total-price');
     const addToCartButtons = document.querySelectorAll('.add-to-cart');
 
+    // Initialize cart from localStorage or empty array
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Function to save cart to localStorage
+    function saveCart() {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+
+    // Function to update cart display
+    function updateCart() {
+        cartItems.innerHTML = '';
+        let total = 0;
+        let count = 0;
+
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            count += item.quantity;
+
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+                <div class="cart-item-details">
+                    <h3 class="cart-item-title">${item.title}</h3>
+                    <p class="cart-item-price">EGP ${item.price.toFixed(2)}</p>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn decrease">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn increase">+</button>
+                        <button class="remove-item">Remove</button>
+                    </div>
+                </div>
+            `;
+
+            // Add event listeners for quantity buttons
+            const decreaseBtn = cartItem.querySelector('.decrease');
+            const increaseBtn = cartItem.querySelector('.increase');
+            const removeBtn = cartItem.querySelector('.remove-item');
+
+            decreaseBtn.addEventListener('click', () => {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                    // Increase stock on product card
+                    const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+                    if (productCard) {
+                        const stockInfoElement = productCard.querySelector('.stock-info');
+                        let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+                        currentStock++;
+                        stockInfoElement.textContent = `In Stock: ${currentStock}`;
+
+                        const addToCartButton = productCard.querySelector('.add-to-cart');
+                        if (addToCartButton) {
+                            addToCartButton.textContent = 'Add to Cart';
+                            addToCartButton.disabled = false;
+                            addToCartButton.style.backgroundColor = '';
+                            addToCartButton.style.cursor = '';
+                        }
+                    }
+                    saveCart();
+                    updateCart();
+                }
+            });
+
+            increaseBtn.addEventListener('click', () => {
+                // Check if there is enough stock before increasing quantity in cart
+                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+                const stockInfoElement = productCard.querySelector('.stock-info');
+                let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+
+                if (currentStock > 0) {
+                    item.quantity += 1;
+                    // Decrease stock on product card
+                    currentStock--;
+                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
+
+                    if (currentStock === 0) {
+                        const addToCartButton = productCard.querySelector('.add-to-cart');
+                        if (addToCartButton) {
+                            addToCartButton.textContent = 'Out of Stock';
+                            addToCartButton.disabled = true;
+                            addToCartButton.style.backgroundColor = '#ccc';
+                            addToCartButton.style.cursor = 'not-allowed';
+                        }
+                    }
+                    saveCart();
+                    updateCart();
+                } else {
+                    alert('Not enough stock available!');
+                }
+            });
+
+            removeBtn.addEventListener('click', () => {
+                // Increase stock on product card by the quantity removed
+                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+                if (productCard) {
+                    const stockInfoElement = productCard.querySelector('.stock-info');
+                    let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+                    currentStock += item.quantity;
+                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
+
+                    const addToCartButton = productCard.querySelector('.add-to-cart');
+                    if (addToCartButton) {
+                        addToCartButton.textContent = 'Add to Cart';
+                        addToCartButton.disabled = false;
+                        addToCartButton.style.backgroundColor = '';
+                        addToCartButton.style.cursor = '';
+                    }
+                }
+                cart = cart.filter(cartItem => cartItem.id !== item.id);
+                saveCart();
+                updateCart();
+            });
+
+            cartItems.appendChild(cartItem);
+        });
+
+        // Update cart count and total
+        cartCount.textContent = count;
+        totalPrice.textContent = `EGP ${total.toFixed(2)}`;
+
+        // Calculate and display estimated delivery date
+        const deliveryDate = new Date();
+        deliveryDate.setDate(deliveryDate.getDate() + 3); // Add 3 days
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.querySelector('.delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', options);
+    }
 
     // Toggle cart visibility
     cartIcon.addEventListener('click', () => {
@@ -269,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Save cart to localStorage
-            localStorage.setItem('cart', JSON.stringify(cart));
+            saveCart();
             
             // Update cart display
             updateCart();
@@ -277,127 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Function to update cart display
-    function updateCart() {
-        cartItems.innerHTML = '';
-        let total = 0;
-        let count = 0;
-
-        cart.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            total += itemTotal;
-            count += item.quantity;
-
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item';
-            cartItem.innerHTML = `
-                <img src="${item.image}" alt="${item.title}" class="cart-item-image">
-                <div class="cart-item-details">
-                    <h3 class="cart-item-title">${item.title}</h3>
-                    <p class="cart-item-price">EGP ${item.price.toFixed(2)}</p>
-                    <div class="cart-item-quantity">
-                        <button class="quantity-btn decrease">-</button>
-                        <span>${item.quantity}</span>
-                        <button class="quantity-btn increase">+</button>
-                        <button class="remove-item">Remove</button>
-                    </div>
-                </div>
-            `;
-
-            // Add event listeners for quantity buttons
-            const decreaseBtn = cartItem.querySelector('.decrease');
-            const increaseBtn = cartItem.querySelector('.increase');
-            const removeBtn = cartItem.querySelector('.remove-item');
-
-            decreaseBtn.addEventListener('click', () => {
-                if (item.quantity > 1) {
-                    item.quantity -= 1;
-                    // Increase stock on product card
-                    const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
-                    if (productCard) {
-                        const stockInfoElement = productCard.querySelector('.stock-info');
-                        let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-                        currentStock++;
-                        stockInfoElement.textContent = `In Stock: ${currentStock}`;
-
-                        const addToCartButton = productCard.querySelector('.add-to-cart');
-                        if (addToCartButton) {
-                            addToCartButton.textContent = 'Add to Cart';
-                            addToCartButton.disabled = false;
-                            addToCartButton.style.backgroundColor = ''; // Reset to default
-                            addToCartButton.style.cursor = '';
-                        }
-                    }
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    updateCart();
-                }
-            });
-
-            increaseBtn.addEventListener('click', () => {
-                // Check if there is enough stock before increasing quantity in cart
-                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
-                const stockInfoElement = productCard.querySelector('.stock-info');
-                let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-
-                if (currentStock > 0) {
-                    item.quantity += 1;
-                    // Decrease stock on product card
-                    currentStock--;
-                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
-
-                    if (currentStock === 0) {
-                        const addToCartButton = productCard.querySelector('.add-to-cart');
-                        if (addToCartButton) {
-                            addToCartButton.textContent = 'Out of Stock';
-                            addToCartButton.disabled = true;
-                            addToCartButton.style.backgroundColor = '#ccc';
-                            addToCartButton.style.cursor = 'not-allowed';
-                        }
-                    }
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    updateCart();
-                } else {
-                    alert('Not enough stock available!');
-                }
-            });
-
-            removeBtn.addEventListener('click', () => {
-                // Increase stock on product card by the quantity removed
-                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
-                if (productCard) {
-                    const stockInfoElement = productCard.querySelector('.stock-info');
-                    let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-                    currentStock += item.quantity;
-                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
-
-                    const addToCartButton = productCard.querySelector('.add-to-cart');
-                    if (addToCartButton) {
-                        addToCartButton.textContent = 'Add to Cart';
-                        addToCartButton.disabled = false;
-                        addToCartButton.style.backgroundColor = ''; // Reset to default
-                        addToCartButton.style.cursor = '';
-                    }
-                }
-                cart = cart.filter(cartItem => cartItem.id !== item.id);
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCart();
-            });
-
-            cartItems.appendChild(cartItem);
-        });
-
-        // Update cart count and total
-        cartCount.textContent = count;
-        totalPrice.textContent = `EGP ${total.toFixed(2)}`;
-
-        // Calculate and display estimated delivery date
-        const deliveryDate = new Date();
-        deliveryDate.setDate(deliveryDate.getDate() + 3); // Add 3 days
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.querySelector('.delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', options);
-    }
-
-    // Initialize cart display
+    // Initial cart update
     updateCart();
 
     // Checkout functionality
@@ -581,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear cart and close modals
         cart = [];
-        localStorage.setItem('cart', JSON.stringify(cart));
+        saveCart();
         updateCart();
         checkoutModal.classList.remove('active');
         cartContainer.classList.remove('active');
@@ -651,3 +658,218 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Listen for navigation updates
+window.addEventListener('navigationUpdated', function() {
+    initializeCart();
+});
+
+function initializeCart() {
+    // Initialize cart count from localStorage if it exists
+    const cartCount = document.querySelector('.cart-count');
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+        const cart = JSON.parse(savedCart);
+        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+
+    // Cart functionality
+    const cartContainer = document.querySelector('.cart-container');
+    const cartIcon = document.querySelector('.cart-icon');
+    const closeCart = document.querySelector('.close-cart');
+    const cartItems = document.querySelector('.cart-items');
+    const totalPrice = document.querySelector('.total-price');
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+
+    // Initialize cart from localStorage or empty array
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    // Function to save cart to localStorage
+    function saveCart() {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+
+    // Toggle cart visibility
+    cartIcon.addEventListener('click', () => {
+        cartContainer.classList.add('active');
+        // Reset payment method to cash and hide credit card fields
+        document.querySelector('input[name="payment"][value="cash"]').checked = true;
+        document.querySelector('.credit-card-fields').style.display = 'none';
+    });
+
+    closeCart.addEventListener('click', () => {
+        cartContainer.classList.remove('active');
+    });
+
+    // Add to cart functionality
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const productCard = button.closest('.product-card');
+            const stockInfoElement = productCard.querySelector('.stock-info');
+            let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+
+            if (currentStock <= 0) {
+                alert('This item is out of stock!');
+                return;
+            }
+
+            // Decrease stock and update display
+            currentStock--;
+            stockInfoElement.textContent = `In Stock: ${currentStock}`;
+
+            if (currentStock === 0) {
+                button.textContent = 'Out of Stock';
+                button.disabled = true;
+                button.style.backgroundColor = '#ccc';
+                button.style.cursor = 'not-allowed';
+            }
+
+            const product = {
+                id: productCard.getAttribute('data-product-id'),
+                title: productCard.querySelector('.product-title').textContent,
+                price: parseFloat(productCard.querySelector('.product-price').textContent.replace('EGP ', '')),
+                image: productCard.querySelector('.product-image').src,
+                quantity: 1
+            };
+
+            // Check if product already exists in cart
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push(product);
+            }
+
+            // Save cart to localStorage
+            saveCart();
+            
+            // Update cart display
+            updateCart();
+            cartContainer.classList.add('active');
+        });
+    });
+
+    // Function to update cart display
+    function updateCart() {
+        cartItems.innerHTML = '';
+        let total = 0;
+        let count = 0;
+
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            count += item.quantity;
+
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+                <div class="cart-item-details">
+                    <h3 class="cart-item-title">${item.title}</h3>
+                    <p class="cart-item-price">EGP ${item.price.toFixed(2)}</p>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn decrease">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn increase">+</button>
+                        <button class="remove-item">Remove</button>
+                    </div>
+                </div>
+            `;
+
+            // Add event listeners for quantity buttons
+            const decreaseBtn = cartItem.querySelector('.decrease');
+            const increaseBtn = cartItem.querySelector('.increase');
+            const removeBtn = cartItem.querySelector('.remove-item');
+
+            decreaseBtn.addEventListener('click', () => {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                    // Increase stock on product card
+                    const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+                    if (productCard) {
+                        const stockInfoElement = productCard.querySelector('.stock-info');
+                        let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+                        currentStock++;
+                        stockInfoElement.textContent = `In Stock: ${currentStock}`;
+
+                        const addToCartButton = productCard.querySelector('.add-to-cart');
+                        if (addToCartButton) {
+                            addToCartButton.textContent = 'Add to Cart';
+                            addToCartButton.disabled = false;
+                            addToCartButton.style.backgroundColor = '';
+                            addToCartButton.style.cursor = '';
+                        }
+                    }
+                    saveCart();
+                    updateCart();
+                }
+            });
+
+            increaseBtn.addEventListener('click', () => {
+                // Check if there is enough stock before increasing quantity in cart
+                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+                const stockInfoElement = productCard.querySelector('.stock-info');
+                let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+
+                if (currentStock > 0) {
+                    item.quantity += 1;
+                    // Decrease stock on product card
+                    currentStock--;
+                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
+
+                    if (currentStock === 0) {
+                        const addToCartButton = productCard.querySelector('.add-to-cart');
+                        if (addToCartButton) {
+                            addToCartButton.textContent = 'Out of Stock';
+                            addToCartButton.disabled = true;
+                            addToCartButton.style.backgroundColor = '#ccc';
+                            addToCartButton.style.cursor = 'not-allowed';
+                        }
+                    }
+                    saveCart();
+                    updateCart();
+                } else {
+                    alert('Not enough stock available!');
+                }
+            });
+
+            removeBtn.addEventListener('click', () => {
+                // Increase stock on product card by the quantity removed
+                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+                if (productCard) {
+                    const stockInfoElement = productCard.querySelector('.stock-info');
+                    let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+                    currentStock += item.quantity;
+                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
+
+                    const addToCartButton = productCard.querySelector('.add-to-cart');
+                    if (addToCartButton) {
+                        addToCartButton.textContent = 'Add to Cart';
+                        addToCartButton.disabled = false;
+                        addToCartButton.style.backgroundColor = '';
+                        addToCartButton.style.cursor = '';
+                    }
+                }
+                cart = cart.filter(cartItem => cartItem.id !== item.id);
+                saveCart();
+                updateCart();
+            });
+
+            cartItems.appendChild(cartItem);
+        });
+
+        // Update cart count and total
+        cartCount.textContent = count;
+        totalPrice.textContent = `EGP ${total.toFixed(2)}`;
+
+        // Calculate and display estimated delivery date
+        const deliveryDate = new Date();
+        deliveryDate.setDate(deliveryDate.getDate() + 3); // Add 3 days
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.querySelector('.delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', options);
+    }
+
+    // Initial cart update
+    updateCart();
+}

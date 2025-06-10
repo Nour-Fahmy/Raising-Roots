@@ -38,6 +38,10 @@ async function loadNavigation() {
     const currentPath = window.location.pathname;
     const isShopPage = currentPath.includes('shop.html');
 
+    // Get current cart count from localStorage
+    const savedCart = localStorage.getItem('cart');
+    const cartCount = savedCart ? JSON.parse(savedCart).reduce((total, item) => total + item.quantity, 0) : 0;
+
     const navHtml = `
         <nav class="navbar">
             <div class="nav-left">
@@ -144,7 +148,7 @@ async function loadNavigation() {
                     ${isShopPage ? `
                         <div class="cart-icon">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-count">0</span>
+                            <span class="cart-count">${cartCount}</span>
                         </div>
                     ` : ''}
                     <div class="profile-dropdown">
@@ -165,7 +169,7 @@ async function loadNavigation() {
                     ${isShopPage ? `
                         <div class="cart-icon">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-count">0</span>
+                            <span class="cart-count">${cartCount}</span>
                         </div>
                     ` : ''}
                     <a href="login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="login-btn">Login</a>
@@ -201,6 +205,12 @@ async function loadNavigation() {
                 document.querySelector('.profile-dropdown')?.classList.remove('active');
             }
         });
+    }
+
+    // If we're on the shop page, reinitialize cart functionality
+    if (isShopPage) {
+        // Dispatch a custom event to notify shop.js that navigation has been updated
+        window.dispatchEvent(new CustomEvent('navigationUpdated'));
     }
 }
 
