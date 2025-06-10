@@ -24,25 +24,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ POST a new product (with optional image upload)
-/*
-router.post('/', upload.single('image'), async (req, res) => {
-  try {
-    const newProduct = new Product({
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      category: req.body.category,
-      image: req.file ? req.file.path : null
-    });
-
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
-  } catch (err) {
-    res.status(400).json({ message: 'Error creating product' });
-  }
-});
-*/
 
 router.post('/', upload.single('image'), async (req, res) => {
     try {
