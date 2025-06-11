@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Raising Roots</title>
+    <link rel="stylesheet" href="../assets/css/NavFoot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f6f4;
+        }
+
+        .navbar {
+            background-color: rgb(94, 56, 41) !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .about-hero {
+            position: relative;
+            height: 60vh;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+            margin: 0 0 3rem 0;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('../images/Img1.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: blur(2px);
+            transform: scale(1.1);
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+
+        .about-hero p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .about-section {
+            margin-bottom: 4rem;
+            background: #fff9f5;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-section h2 {
+            color: rgb(94, 56, 41);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .about-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: rgb(94, 56, 41);
+        }
+
+        .mission-vision {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .mission-card, .vision-card {
+            background: #fff9f5;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .mission-card:hover, .vision-card:hover {
+            transform: translateY(-5px);
+            background: #fff5ee;
+        }
+
+        .mission-card h2, .vision-card h2 {
+            color: rgb(94, 56, 41);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .mission-card h2::after, .vision-card h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: rgb(94, 56, 41);
+        }
+
+        .team-section {
+            text-align: center;
+            background: #fff9f5;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 4rem;
+        }
+
+        .team-section h2 {
+            color: rgb(94, 56, 41);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .team-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: rgb(94, 56, 41);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .team-member {
+            background: #fff9f5;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            background: #fff5ee;
+        }
+
+        .team-member img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+            border: 4px solid rgb(94, 56, 41);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-member h3 {
+            color: rgb(94, 56, 41);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-member p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .values-section {
+            background: #fff9f5;
+            padding: 4rem 0;
+            margin: 3rem 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .values-section h2 {
+            color: rgb(94, 56, 41);
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .values-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: rgb(94, 56, 41);
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2.5rem;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .value-item {
+            padding: 2rem;
+            transition: transform 0.3s ease;
+            background: #fff9f5;
+            border-radius: 10px;
+        }
+
+        .value-item:hover {
+            transform: translateY(-5px);
+            background: #fff5ee;
+        }
+
+        .value-item i {
+            font-size: 3rem;
+            color: rgb(94, 56, 41);
+            margin-bottom: 1.5rem;
+        }
+
+        .value-item h3 {
+            color: rgb(94, 56, 41);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: auto;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .about-hero {
+                height: 50vh;
+                min-height: 400px;
+            }
+
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-hero p {
+                font-size: 1.2rem;
+            }
+
+            .mission-vision {
+                grid-template-columns: 1fr;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation will be loaded here -->
+    <div id="nav-placeholder"></div>
+
+    <div class="about-container">
+        <section class="about-hero">
+            <div class="hero-content">
+                <h1>About Raising Roots</h1>
+                <p>Empowering parents with knowledge, support, and community</p>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <h2>Our Story</h2>
+            <p>Raising Roots was born from a simple yet powerful idea: every parent deserves access to reliable information, expert guidance, and a supportive community. Founded in 2024, we've grown from a small community of parents to a comprehensive platform serving thousands of families worldwide.</p>
+        </section>
+
+        <div class="mission-vision">
+            <div class="mission-card">
+                <h2>Our Mission</h2>
+                <p>To empower parents with the knowledge, tools, and support they need to raise healthy, happy children. We believe that by providing accessible, evidence-based information and fostering a supportive community, we can help parents navigate the beautiful journey of parenthood with confidence.</p>
+            </div>
+            <div class="vision-card">
+                <h2>Our Vision</h2>
+                <p>To create a world where every parent has access to the resources and support they need to raise thriving children. We envision a global community where parents can connect, share experiences, and learn from each other, supported by expert guidance and reliable information.</p>
+            </div>
+        </div>
+
+        <section class="values-section">
+            <div class="about-container">
+                <h2>Our Values</h2>
+                <div class="values-grid">
+                    <div class="value-item">
+                        <i class="fas fa-heart"></i>
+                        <h3>Empathy</h3>
+                        <p>Understanding and supporting parents in their unique journey</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-book"></i>
+                        <h3>Education</h3>
+                        <p>Providing evidence-based, reliable information</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-users"></i>
+                        <h3>Community</h3>
+                        <p>Building supportive networks for parents</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Trust</h3>
+                        <p>Maintaining the highest standards of reliability and safety</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="team-section">
+            <h2>Our Team</h2>
+            <p>Meet the passionate individuals behind Raising Roots</p>
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="../images/default-avatar.png" alt="Team Member">
+                    <h3>Sarah Johnson</h3>
+                    <p>Founder & CEO</p>
+                </div>
+                <div class="team-member">
+                    <img src="../images/default-avatar.png" alt="Team Member">
+                    <h3>Dr. Michael Chen</h3>
+                    <p>Medical Director</p>
+                </div>
+                <div class="team-member">
+                    <img src="../images/default-avatar.png" alt="Team Member">
+                    <h3>Emily Parker</h3>
+                    <p>Community Manager</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer will be loaded here -->
+    <div id="footer-placeholder"></div>
+
+    <script src="../assets/js/NavFoot.js"></script>
+</body>
+</html>
