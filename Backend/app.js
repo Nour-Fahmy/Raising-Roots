@@ -51,9 +51,11 @@ app.get('/api/v1/ping', (req, res) => {
 // User routes
 const userRoutes = require('./routes/users');
 const expertApplicationRoutes = require('./routes/expertApplications');
+const postRoutes = require('./routes/posts');
 // const expertRoutes = require('./routes/experts'); // Removed expert routes
 app.use(`${process.env.API_URL}/users`, userRoutes);
 app.use(`${process.env.API_URL}/experts`, expertApplicationRoutes);
+app.use(`${process.env.API_URL}/posts`, postRoutes);
 // app.use(`${process.env.API_URL}/experts`, expertRoutes); // Removed expert routes
 
 // Error handling middleware

@@ -151,7 +151,7 @@ window.onload = function() {
 };
 
 // Function to show community posts (home)
-function showCommunityPosts() {
+async function showCommunityPosts() {
   // Hide all sections
   document.querySelector('#community-section').classList.add('hidden');
   document.querySelector('#expert-section').classList.add('hidden');
@@ -166,6 +166,28 @@ function showCommunityPosts() {
     item.classList.remove('active');
   });
   document.querySelector('.nav-item[onclick="showCommunityPosts()"]').classList.add('active');
+
+  // Fetch posts from backend
+  try {
+    const response = await fetch('http://localhost:3000/api/v1/posts');
+    if (response.ok) {
+      const posts = await response.json();
+      const postsContainer = document.getElementById('posts-container');
+      postsContainer.innerHTML = ''; // Clear existing posts
+      
+      if (posts.data && posts.data.length > 0) {
+        posts.data.forEach(post => {
+          postsContainer.appendChild(createPostElement(post));
+        });
+      } else {
+        postsContainer.innerHTML = '<p class="no-posts">No posts yet. Be the first to share!</p>';
+      }
+    } else {
+      console.error('Failed to fetch posts');
+    }
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+  }
 }
 
 // Function to select and display the active channel
@@ -334,42 +356,60 @@ function hideCreatePostForm() {
   document.getElementById('post-category').value = '';
 }
 
-function submitPost(event) {
+// Function to submit a new post
+async function submitPost(event) {
   event.preventDefault();
   
   const title = document.getElementById('post-title').value;
   const content = document.getElementById('post-content').value;
   const category = document.getElementById('post-category').value;
   
-  // Create new post element
-  const postElement = createPostElement({
-    title,
-    content,
-    category,
-    author: 'Current User', // This would come from user authentication
-    date: 'Just now'
-  });
-  
-  // Add post to the grid
-  const postsContainer = document.getElementById('posts-container');
-  postsContainer.insertBefore(postElement, postsContainer.firstChild);
-  
-  // Hide form and clear fields
-  hideCreatePostForm();
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Please login to create a post');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:3000/api/v1/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ title, content, category })
+    });
+
+    if (response.ok) {
+      const newPost = await response.json();
+      const postsContainer = document.getElementById('posts-container');
+      postsContainer.insertBefore(createPostElement(newPost.data), postsContainer.firstChild);
+      hideCreatePostForm();
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-content').value = '';
+      document.getElementById('post-category').value = '';
+    } else {
+      const error = await response.json();
+      alert(error.message || 'Failed to create post');
+    }
+  } catch (error) {
+    console.error('Error creating post:', error);
+    alert('Failed to create post. Please try again.');
+  }
 }
 
+// Function to create a post element
 function createPostElement(post) {
   const article = document.createElement('article');
   article.className = 'post-card';
-  
   article.innerHTML = `
     <div class="post-header">
       <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
       <div class="post-info">
         <h3>${post.title}</h3>
         <div class="post-meta">
-          <span class="author">${post.author}</span>
-          <span class="date">${post.date}</span>
+          <span class="author">${post.author?.username || 'Anonymous'}</span>
+          <span class="date">${new Date(post.createdAt).toLocaleDateString()}</span>
           <span class="category">${post.category}</span>
         </div>
       </div>
@@ -378,30 +418,52 @@ function createPostElement(post) {
       <p>${post.content}</p>
     </div>
     <div class="post-actions">
-      <button class="action-btn" onclick="likePost(this)">
-        <i class="fas fa-heart"></i> Like
+      <button class="action-btn" onclick="likePost(this)" data-post-id="${post._id}">
+        <i class="fas fa-heart"></i> Like (${post.likes?.length || 0})
       </button>
-      <button class="action-btn" onclick="showComments(this)">
-        <i class="fas fa-comment"></i> Comment
+      <button class="action-btn" onclick="showComments(this)" data-post-id="${post._id}">
+        <i class="fas fa-comment"></i> Comment (${post.comments?.length || 0})
       </button>
-      <button class="action-btn" onclick="sharePost(this)">
+      <button class="action-btn" onclick="sharePost(this)" data-post-id="${post._id}">
         <i class="fas fa-share"></i> Share
+      </button>
+      <button class="action-btn" onclick="toggleSavePost(this)" data-post-id="${post._id}">
+        <i class="far fa-bookmark"></i> Save
       </button>
     </div>
   `;
-  
   return article;
 }
 
-function likePost(button) {
-  const icon = button.querySelector('i');
-  if (icon.classList.contains('fas')) {
-    icon.classList.remove('fas');
-    icon.classList.add('far');
-  } else {
-    icon.classList.remove('far');
-    icon.classList.add('fas');
-    icon.style.color = '#ff4757';
+// Function to like a post
+async function likePost(button) {
+  const postId = button.dataset.postId;
+  const token = localStorage.getItem('token');
+  
+  if (!token) {
+    alert('Please login to like posts');
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/like`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      const updatedPost = await response.json();
+      const likeCount = updatedPost.data.likes.length;
+      button.innerHTML = `<i class="fas fa-heart"></i> Like (${likeCount})`;
+    } else {
+      const error = await response.json();
+      alert(error.message || 'Failed to like post');
+    }
+  } catch (error) {
+    console.error('Error liking post:', error);
+    alert('Failed to like post. Please try again.');
   }
 }
 
@@ -718,4 +780,5 @@ function handleHeaderSearch(event) {
     user.style.display = isVisible ? 'flex' : 'none';
   });
 }
+
 

@@ -1033,4 +1033,127 @@ section.active {
     .application-actions .btn {
         width: 100%;
     }
+}
+
+/* Community Management Styles */
+.member-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.2s ease;
+}
+
+.member-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.member-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.member-header img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.member-info h4 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.member-role {
+    color: #666;
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+.member-email {
+    color: #888;
+    font-size: 0.85em;
+}
+
+.member-details {
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.member-details p {
+    margin: 8px 0;
+    color: #555;
+}
+
+.member-details i {
+    width: 20px;
+    color: #666;
+}
+
+.member-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.member-card.doctor {
+    border-left: 4px solid #28a745;
+}
+
+.member-card.user {
+    border-left: 4px solid #17a2b8;
+}
+
+.no-members {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Dark theme support */
+body.dark-theme .member-card {
+    background: #2d2d2d;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-theme .member-info h4 {
+    color: #fff;
+}
+
+body.dark-theme .member-role,
+body.dark-theme .member-email {
+    color: #bbb;
+}
+
+body.dark-theme .member-details {
+    background: #363636;
+}
+
+body.dark-theme .member-details p {
+    color: #ddd;
+}
+
+body.dark-theme .member-details i {
+    color: #bbb;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .member-actions {
+        flex-direction: column;
+    }
+    
+    .member-actions .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
 } 

@@ -113,6 +113,10 @@ function navigateToSection(sectionId) {
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
         targetSection.style.display = 'block';
+        // Fetch posts when navigating to posts section
+        if (sectionId === 'posts') {
+            fetchPosts();
+        }
     }
     
     // Update active nav item
@@ -123,6 +127,10 @@ function navigateToSection(sectionId) {
             item.classList.add('active');
         }
     });
+
+    if (sectionId === 'community') {
+        fetchCommunity();
+    }
 }
 
 // Update dashboard statistics
@@ -648,3 +656,283 @@ const modalStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = modalStyles;
 document.head.appendChild(styleSheet);
+
+// Function to fetch and display posts
+async function fetchPosts() {
+    try {
+        const response = await fetch('http://localhost:3000/api/v1/posts');
+        if (response.ok) {
+            const data = await response.json();
+            const postsGrid = document.querySelector('#all-posts-tab .posts-grid');
+            postsGrid.innerHTML = ''; // Clear existing posts
+            
+            if (data.data && data.data.length > 0) {
+                data.data.forEach(post => {
+                    postsGrid.appendChild(createPostCard(post));
+                });
+            } else {
+                postsGrid.innerHTML = '<p class="no-posts">No posts found</p>';
+            }
+        } else {
+            console.error('Failed to fetch posts');
+            showNotification('Failed to fetch posts', 'error');
+        }
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        showNotification('Error fetching posts', 'error');
+    }
+}
+
+// Function to create a post card for admin panel
+function createPostCard(post) {
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    card.innerHTML = `
+        <div class="post-header">
+            <div class="post-author">
+                <img src="../../images/default-avatar.png" alt="${post.author?.username || 'Anonymous'}">
+                <div class="post-author-info">
+                    <h4>${post.author?.username || 'Anonymous'}</h4>
+                    <p>${new Date(post.createdAt).toLocaleDateString()}</p>
+                </div>
+            </div>
+            <div class="post-status ${post.status}">${post.status}</div>
+        </div>
+        <div class="post-content">
+            <h3>${post.title}</h3>
+            <p>${post.content}</p>
+        </div>
+        <div class="post-stats">
+            <span><i class="fas fa-heart"></i> ${post.likes?.length || 0}</span>
+            <span><i class="fas fa-comment"></i> ${post.comments?.length || 0}</span>
+            <span><i class="fas fa-flag"></i> ${post.reports?.length || 0}</span>
+        </div>
+        <div class="post-actions">
+            <button class="btn primary-btn" onclick="handlePostAction(this, '${post._id}', 'approve')">
+                <i class="fas fa-check"></i> Approve
+            </button>
+            <button class="btn secondary-btn" onclick="handlePostAction(this, '${post._id}', 'hide')">
+                <i class="fas fa-eye-slash"></i> Hide
+            </button>
+            <button class="btn danger-btn" onclick="handlePostAction(this, '${post._id}', 'delete')">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `;
+    return card;
+}
+
+// Function to handle post actions (approve, hide, delete)
+async function handlePostAction(button, postId, action) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        showNotification('Please login to perform this action', 'error');
+        return;
+    }
+
+    try {
+        let response;
+        switch (action) {
+            case 'approve':
+                response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: 'active' })
+                });
+                break;
+            case 'hide':
+                response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: 'hidden' })
+                });
+                break;
+            case 'delete':
+                response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                break;
+        }
+
+        if (response.ok) {
+            showNotification(`Post ${action}d successfully`, 'success');
+            fetchPosts(); // Refresh the posts list
+        } else {
+            const error = await response.json();
+            showNotification(error.message || `Failed to ${action} post`, 'error');
+        }
+    } catch (error) {
+        console.error(`Error ${action}ing post:`, error);
+        showNotification(`Error ${action}ing post`, 'error');
+    }
+}
+
+// Function to fetch and display community members
+async function fetchCommunity() {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showNotification('Please login to view community members', 'error');
+            return;
+        }
+
+        const response = await fetch('http://localhost:3000/api/v1/users', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const allMembersGrid = document.querySelector('#all-tab .members-grid');
+            const doctorsGrid = document.querySelector('#doctors-tab .doctors-grid');
+            const clientsGrid = document.querySelector('#clients-tab .clients-grid');
+
+            // Clear existing content
+            allMembersGrid.innerHTML = '';
+            doctorsGrid.innerHTML = '';
+            clientsGrid.innerHTML = '';
+
+            if (data.data && data.data.length > 0) {
+                data.data.forEach(member => {
+                    const memberCard = createMemberCard(member);
+                    allMembersGrid.appendChild(memberCard.cloneNode(true));
+
+                    if (member.role === 'doctor') {
+                        doctorsGrid.appendChild(memberCard.cloneNode(true));
+                    } else {
+                        clientsGrid.appendChild(memberCard.cloneNode(true));
+                    }
+                });
+            } else {
+                const noMembersMessage = '<p class="no-members">No members found</p>';
+                allMembersGrid.innerHTML = noMembersMessage;
+                doctorsGrid.innerHTML = noMembersMessage;
+                clientsGrid.innerHTML = noMembersMessage;
+            }
+        } else {
+            console.error('Failed to fetch community members');
+            showNotification('Failed to fetch community members', 'error');
+        }
+    } catch (error) {
+        console.error('Error fetching community members:', error);
+        showNotification('Error fetching community members', 'error');
+    }
+}
+
+// Function to create a member card
+function createMemberCard(member) {
+    const card = document.createElement('div');
+    card.className = `member-card ${member.role}`;
+    card.innerHTML = `
+        <div class="member-header">
+            <img src="../../images/default-avatar.png" alt="${member.username}">
+            <div class="member-info">
+                <h4>${member.username}</h4>
+                <p class="member-role">${member.role}</p>
+                <p class="member-email">${member.email}</p>
+            </div>
+        </div>
+        <div class="member-details">
+            <p><i class="fas fa-baby"></i> Baby: ${member.babyName}</p>
+            <p><i class="fas fa-venus-mars"></i> Gender: ${member.babyGender}</p>
+            <p><i class="fas fa-calendar"></i> Birth Date: ${new Date(member.birthDate).toLocaleDateString()}</p>
+        </div>
+        <div class="member-actions">
+            ${member.role === 'user' ? `
+                <button class="btn primary-btn" onclick="handleMemberAction(this, '${member._id}', 'promote')">
+                    <i class="fas fa-user-md"></i> Promote to Doctor
+                </button>
+            ` : member.role === 'doctor' ? `
+                <button class="btn secondary-btn" onclick="handleMemberAction(this, '${member._id}', 'demote')">
+                    <i class="fas fa-user"></i> Demote to User
+                </button>
+            ` : ''}
+            <button class="btn danger-btn" onclick="handleMemberAction(this, '${member._id}', 'delete')">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `;
+    return card;
+}
+
+// Function to handle member actions (promote, demote, delete)
+async function handleMemberAction(button, memberId, action) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        showNotification('Please login to perform this action', 'error');
+        return;
+    }
+
+    try {
+        let response;
+        switch (action) {
+            case 'promote':
+                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}/role`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ role: 'doctor' })
+                });
+                break;
+            case 'demote':
+                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}/role`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ role: 'user' })
+                });
+                break;
+            case 'delete':
+                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                break;
+        }
+
+        if (response.ok) {
+            showNotification(`Member ${action}d successfully`, 'success');
+            fetchCommunity(); // Refresh the members list
+        } else {
+            const error = await response.json();
+            showNotification(error.message || `Failed to ${action} member`, 'error');
+        }
+    } catch (error) {
+        console.error(`Error ${action}ing member:`, error);
+        showNotification(`Error ${action}ing member`, 'error');
+    }
+}
+
+// Function to search community members
+function searchCommunity(searchTerm) {
+    const memberCards = document.querySelectorAll('.member-card');
+    memberCards.forEach(card => {
+        const username = card.querySelector('h4').textContent.toLowerCase();
+        const email = card.querySelector('.member-email').textContent.toLowerCase();
+        const role = card.querySelector('.member-role').textContent.toLowerCase();
+        
+        if (username.includes(searchTerm) || 
+            email.includes(searchTerm) || 
+            role.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
