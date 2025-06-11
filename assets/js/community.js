@@ -103,6 +103,12 @@ window.onload = function() {
   loadMessages();
   showCommunityPosts();
   
+  // Add header search event listener
+  const headerSearch = document.querySelector('.search-bar input');
+  if (headerSearch) {
+    headerSearch.addEventListener('input', handleHeaderSearch);
+  }
+  
   // Check if we should show the expert section based on URL hash
   if (window.location.hash === '#expert-section') {
     selectChannel('expert');
@@ -167,6 +173,7 @@ function selectChannel(channel) {
   // Hide all sections
   document.querySelector('#community-posts').classList.add('hidden');
   document.querySelector('#saved-posts-section').classList.add('hidden');
+  document.querySelector('#expert-application-section').classList.add('hidden');
   
   // Show the correct channel section and hide others
   const channels = ['community', 'expert', 'dm'];  // Channel names
@@ -664,20 +671,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
 // Show Expert Application Section
 function showExpertApplicationSection() {
-  // Hide all main sections
+  // Hide all other sections
   document.querySelector('#community-posts').classList.add('hidden');
   document.querySelector('#community-section').classList.add('hidden');
   document.querySelector('#expert-section').classList.add('hidden');
   document.querySelector('#dm-section').classList.add('hidden');
   document.querySelector('#saved-posts-section').classList.add('hidden');
+  
   // Show expert application section
   document.querySelector('#expert-application-section').classList.remove('hidden');
+  
   // Update active state in sidebar
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.remove('active');
   });
-  document.querySelector('.nav-item[onclick="showExpertApplicationSection()"]')?.classList.add('active');
+  document.querySelector('.nav-item[onclick="showExpertApplicationSection()"]').classList.add('active');
 }
+
+// Function to handle header search
+function handleHeaderSearch(event) {
+  const searchTerm = event.target.value.toLowerCase().trim();
+  const posts = document.querySelectorAll('.post-card');
+  const users = document.querySelectorAll('.user-item');
+  
+  // Search through posts
+  posts.forEach(post => {
+    const title = post.querySelector('h3').textContent.toLowerCase();
+    const content = post.querySelector('.post-content p').textContent.toLowerCase();
+    const author = post.querySelector('.author').textContent.toLowerCase();
+    const category = post.querySelector('.category').textContent.toLowerCase();
+    
+    const isVisible = title.includes(searchTerm) || 
+                     content.includes(searchTerm) || 
+                     author.includes(searchTerm) || 
+                     category.includes(searchTerm);
+    
+    post.style.display = isVisible ? 'block' : 'none';
+  });
+  
+  // Search through users in DM section
+  users.forEach(user => {
+    const username = user.querySelector('h4').textContent.toLowerCase();
+    const isVisible = username.includes(searchTerm);
+    user.style.display = isVisible ? 'flex' : 'none';
+  });
+}
+
