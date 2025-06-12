@@ -385,135 +385,166 @@ textarea {
 
 /* Community Section */
 .community-section {
-    background-color: var(--background-color);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    border: 2px solid var(--border-color);
+    padding: 20px;
 }
 
 .community-tabs {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 20px;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 10px;
-    flex-wrap: wrap;
 }
 
 .tab-btn {
-    padding: 12px 24px;
+    padding: 10px 20px;
     border: none;
-    background: none;
+    background: var(--background-color);
     color: var(--text-color);
-    font-size: 1.1rem;
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 8px;
     transition: var(--transition);
-    font-weight: 500;
-}
-
-.tab-btn:hover {
-    background-color: var(--hover-color);
-    color: var(--accent-color);
 }
 
 .tab-btn.active {
-    background-color: var(--primary-color);
-    color: var(--background-color);
+    background: var(--primary-color);
+    color: white;
 }
 
-.tab-content {
-    margin-top: 20px;
-}
-
-.tab-pane {
-    display: none;
-}
-
-.tab-pane.active {
-    display: block;
-}
-
-.members-grid,
-.doctors-grid,
-.clients-grid {
+.members-grid, .doctors-grid, .clients-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
+    padding: 20px 0;
 }
 
-.doctor-card,
-.client-card {
-    background: var(--background-color);
-    border-radius: 8px;
+.member-card {
+    background: white;
+    border-radius: 10px;
     padding: 20px;
     box-shadow: var(--shadow);
-    border: 2px solid var(--border-color);
     transition: var(--transition);
 }
 
-.doctor-card:hover,
-.client-card:hover {
-    border-color: var(--accent-color);
-    box-shadow: 0 4px 8px var(--hover-color);
-    transform: translateY(-2px);
+.member-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.doctor-card img,
-.client-card img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
+.member-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
     margin-bottom: 15px;
 }
 
-.doctor-card h3,
-.client-card h3 {
-    font-size: 1.2rem;
+.member-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.member-info h4 {
+    margin: 0;
     color: var(--text-color);
-    margin-bottom: 5px;
 }
 
-.doctor-card p,
-.client-card p {
-    color: var(--secondary-color);
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-}
-
-.doctor-card .specialty,
-.client-card .status {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin-bottom: 10px;
-}
-
-.doctor-card .specialty {
-    background-color: var(--hover-color);
+.member-role {
     color: var(--accent-color);
+    font-size: 0.9em;
+    margin: 5px 0;
 }
 
-.client-card .status {
-    background-color: var(--secondary-color);
-    color: var(--background-color);
+.member-role.active {
+    color: #4CAF50;
 }
 
-.doctor-card .actions,
-.client-card .actions {
+.member-role.pending {
+    color: #FFA500;
+}
+
+.member-email {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.member-details {
+    margin: 15px 0;
+    padding: 15px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.member-details p {
+    margin: 8px 0;
+    color: #666;
+}
+
+.member-details i {
+    width: 20px;
+    color: var(--primary-color);
+}
+
+.member-actions {
     display: flex;
     gap: 10px;
     margin-top: 15px;
 }
 
-.doctor-card .actions button,
-.client-card .actions button {
+.member-actions button {
     flex: 1;
     padding: 8px;
-    font-size: 0.9rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.member-actions .primary-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.member-actions .danger-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.member-actions button:hover {
+    opacity: 0.9;
+}
+
+.no-members {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    grid-column: 1 / -1;
+}
+
+/* Search box styles */
+.search-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 15px;
+    padding-left: 40px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
 }
 
 /* Posts Section */
@@ -1033,90 +1064,6 @@ section.active {
     .application-actions .btn {
         width: 100%;
     }
-}
-
-/* Community Management Styles */
-.member-card {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    transition: transform 0.2s ease;
-}
-
-.member-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.member-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.member-header img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    margin-right: 15px;
-    object-fit: cover;
-}
-
-.member-info h4 {
-    margin: 0;
-    font-size: 1.1em;
-    color: #333;
-}
-
-.member-role {
-    color: #666;
-    font-size: 0.9em;
-    margin: 5px 0;
-}
-
-.member-email {
-    color: #888;
-    font-size: 0.85em;
-}
-
-.member-details {
-    margin: 15px 0;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 6px;
-}
-
-.member-details p {
-    margin: 8px 0;
-    color: #555;
-}
-
-.member-details i {
-    width: 20px;
-    color: #666;
-}
-
-.member-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.member-card.doctor {
-    border-left: 4px solid #28a745;
-}
-
-.member-card.user {
-    border-left: 4px solid #17a2b8;
-}
-
-.no-members {
-    text-align: center;
-    color: #666;
-    padding: 20px;
-    font-style: italic;
 }
 
 /* Dark theme support */

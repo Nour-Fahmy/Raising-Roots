@@ -1,5 +1,34 @@
 // =================== community.js ===================
 
+// Function to show notifications
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+      <span>${message}</span>
+    </div>
+  `;
+
+  // Add to document
+  document.body.appendChild(notification);
+
+  // Trigger animation
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 10);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 3000);
+}
+
 // Profile Functions
 async function loadProfileContent() {
   const profileContainer = document.getElementById('profile-container');
@@ -345,15 +374,23 @@ function goBackToChannels() {
 function showCreatePostForm() {
   const form = document.getElementById('create-post-form');
   form.classList.remove('hidden');
+  // Add a small delay before adding active class for animation
+  setTimeout(() => {
+    form.classList.add('active');
+  }, 10);
 }
 
 function hideCreatePostForm() {
   const form = document.getElementById('create-post-form');
-  form.classList.add('hidden');
-  // Clear form fields
-  document.getElementById('post-title').value = '';
-  document.getElementById('post-content').value = '';
-  document.getElementById('post-category').value = '';
+  form.classList.remove('active');
+  // Wait for animation to complete before hiding
+  setTimeout(() => {
+    form.classList.add('hidden');
+    // Clear form fields
+    document.getElementById('post-title').value = '';
+    document.getElementById('post-content').value = '';
+    document.getElementById('post-category').value = '';
+  }, 300);
 }
 
 // Function to submit a new post
@@ -366,9 +403,12 @@ async function submitPost(event) {
   
   const token = localStorage.getItem('token');
   if (!token) {
-    alert('Please login to create a post');
+    showNotification('Please login to create a post', 'error');
     return;
   }
+
+  // Hide form first
+  hideCreatePostForm();
 
   try {
     const response = await fetch('http://localhost:3000/api/v1/posts', {
@@ -380,21 +420,21 @@ async function submitPost(event) {
       body: JSON.stringify({ title, content, category })
     });
 
+    const data = await response.json();
+
     if (response.ok) {
-      const newPost = await response.json();
-      const postsContainer = document.getElementById('posts-container');
-      postsContainer.insertBefore(createPostElement(newPost.data), postsContainer.firstChild);
-      hideCreatePostForm();
-      document.getElementById('post-title').value = '';
-      document.getElementById('post-content').value = '';
-      document.getElementById('post-category').value = '';
+      // Wait for form animation to complete before showing notification
+      setTimeout(() => {
+        showNotification('Post submitted successfully! It will be visible after admin approval.', 'success');
+        // Refresh the posts list
+        showCommunityPosts();
+      }, 300);
     } else {
-      const error = await response.json();
-      alert(error.message || 'Failed to create post');
+      showNotification(data.message || 'Failed to create post', 'error');
     }
   } catch (error) {
     console.error('Error creating post:', error);
-    alert('Failed to create post. Please try again.');
+    showNotification('Error creating post', 'error');
   }
 }
 
@@ -402,34 +442,48 @@ async function submitPost(event) {
 function createPostElement(post) {
   const article = document.createElement('article');
   article.className = 'post-card';
+  article.dataset.postId = post._id;
+  article.dataset.category = post.category;
+
+  const token = localStorage.getItem('token');
+  const user = token ? JSON.parse(localStorage.getItem('user')) : null;
+
   article.innerHTML = `
     <div class="post-header">
-      <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
-      <div class="post-info">
-        <h3>${post.title}</h3>
-        <div class="post-meta">
-          <span class="author">${post.author?.username || 'Anonymous'}</span>
-          <span class="date">${new Date(post.createdAt).toLocaleDateString()}</span>
-          <span class="category">${post.category}</span>
+      <div class="post-author">
+        <img src="../images/default-avatar.png" alt="${post.author.username || 'User'}" class="author-avatar">
+        <div class="author-info">
+          <h3 class="author-name">${post.author.username || 'Anonymous'}</h3>
+          <span class="post-date">${new Date(post.createdAt).toLocaleDateString()}</span>
         </div>
+      </div>
+      <div class="post-actions">
+        ${user ? `
+        <button class="report-btn" onclick="reportPost('${post._id}')" title="Report Post">
+          <i class="fas fa-flag"></i>
+        </button>
+        ` : ''}
       </div>
     </div>
     <div class="post-content">
-      <p>${post.content}</p>
+      <h3 class="post-title">${post.title || 'Untitled Post'}</h3>
+      <p class="post-text">${post.content || ''}</p>
     </div>
-    <div class="post-actions">
-      <button class="action-btn" onclick="likePost(this)" data-post-id="${post._id}">
-        <i class="fas fa-heart"></i> Like (${post.likes?.length || 0})
-      </button>
-      <button class="action-btn" onclick="showComments(this)" data-post-id="${post._id}">
-        <i class="fas fa-comment"></i> Comment (${post.comments?.length || 0})
-      </button>
-      <button class="action-btn" onclick="sharePost(this)" data-post-id="${post._id}">
-        <i class="fas fa-share"></i> Share
-      </button>
-      <button class="action-btn" onclick="toggleSavePost(this)" data-post-id="${post._id}">
-        <i class="far fa-bookmark"></i> Save
-      </button>
+    <div class="post-footer">
+      <div class="post-category">${post.category || 'Uncategorized'}</div>
+      <div class="post-engagement">
+        <button class="like-btn" onclick="likePost(this)">
+          <i class="far fa-heart"></i>
+          <span class="likes-count">${post.likes ? post.likes.length : 0}</span>
+        </button>
+        <button class="comment-btn" onclick="showComments(this)">
+          <i class="far fa-comment"></i>
+          <span class="comments-count">${post.comments ? post.comments.length : 0}</span>
+        </button>
+        <button class="save-btn" onclick="toggleSavePost(this)" title="Save Post">
+          <i class="far fa-bookmark"></i>
+        </button>
+      </div>
     </div>
   `;
   return article;
@@ -468,13 +522,7 @@ async function likePost(button) {
 }
 
 function showComments(button) {
-  // This would be implemented to show a comments section
-  alert('Comments feature coming soon!');
-}
-
-function sharePost(button) {
-  // This would be implemented to share the post
-  alert('Share feature coming soon!');
+  // Implementation for showing comments
 }
 
 function filterPosts() {
@@ -497,7 +545,10 @@ function filterPosts() {
 }
 
 // Add event listener for search input
-document.getElementById('search-posts').addEventListener('input', filterPosts);
+const searchInput = document.getElementById('search-posts');
+if (searchInput) {
+  searchInput.addEventListener('input', filterPosts);
+}
 
 // DM Functions
 let currentUser = null;
@@ -633,38 +684,39 @@ document.getElementById('dm-input')?.addEventListener('keypress', function(e) {
 // Save/Unsave Post Functionality
 function toggleSavePost(button) {
   const postCard = button.closest('.post-card');
-  const postTitle = postCard.querySelector('h3').textContent;
-  const postContent = postCard.querySelector('.post-content p').textContent;
-  const postAuthor = postCard.querySelector('.author').textContent;
-  const postDate = postCard.querySelector('.date').textContent;
-  const postCategory = postCard.querySelector('.category').textContent;
-
-  // Create a unique key for the post (could use title+author+date)
-  const postKey = `${postTitle}|${postAuthor}|${postDate}`;
+  const postId = postCard.dataset.postId;
+  const postTitle = postCard.querySelector('.post-title').textContent;
+  const postContent = postCard.querySelector('.post-text').textContent;
+  const postAuthor = postCard.querySelector('.author-name').textContent;
+  const postDate = postCard.querySelector('.post-date').textContent;
+  const postCategory = postCard.querySelector('.post-category').textContent;
 
   // Get saved posts from localStorage
-  let savedPosts = JSON.parse(localStorage.getItem('savedPosts')) || {};
-
-  const icon = button.querySelector('i');
-  if (savedPosts[postKey]) {
-    // Unsave
-    delete savedPosts[postKey];
-    icon.classList.remove('fas');
-    icon.classList.add('far');
-    button.innerHTML = '<i class="far fa-bookmark"></i> Save';
+  const savedPosts = JSON.parse(localStorage.getItem('savedPosts')) || {};
+  
+  if (savedPosts[postId]) {
+    // Remove from saved posts
+    delete savedPosts[postId];
+    button.classList.remove('saved');
+    button.querySelector('i').classList.remove('fas');
+    button.querySelector('i').classList.add('far');
+    showNotification('Post removed from saved posts', 'info');
   } else {
-    // Save
-    savedPosts[postKey] = {
+    // Add to saved posts
+    savedPosts[postId] = {
       title: postTitle,
       content: postContent,
       author: postAuthor,
       date: postDate,
       category: postCategory
     };
-    icon.classList.remove('far');
-    icon.classList.add('fas');
-    button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+    button.classList.add('saved');
+    button.querySelector('i').classList.remove('far');
+    button.querySelector('i').classList.add('fas');
+    showNotification('Post saved successfully', 'success');
   }
+  
+  // Update localStorage
   localStorage.setItem('savedPosts', JSON.stringify(savedPosts));
 }
 
@@ -689,34 +741,49 @@ function showSavedPosts() {
   container.innerHTML = '';
   const savedPosts = JSON.parse(localStorage.getItem('savedPosts')) || {};
   const keys = Object.keys(savedPosts);
+  
   if (keys.length === 0) {
-    container.innerHTML = '<p style="padding:2rem; text-align:center; color:#888;">No saved posts yet.</p>';
-    return;
+    container.innerHTML = '<p style="padding:2rem; text-align:center; color:var(--text-muted);">No saved posts yet.</p>';
   }
+
   keys.reverse().forEach(key => {
     const post = savedPosts[key];
     const article = document.createElement('article');
     article.className = 'post-card';
     article.innerHTML = `
       <div class="post-header">
-        <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
-        <div class="post-info">
-          <h3>${post.title}</h3>
-          <div class="post-meta">
-            <span class="author">${post.author}</span>
-            <span class="date">${post.date}</span>
-            <span class="category">${post.category}</span>
+        <div class="post-author">
+          <img src="../images/default-avatar.png" alt="${post.author}" class="author-avatar">
+          <div class="author-info">
+            <h3 class="author-name">${post.author}</h3>
+            <span class="post-date">${post.date}</span>
           </div>
+        </div>
+        <div class="post-actions">
+          <button class="report-btn" onclick="reportPost('${key}')" title="Report Post">
+            <i class="fas fa-flag"></i>
+          </button>
         </div>
       </div>
       <div class="post-content">
-        <p>${post.content}</p>
+        <h3 class="post-title">${post.title}</h3>
+        <p class="post-text">${post.content}</p>
       </div>
-      <div class="post-actions">
-        <button class="action-btn" onclick="likePost(this)"><i class="fas fa-heart"></i> Like</button>
-        <button class="action-btn" onclick="showComments(this)"><i class="fas fa-comment"></i> Comment</button>
-        <button class="action-btn" onclick="sharePost(this)"><i class="fas fa-share"></i> Share</button>
-        <button class="action-btn" onclick="toggleSavePost(this)"><i class="fas fa-bookmark"></i> Saved</button>
+      <div class="post-footer">
+        <div class="post-category">${post.category}</div>
+        <div class="post-engagement">
+          <button class="like-btn" onclick="likePost(this)">
+            <i class="far fa-heart"></i>
+            <span class="likes-count">0</span>
+          </button>
+          <button class="comment-btn" onclick="showComments(this)">
+            <i class="far fa-comment"></i>
+            <span class="comments-count">0</span>
+          </button>
+          <button class="save-btn saved" onclick="toggleSavePost(this)" title="Remove from Saved">
+            <i class="fas fa-bookmark"></i>
+          </button>
+        </div>
       </div>
     `;
     container.appendChild(article);
@@ -735,7 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 // Show Expert Application Section
 function showExpertApplicationSection() {
-  // Hide all other sections
+  // Hide all sections
   document.querySelector('#community-posts').classList.add('hidden');
   document.querySelector('#community-section').classList.add('hidden');
   document.querySelector('#expert-section').classList.add('hidden');
@@ -780,5 +847,165 @@ function handleHeaderSearch(event) {
     user.style.display = isVisible ? 'flex' : 'none';
   });
 }
+
+// Function to show expert application form
+function showExpertApplicationForm() {
+    const form = document.getElementById('expertApplicationForm');
+    if (form) {
+        form.style.display = 'block';
+        // Add event listener for clicking outside the form
+        document.addEventListener('click', handleOutsideClick);
+    }
+}
+
+// Function to hide expert application form
+function hideExpertApplicationForm() {
+    const form = document.getElementById('expertApplicationForm');
+    if (form) {
+        form.style.display = 'none';
+        // Remove event listener when hiding the form
+        document.removeEventListener('click', handleOutsideClick);
+    }
+}
+
+// Function to handle clicks outside the form
+function handleOutsideClick(event) {
+    const form = document.getElementById('expertApplicationForm');
+    const applyButton = document.querySelector('.apply-expert-btn');
+    
+    // Check if click is outside both the form and the apply button
+    if (form && !form.contains(event.target) && !applyButton.contains(event.target)) {
+        hideExpertApplicationForm();
+    }
+}
+
+// Add cleanup when navigating away
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        hideExpertApplicationForm();
+    }
+});
+
+// Add cleanup when the page is unloaded
+window.addEventListener('beforeunload', () => {
+    hideExpertApplicationForm();
+});
+
+// Function to create post card
+function createPostCard(post) {
+    const template = document.getElementById('postCardTemplate');
+    const card = template.content.cloneNode(true);
+    
+    // Set post content
+    card.querySelector('.post-title').textContent = post.title;
+    card.querySelector('.post-text').textContent = post.content;
+    card.querySelector('.post-category').textContent = post.category;
+    card.querySelector('.author-name').textContent = post.author.username;
+    card.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleDateString();
+    
+    // Add report functionality
+    const reportBtn = card.querySelector('.report-btn');
+    reportBtn.addEventListener('click', () => reportPost(post._id));
+    
+    return card;
+}
+
+// Function to report a post
+async function reportPost(postId) {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification('Please login to report posts', 'error');
+      return;
+    }
+
+    const reason = prompt('Please enter the reason for reporting this post:');
+    if (!reason) return;
+
+    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/report`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ reason })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      showNotification('Post reported successfully', 'success');
+    } else {
+      showNotification(data.message || 'Failed to report post', 'error');
+    }
+  } catch (error) {
+    console.error('Error reporting post:', error);
+    showNotification('An error occurred while reporting the post', 'error');
+  }
+}
+
+// Expert Application Functions
+function showExpertApplicationSection() {
+  // Hide all sections
+  document.querySelector('#community-posts').classList.add('hidden');
+  document.querySelector('#community-section').classList.add('hidden');
+  document.querySelector('#expert-section').classList.add('hidden');
+  document.querySelector('#dm-section').classList.add('hidden');
+  document.querySelector('#saved-posts-section').classList.add('hidden');
+  
+  // Show expert application section
+  document.querySelector('#expert-application-section').classList.remove('hidden');
+  
+  // Update active state in sidebar
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector('.nav-item[onclick="showExpertApplicationSection()"]').classList.add('active');
+}
+
+// Handle expert application form submission
+document.getElementById('expert-application-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData();
+  formData.append('name', document.getElementById('expert-name').value);
+  formData.append('email', document.getElementById('expert-email').value);
+  formData.append('number', document.getElementById('expert-number').value);
+  formData.append('cv', document.getElementById('expert-cv').files[0]);
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification('Please log in to submit an application', 'error');
+      return;
+    }
+
+    const response = await fetch('http://localhost:3000/api/v1/experts/apply', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    // Show success message regardless of response type since we know it worked
+    document.getElementById('expert-application-success').classList.remove('hidden');
+    document.getElementById('expert-application-form').reset();
+    
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+      document.getElementById('expert-application-success').classList.add('hidden');
+    }, 3000);
+
+    showNotification('Application submitted successfully!', 'success');
+
+  } catch (error) {
+    console.error('Application submission error:', error);
+    // Only show error if we're certain it failed
+    if (!document.getElementById('expert-application-success').classList.contains('hidden')) {
+      showNotification('There was an error submitting your application. Please try again.', 'error');
+    }
+  }
+});
 
 

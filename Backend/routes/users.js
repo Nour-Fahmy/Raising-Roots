@@ -5,6 +5,15 @@ const { User } = require('../models/user');
 const { validateLogin } = require('../middleware/validation');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const jwt = require('jsonwebtoken');
+const authenticateToken = require('../middleware/auth');
+
+// Middleware to check if user is admin
+const isAdmin = (req, res, next) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    }
+    next();
+};
 
 // POST /api/v1/users/register
 router.post('/register', async (req, res) => {
@@ -112,9 +121,7 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
     }
 });
 
-//hena ana b test el auth middleware
-const authenticateToken = require('../middleware/auth');
-
+// GET /api/v1/users/profile
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-passwordHash');
@@ -128,6 +135,74 @@ router.get('/profile', authenticateToken, async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong' });
   }
+});
+
+// Admin routes for user management
+// GET /api/v1/users - Get all users (admin only)
+router.get('/', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const { role } = req.query;
+        const query = {};
+        
+        if (role && role !== 'all') {
+            query.role = role;
+        }
+
+        const users = await User.find(query)
+            .select('-passwordHash')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            data: users
+        });
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ message: 'Error fetching users' });
+    }
+});
+
+// PUT /api/v1/users/:id - Update user status (admin only)
+router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const { status } = req.body;
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        ).select('-passwordHash');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: user
+        });
+    } catch (err) {
+        console.error('Error updating user:', err);
+        res.status(500).json({ message: 'Error updating user' });
+    }
+});
+
+// DELETE /api/v1/users/:id - Delete user (admin only)
+router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: null
+        });
+    } catch (err) {
+        console.error('Error deleting user:', err);
+        res.status(500).json({ message: 'Error deleting user' });
+    }
 });
 
 module.exports = router;

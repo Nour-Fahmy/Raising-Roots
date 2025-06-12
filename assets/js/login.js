@@ -324,11 +324,24 @@ function getRedirectUrl() {
 
 // Function to handle successful login
 async function handleSuccessfulLogin(userData) {
-    // Store the token in localStorage
+    // Store the token and user data in localStorage
     localStorage.setItem('token', userData.token);
+    localStorage.setItem('user', JSON.stringify(userData.user));
     
     // Get redirect URL
     const redirectUrl = getRedirectUrl();
+    
+    // If user is admin and trying to access admin panel, redirect there
+    if (userData.user.role === 'admin' && redirectUrl.includes('admin')) {
+        window.location.href = redirectUrl;
+        return;
+    }
+    
+    // For non-admin users trying to access admin panel, show error
+    if (redirectUrl.includes('admin') && userData.user.role !== 'admin') {
+        showFormFeedback('login', 'Access denied. Admin privileges required.');
+        return;
+    }
     
     // Redirect to the appropriate page
     window.location.href = redirectUrl;
@@ -430,7 +443,7 @@ signupForm.addEventListener('submit', async function(e) {
     }
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/signup', {
+        const response = await fetch('http://localhost:3000/api/v1/users/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -448,7 +461,19 @@ signupForm.addEventListener('submit', async function(e) {
         const data = await response.json();
         
         if (response.ok) {
-            await handleSuccessfulLogin(data);
+            // Show success message
+            showFormFeedback('signup', 'Account created successfully! Please log in.', false);
+            
+            // Clear the form
+            signupForm.reset();
+            
+            // Wait for 1.5 seconds to show the success message
+            setTimeout(() => {
+                // Switch to login form
+                showForm('login');
+                // Show login success message
+                showFormFeedback('login', 'Please log in with your new account.', false);
+            }, 1500);
         } else {
             showFormFeedback('signup', data.message || 'Signup failed. Please try again.');
         }

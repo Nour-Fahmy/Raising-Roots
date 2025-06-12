@@ -44,8 +44,8 @@ const postSchema = new mongoose.Schema({
   }],
   status: {
     type: String,
-    enum: ['active', 'reported', 'hidden'],
-    default: 'active'
+    enum: ['active', 'reported', 'pending'],
+    default: 'pending'
   },
   reports: [{
     user: {

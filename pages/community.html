@@ -100,101 +100,7 @@
 
         <!-- Posts Grid -->
         <div class="posts-grid" id="posts-container">
-          <!-- Sample Post 1 -->
-          <article class="post-card">
-            <div class="post-header">
-              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
-              <div class="post-info">
-                <h3>Tips for Better Sleep Training</h3>
-                <div class="post-meta">
-                  <span class="author">Sarah Johnson</span>
-                  <span class="date">2 hours ago</span>
-                  <span class="category">Parenting Tips</span>
-                </div>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>Here are some effective sleep training methods that worked for my 6-month-old. We started with a consistent bedtime routine and gradually reduced night feedings. The key was staying consistent and patient. Would love to hear your experiences!</p>
-            </div>
-            <div class="post-actions">
-              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
-              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
-              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
-              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
-            </div>
-          </article>
-
-          <!-- Sample Post 2 -->
-          <article class="post-card">
-            <div class="post-header">
-              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
-              <div class="post-info">
-                <h3>First Time Mom - Need Advice!</h3>
-                <div class="post-meta">
-                  <span class="author">Emily Parker</span>
-                  <span class="date">5 hours ago</span>
-                  <span class="category">Questions</span>
-                </div>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>Hi everyone! I'm a first-time mom to a beautiful 2-month-old baby girl. I'm looking for advice on introducing solid foods. When did you start? What were your baby's first foods? Any tips on making this transition smooth?</p>
-            </div>
-            <div class="post-actions">
-              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
-              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
-              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
-              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
-            </div>
-          </article>
-
-          <!-- Sample Post 3 -->
-          <article class="post-card">
-            <div class="post-header">
-              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
-              <div class="post-info">
-                <h3>Our Baby's First Steps! 🎉</h3>
-                <div class="post-meta">
-                  <span class="author">Michael Chen</span>
-                  <span class="date">1 day ago</span>
-                  <span class="category">Experiences</span>
-                </div>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>Today was a milestone day! Our little one took their first steps! It's amazing to see how quickly they grow and develop. To all the parents out there, cherish every moment - they grow up so fast! What was your baby's first milestone?</p>
-            </div>
-            <div class="post-actions">
-              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
-              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
-              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
-              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
-            </div>
-          </article>
-
-          <!-- Sample Post 4 -->
-          <article class="post-card">
-            <div class="post-header">
-              <img src="../images/default-avatar.png" alt="User Avatar" class="user-avatar">
-              <div class="post-info">
-                <h3>Dealing with Teething</h3>
-                <div class="post-meta">
-                  <span class="author">Lisa Thompson</span>
-                  <span class="date">3 days ago</span>
-                  <span class="category">Advice</span>
-                </div>
-              </div>
-            </div>
-            <div class="post-content">
-              <p>My 8-month-old is teething and it's been quite challenging. Here are some remedies that helped us: cold teething rings, gentle gum massage, and lots of cuddles! What worked for your little ones during teething?</p>
-            </div>
-            <div class="post-actions">
-              <button class="action-btn"><i class="fas fa-heart"></i> Like</button>
-              <button class="action-btn"><i class="fas fa-comment"></i> Comment</button>
-              <button class="action-btn"><i class="fas fa-share"></i> Share</button>
-              <button class="action-btn" onclick="toggleSavePost(this)"><i class="far fa-bookmark"></i> Save</button>
-            </div>
-          </article>
+          <!-- Posts will be dynamically added here -->
         </div>
       </section>
 
@@ -320,6 +226,43 @@
       </section>
     </div>
   </main>
+
+  <!-- Post Card Template -->
+  <template id="postCardTemplate">
+    <article class="post-card">
+      <div class="post-header">
+        <div class="post-author">
+          <img src="" alt="Author" class="author-avatar">
+          <div class="author-info">
+            <h3 class="author-name"></h3>
+            <span class="post-date"></span>
+          </div>
+        </div>
+        <div class="post-actions">
+          <button class="report-btn" title="Report Post">
+            <i class="fas fa-flag"></i>
+          </button>
+        </div>
+      </div>
+      <div class="post-content">
+        <h3 class="post-title"></h3>
+        <p class="post-text"></p>
+      </div>
+      <div class="post-footer">
+        <div class="post-category"></div>
+        <div class="post-engagement">
+          <button class="like-btn">
+            <i class="far fa-heart"></i>
+            <span class="likes-count">0</span>
+          </button>
+          <button class="comment-btn">
+            <i class="far fa-comment"></i>
+            <span class="comments-count">0</span>
+          </button>
+        </div>
+      </div>
+    </article>
+  </template>
 
   <script src="../assets/js/community.js"></script>
 </body>

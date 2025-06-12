@@ -53,10 +53,14 @@ const userRoutes = require('./routes/users');
 const expertApplicationRoutes = require('./routes/expertApplications');
 const postRoutes = require('./routes/posts');
 // const expertRoutes = require('./routes/experts'); // Removed expert routes
-app.use(`${process.env.API_URL}/users`, userRoutes);
-app.use(`${process.env.API_URL}/experts`, expertApplicationRoutes);
-app.use(`${process.env.API_URL}/posts`, postRoutes);
-// app.use(`${process.env.API_URL}/experts`, expertRoutes); // Removed expert routes
+
+// Use default API URL if not set in environment
+const API_URL = process.env.API_URL || '/api/v1';
+
+app.use(`${API_URL}/users`, userRoutes);
+app.use(`${API_URL}/experts`, expertApplicationRoutes);
+app.use(`${API_URL}/posts`, postRoutes);
+// app.use(`${API_URL}/experts`, expertRoutes); // Removed expert routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -70,6 +74,5 @@ app.use((err, req, res, next) => {
 
 const productRoutes = require('./routes/products');
 app.use('/api/v1/products', productRoutes);
-
 
 module.exports = app;

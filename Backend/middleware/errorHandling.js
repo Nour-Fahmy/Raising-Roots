@@ -52,6 +52,13 @@ const formatErrorResponse = (err) => {
 
 // Error Handling Middleware
 const errorHandler = (err, req, res, next) => {
+    console.error('Error details:', {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+        statusCode: err.statusCode
+    });
+
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
 
@@ -71,7 +78,14 @@ const errorHandler = (err, req, res, next) => {
     }
 
     // Send error response
-    res.status(err.statusCode).json(formatErrorResponse(err));
+    res.status(err.statusCode).json({
+        success: false,
+        message: err.message,
+        ...(process.env.NODE_ENV === 'development' && {
+            stack: err.stack,
+            error: err
+        })
+    });
 };
 
 // Async Error Handler Wrapper

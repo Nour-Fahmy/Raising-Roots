@@ -9,6 +9,16 @@
 
 // Admin Dashboard JavaScript
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if user is admin
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!token || !user || user.role !== 'admin') {
+        // Redirect to login page with admin redirect
+        window.location.href = '../login.html?redirect=admin/index.html';
+        return;
+    }
+
     // Initialize the dashboard
     initializeDashboard();
     
@@ -30,6 +40,9 @@ function initializeDashboard() {
     
     // Update recent activity
     updateRecentActivity();
+
+    // Initialize expert applications
+    initExpertApplications();
 }
 
 // Set up event listeners for navigation and interactions
@@ -91,14 +104,49 @@ function setupEventListeners() {
         });
     });
     
-    // Tab switching
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabId = button.getAttribute('data-tab');
-            switchTab(button.closest('.tab-content'), tabId);
+    // Community section tab buttons
+    const communityTabs = document.querySelector('.community-tabs');
+    if (communityTabs) {
+        communityTabs.addEventListener('click', (e) => {
+            if (e.target.classList.contains('tab-btn')) {
+                const tabId = e.target.getAttribute('data-tab');
+                switchTab('.community-section', tabId);
+            }
         });
-    });
+    }
+
+    // Posts section tab buttons
+    const postsTabs = document.querySelector('.posts-tabs');
+    if (postsTabs) {
+        postsTabs.addEventListener('click', (e) => {
+            if (e.target.classList.contains('tab-btn')) {
+                const tabId = e.target.getAttribute('data-tab');
+                switchTab('.posts-section', tabId);
+            }
+        });
+    }
+
+    // Initialize tab visibility
+    const communitySection = document.querySelector('.community-section');
+    const postsSection = document.querySelector('.posts-section');
+
+    if (communitySection) {
+        const communityPanes = communitySection.querySelectorAll('.tab-pane');
+        communityPanes.forEach(pane => {
+            if (!pane.classList.contains('active')) {
+                pane.style.display = 'none';
+            }
+        });
+    }
+
+    if (postsSection) {
+        const postsPanes = postsSection.querySelectorAll('.tab-pane');
+        postsPanes.forEach(pane => {
+            if (!pane.classList.contains('active')) {
+                pane.style.display = 'none';
+            }
+        });
+    }
 }
 
 // Navigate between sections
@@ -113,9 +161,15 @@ function navigateToSection(sectionId) {
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
         targetSection.style.display = 'block';
-        // Fetch posts when navigating to posts section
+        
+        // Initialize specific sections
         if (sectionId === 'posts') {
+            console.log('Initializing posts section...');
             fetchPosts();
+        } else if (sectionId === 'community') {
+            fetchCommunity();
+        } else if (sectionId === 'expert-applications') {
+            initExpertApplications();
         }
     }
     
@@ -127,10 +181,6 @@ function navigateToSection(sectionId) {
             item.classList.add('active');
         }
     });
-
-    if (sectionId === 'community') {
-        fetchCommunity();
-    }
 }
 
 // Update dashboard statistics
@@ -198,17 +248,42 @@ function handleFilter(sectionId, filterValue) {
 
 // Switch between tabs
 function switchTab(tabContainer, tabId) {
-    // Update active tab button
-    const tabButtons = tabContainer.querySelectorAll('.tab-btn');
-    tabButtons.forEach(button => {
-        button.classList.toggle('active', button.getAttribute('data-tab') === tabId);
-    });
-    
-    // Show active tab content
-    const tabPanes = tabContainer.querySelectorAll('.tab-pane');
+    // Get the tab container element
+    const container = document.querySelector(tabContainer);
+    if (!container) {
+        console.error(`Tab container ${tabContainer} not found`);
+        return;
+    }
+
+    // Get all tab buttons and panes within this container
+    const tabButtons = container.querySelectorAll('.tab-btn');
+    const tabPanes = container.querySelectorAll('.tab-pane');
+
+    // Remove active class from all buttons and panes
+    tabButtons.forEach(btn => btn.classList.remove('active'));
     tabPanes.forEach(pane => {
-        pane.classList.toggle('active', pane.id === `${tabId}-tab`);
+        pane.classList.remove('active');
+        pane.style.display = 'none'; // Hide all panes
     });
+
+    // Add active class to selected tab and pane
+    const selectedButton = container.querySelector(`[data-tab="${tabId}"]`);
+    const selectedPane = container.querySelector(`#${tabId}-tab`);
+
+    if (selectedButton) selectedButton.classList.add('active');
+    if (selectedPane) {
+        selectedPane.classList.add('active');
+        selectedPane.style.display = 'block'; // Show only the selected pane
+    }
+
+    // If switching to doctors or clients tab, ensure the data is loaded
+    if (tabId === 'doctors' || tabId === 'clients') {
+        fetchCommunity();
+    }
+    // If switching to reported or pending posts, ensure the data is loaded
+    if (tabId === 'reported' || tabId === 'pending') {
+        fetchPosts();
+    }
 }
 
 // Utility functions
@@ -660,40 +735,171 @@ document.head.appendChild(styleSheet);
 // Function to fetch and display posts
 async function fetchPosts() {
     try {
-        const response = await fetch('http://localhost:3000/api/v1/posts');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showNotification('Please login to view posts', 'error');
+            return;
+        }
+
+        // Get the active tab
+        const activeTab = document.querySelector('.posts-tabs .tab-btn.active');
+        const activeTabId = activeTab ? activeTab.getAttribute('data-tab') : 'all-posts';
+
+        // Get the appropriate container based on active tab
+        let targetContainer;
+        switch(activeTabId) {
+            case 'reported':
+                targetContainer = document.querySelector('#reported-tab .posts-grid');
+                break;
+            case 'pending':
+                targetContainer = document.querySelector('#pending-tab .posts-grid');
+                break;
+            default:
+                targetContainer = document.querySelector('#all-posts-tab .posts-grid');
+        }
+
+        if (!targetContainer) {
+            console.error('Target container not found');
+            return;
+        }
+
+        // Clear existing content
+        targetContainer.innerHTML = '';
+
+        // Build query parameters based on active tab
+        let status;
+        switch(activeTabId) {
+            case 'reported':
+                status = 'reported';
+                break;
+            case 'pending':
+                status = 'pending';
+                break;
+            default:
+                status = 'active';
+        }
+
+        // Fetch posts from backend
+        const response = await fetch(`http://localhost:3000/api/v1/posts?status=${status}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
         if (response.ok) {
             const data = await response.json();
-            const postsGrid = document.querySelector('#all-posts-tab .posts-grid');
-            postsGrid.innerHTML = ''; // Clear existing posts
             
             if (data.data && data.data.length > 0) {
                 data.data.forEach(post => {
-                    postsGrid.appendChild(createPostCard(post));
+                    targetContainer.appendChild(createPostCard(post));
                 });
             } else {
-                postsGrid.innerHTML = '<p class="no-posts">No posts found</p>';
+                targetContainer.innerHTML = `<p class="no-posts">No ${activeTabId.replace('-', ' ')} found</p>`;
             }
         } else {
-            console.error('Failed to fetch posts');
-            showNotification('Failed to fetch posts', 'error');
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to fetch posts');
         }
+
     } catch (error) {
         console.error('Error fetching posts:', error);
-        showNotification('Error fetching posts', 'error');
+        showNotification(error.message || 'Error fetching posts', 'error');
     }
 }
 
-// Function to create a post card for admin panel
+// Function to handle post actions (approve, reject, delete)
+async function handlePostAction(button, postId, action) {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showNotification('Please login to perform this action', 'error');
+            return;
+        }
+
+        let url = `http://localhost:3000/api/v1/posts/${postId}`;
+        let method = 'PUT';
+        let body = {};
+
+        switch (action) {
+            case 'approve':
+                body = { status: 'active' };
+                break;
+            case 'reject':
+            case 'delete':
+                method = 'DELETE';
+                break;
+            default:
+                throw new Error('Invalid action');
+        }
+
+        console.log('Sending request:', {
+            url,
+            method,
+            body: method !== 'DELETE' ? body : undefined
+        });
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            ...(method !== 'DELETE' && { body: JSON.stringify(body) })
+        });
+
+        const data = await response.json();
+        console.log('Response:', data);
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to perform action');
+        }
+
+        showNotification(`Post ${action}d successfully`, 'success');
+        fetchPosts(); // Refresh the posts list
+    } catch (error) {
+        console.error('Error handling post action:', error);
+        showNotification(error.message || 'Error performing action', 'error');
+    }
+}
+
+// Update createPostCard function to show appropriate buttons based on status
 function createPostCard(post) {
     const card = document.createElement('div');
     card.className = 'post-card';
+    
+    // Format date
+    const postDate = new Date(post.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    // Determine which buttons to show based on post status
+    let actionButtons = '';
+    if (post.status === 'pending') {
+        actionButtons = `
+            <button class="btn primary-btn" onclick="handlePostAction(this, '${post._id}', 'approve')">
+                <i class="fas fa-check"></i> Approve
+            </button>
+            <button class="btn danger-btn" onclick="handlePostAction(this, '${post._id}', 'delete')">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        `;
+    } else {
+        actionButtons = `
+            <button class="btn danger-btn" onclick="handlePostAction(this, '${post._id}', 'delete')">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        `;
+    }
+
     card.innerHTML = `
         <div class="post-header">
             <div class="post-author">
-                <img src="../../images/default-avatar.png" alt="${post.author?.username || 'Anonymous'}">
+                <img src="${post.author.avatar || '../../images/default-avatar.png'}" alt="${post.author.username}" class="author-avatar">
                 <div class="post-author-info">
-                    <h4>${post.author?.username || 'Anonymous'}</h4>
-                    <p>${new Date(post.createdAt).toLocaleDateString()}</p>
+                    <h4>${post.author.username}</h4>
+                    <p>${postDate}</p>
                 </div>
             </div>
             <div class="post-status ${post.status}">${post.status}</div>
@@ -705,79 +911,17 @@ function createPostCard(post) {
         <div class="post-stats">
             <span><i class="fas fa-heart"></i> ${post.likes?.length || 0}</span>
             <span><i class="fas fa-comment"></i> ${post.comments?.length || 0}</span>
-            <span><i class="fas fa-flag"></i> ${post.reports?.length || 0}</span>
         </div>
         <div class="post-actions">
-            <button class="btn primary-btn" onclick="handlePostAction(this, '${post._id}', 'approve')">
-                <i class="fas fa-check"></i> Approve
-            </button>
-            <button class="btn secondary-btn" onclick="handlePostAction(this, '${post._id}', 'hide')">
-                <i class="fas fa-eye-slash"></i> Hide
-            </button>
-            <button class="btn danger-btn" onclick="handlePostAction(this, '${post._id}', 'delete')">
-                <i class="fas fa-trash"></i> Delete
-            </button>
+            ${actionButtons}
         </div>
     `;
+
     return card;
 }
 
-// Function to handle post actions (approve, hide, delete)
-async function handlePostAction(button, postId, action) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        showNotification('Please login to perform this action', 'error');
-        return;
-    }
-
-    try {
-        let response;
-        switch (action) {
-            case 'approve':
-                response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ status: 'active' })
-                });
-                break;
-            case 'hide':
-                response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ status: 'hidden' })
-                });
-                break;
-            case 'delete':
-                response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                break;
-        }
-
-        if (response.ok) {
-            showNotification(`Post ${action}d successfully`, 'success');
-            fetchPosts(); // Refresh the posts list
-        } else {
-            const error = await response.json();
-            showNotification(error.message || `Failed to ${action} post`, 'error');
-        }
-    } catch (error) {
-        console.error(`Error ${action}ing post:`, error);
-        showNotification(`Error ${action}ing post`, 'error');
-    }
-}
-
-// Function to fetch and display community members
 async function fetchCommunity() {
+    let targetContainer;
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -785,76 +929,128 @@ async function fetchCommunity() {
             return;
         }
 
-        const response = await fetch('http://localhost:3000/api/v1/users', {
+        // Get the active tab
+        const activeTab = document.querySelector('.community-tabs .tab-btn.active');
+        const activeTabId = activeTab ? activeTab.getAttribute('data-tab') : 'all';
+
+        // Get the appropriate container based on active tab
+        switch(activeTabId) {
+            case 'doctors':
+                targetContainer = document.querySelector('#doctors-tab .doctors-grid');
+                break;
+            case 'clients':
+                targetContainer = document.querySelector('#clients-tab .clients-grid');
+                break;
+            default:
+                targetContainer = document.querySelector('#all-tab .members-grid');
+        }
+
+        if (!targetContainer) {
+            console.error('Target container not found');
+            return;
+        }
+
+        // Clear existing content
+        targetContainer.innerHTML = '';
+
+        // Build query parameters based on active tab
+        let role;
+        switch(activeTabId) {
+            case 'doctors':
+                role = 'doctor';
+                break;
+            case 'clients':
+                role = 'user';
+                break;
+            default:
+                role = 'all';
+        }
+
+        // Show loading state
+        targetContainer.innerHTML = '<div class="loading">Loading members...</div>';
+
+        // Fetch users from backend
+        const url = role === 'all' 
+            ? 'http://localhost:3000/api/v1/users'
+            : `http://localhost:3000/api/v1/users?role=${role}`;
+
+        const response = await fetch(url, {
+            method: 'GET',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            const allMembersGrid = document.querySelector('#all-tab .members-grid');
-            const doctorsGrid = document.querySelector('#doctors-tab .doctors-grid');
-            const clientsGrid = document.querySelector('#clients-tab .clients-grid');
+        // Clear loading state
+        targetContainer.innerHTML = '';
 
-            // Clear existing content
-            allMembersGrid.innerHTML = '';
-            doctorsGrid.innerHTML = '';
-            clientsGrid.innerHTML = '';
-
-            if (data.data && data.data.length > 0) {
-                data.data.forEach(member => {
-                    const memberCard = createMemberCard(member);
-                    allMembersGrid.appendChild(memberCard.cloneNode(true));
-
-                    if (member.role === 'doctor') {
-                        doctorsGrid.appendChild(memberCard.cloneNode(true));
-                    } else {
-                        clientsGrid.appendChild(memberCard.cloneNode(true));
-                    }
-                });
-            } else {
-                const noMembersMessage = '<p class="no-members">No members found</p>';
-                allMembersGrid.innerHTML = noMembersMessage;
-                doctorsGrid.innerHTML = noMembersMessage;
-                clientsGrid.innerHTML = noMembersMessage;
-            }
-        } else {
-            console.error('Failed to fetch community members');
-            showNotification('Failed to fetch community members', 'error');
+        if (!response.ok) {
+            throw new Error('Failed to fetch community members');
         }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server returned non-JSON response');
+        }
+
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to fetch community members');
+        }
+
+        if (data.data && data.data.length > 0) {
+            data.data.forEach(user => {
+                targetContainer.appendChild(createMemberCard(user));
+            });
+        } else {
+            targetContainer.innerHTML = `<p class="no-members">No ${activeTabId} found</p>`;
+        }
+
     } catch (error) {
         console.error('Error fetching community members:', error);
-        showNotification('Error fetching community members', 'error');
+        showNotification(error.message || 'Error fetching community members', 'error');
+        if (targetContainer) {
+            targetContainer.innerHTML = `<p class="error-message">Error loading members. Please try again.</p>`;
+        }
     }
 }
 
-// Function to create a member card
+// Update createMemberCard function to match the backend data structure
 function createMemberCard(member) {
     const card = document.createElement('div');
-    card.className = `member-card ${member.role}`;
+    card.className = 'member-card';
+    
+    // Format join date
+    const joinDate = new Date(member.createdAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    // Determine member status and role display
+    const statusClass = member.status === 'active' ? 'active' : 'pending';
+    const roleDisplay = member.role === 'doctor' ? 'Doctor' : 
+                       member.role === 'user' ? 'Client' : member.role;
+
     card.innerHTML = `
         <div class="member-header">
-            <img src="../../images/default-avatar.png" alt="${member.username}">
+            <img src="${member.avatar || '../../images/default-avatar.png'}" alt="${member.username}" class="member-avatar">
             <div class="member-info">
                 <h4>${member.username}</h4>
-                <p class="member-role">${member.role}</p>
-                <p class="member-email">${member.email}</p>
+                <span class="member-role ${statusClass}">${roleDisplay}</span>
             </div>
         </div>
         <div class="member-details">
-            <p><i class="fas fa-baby"></i> Baby: ${member.babyName}</p>
-            <p><i class="fas fa-venus-mars"></i> Gender: ${member.babyGender}</p>
-            <p><i class="fas fa-calendar"></i> Birth Date: ${new Date(member.birthDate).toLocaleDateString()}</p>
+            <p><i class="fas fa-envelope"></i> ${member.email}</p>
+            ${member.specialty ? `<p><i class="fas fa-stethoscope"></i> ${member.specialty}</p>` : ''}
+            <p><i class="fas fa-calendar"></i> Joined ${joinDate}</p>
         </div>
         <div class="member-actions">
-            ${member.role === 'user' ? `
-                <button class="btn primary-btn" onclick="handleMemberAction(this, '${member._id}', 'promote')">
-                    <i class="fas fa-user-md"></i> Promote to Doctor
-                </button>
-            ` : member.role === 'doctor' ? `
-                <button class="btn secondary-btn" onclick="handleMemberAction(this, '${member._id}', 'demote')">
-                    <i class="fas fa-user"></i> Demote to User
+            ${member.status === 'pending' ? `
+                <button class="btn primary-btn" onclick="handleMemberAction(this, '${member._id}', 'approve')">
+                    <i class="fas fa-check"></i> Approve
                 </button>
             ` : ''}
             <button class="btn danger-btn" onclick="handleMemberAction(this, '${member._id}', 'delete')">
@@ -862,10 +1058,11 @@ function createMemberCard(member) {
             </button>
         </div>
     `;
+
     return card;
 }
 
-// Function to handle member actions (promote, demote, delete)
+// Update handleMemberAction function to use the correct endpoint
 async function handleMemberAction(button, memberId, action) {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -873,49 +1070,56 @@ async function handleMemberAction(button, memberId, action) {
         return;
     }
 
+    const card = button.closest('.member-card');
+    const memberName = card.querySelector('h4').textContent;
+
+    if (!confirm(`Are you sure you want to ${action} this member: "${memberName}"?`)) {
+        return;
+    }
+
     try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+
         let response;
         switch (action) {
-            case 'promote':
-                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}/role`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ role: 'doctor' })
-                });
-                break;
-            case 'demote':
-                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}/role`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ role: 'user' })
+            case 'approve':
+                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}`, {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify({ status: 'active' })
                 });
                 break;
             case 'delete':
                 response = await fetch(`http://localhost:3000/api/v1/users/${memberId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: headers
                 });
                 break;
+            default:
+                throw new Error('Invalid action');
         }
 
-        if (response.ok) {
-            showNotification(`Member ${action}d successfully`, 'success');
-            fetchCommunity(); // Refresh the members list
-        } else {
-            const error = await response.json();
-            showNotification(error.message || `Failed to ${action} member`, 'error');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Failed to ${action} member`);
         }
+
+        showNotification(`Member ${action}d successfully`, 'success');
+
+        // Update UI
+        if (action === 'delete') {
+            card.remove();
+        } else {
+            // Refresh the community members list
+            await fetchCommunity();
+        }
+
     } catch (error) {
         console.error(`Error ${action}ing member:`, error);
-        showNotification(`Error ${action}ing member`, 'error');
+        showNotification(error.message || `Error ${action}ing member`, 'error');
     }
 }
 
@@ -927,12 +1131,15 @@ function searchCommunity(searchTerm) {
         const email = card.querySelector('.member-email').textContent.toLowerCase();
         const role = card.querySelector('.member-role').textContent.toLowerCase();
         
-        if (username.includes(searchTerm) || 
-            email.includes(searchTerm) || 
-            role.includes(searchTerm)) {
+        if (username.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm)) {
             card.style.display = 'block';
         } else {
             card.style.display = 'none';
         }
     });
 }
+
+// Add event listener for community search
+document.getElementById('searchCommunity')?.addEventListener('input', (e) => {
+    searchCommunity(e.target.value.toLowerCase());
+});

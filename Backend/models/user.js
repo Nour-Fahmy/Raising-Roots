@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'user' // Can be 'user' or 'admin'
   },
+  status: {
+    type: String,
+    enum: ['active', 'pending'],
+    default: 'pending'
+  },
   babyName: {
     type: String,
     required: true

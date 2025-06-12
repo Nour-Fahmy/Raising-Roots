@@ -1,19 +1,26 @@
 const jwt = require('jsonwebtoken');
+const { AuthenticationError } = require('./errorHandling');
 
 function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
-
-  if (!token) {
-    return res.status(401).json({ message: 'Access denied. Token missing.' });
-  }
-
   try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+
+    if (!token) {
+      throw new AuthenticationError('Access denied. Token missing.');
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // attach decoded info to request
     next();
   } catch (err) {
-    res.status(403).json({ message: 'Invalid or expired token.' });
+    if (err.name === 'JsonWebTokenError') {
+      next(new AuthenticationError('Invalid token. Please log in again.'));
+    } else if (err.name === 'TokenExpiredError') {
+      next(new AuthenticationError('Your token has expired. Please log in again.'));
+    } else {
+      next(err);
+    }
   }
 }
 
