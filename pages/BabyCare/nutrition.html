@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nutrition Guide - Raising Roots</title>
+    <title data-i18n="nutrition_title">Nutrition Guide - Raising Roots</title>
     <link rel="stylesheet" href="../../assets/css/NavFoot.css">
     <link rel="stylesheet" href="../../assets/css/BabyCare/nutrition.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../assets/js/i18n.js"></script>
     <style>
         .navbar {
             background-color: rgb(94, 56, 41) !important;
@@ -23,101 +25,101 @@
         
         <div class="nav-center">
             <div class="nav-item">
-                <a href="./Baby.html" class="nav-link">Baby Care</a>
+                <a href="./Baby.html" class="nav-link" data-i18n="baby_care">Baby Care</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Daily Care</h4>
-                            <a href="./nutrition.html">Feeding Guide</a>
-                            <a href="./sleep.html">Sleep Schedule</a>
-                            <a href="./health.html">Diapering Tips</a>
+                            <h4 data-i18n="daily_care">Daily Care</h4>
+                            <a href="./nutrition.html" data-i18n="feeding_guide">Feeding Guide</a>
+                            <a href="./sleep.html" data-i18n="sleep_schedule">Sleep Schedule</a>
+                            <a href="./health.html" data-i18n="diapering_tips">Diapering Tips</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Health & Safety</h4>
-                            <a href="#">First Aid</a>
-                            <a href="#">Baby-Proofing</a>
-                            <a href="#">Common Concerns</a>
+                            <h4 data-i18n="health_safety">Health & Safety</h4>
+                            <a href="#" data-i18n="first_aid">First Aid</a>
+                            <a href="#" data-i18n="baby_proofing">Baby-Proofing</a>
+                            <a href="#" data-i18n="common_concerns">Common Concerns</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Development</h4>
-                            <a href="#">Milestones</a>
-                            <a href="#">Activities</a>
-                            <a href="#">Learning</a>
+                            <h4 data-i18n="development">Development</h4>
+                            <a href="#" data-i18n="milestones">Milestones</a>
+                            <a href="#" data-i18n="activities">Activities</a>
+                            <a href="#" data-i18n="learning">Learning</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="nav-item">
-                <a href="../community.html" class="nav-link">Community</a>
+                <a href="../community.html" class="nav-link" data-i18n="community">Community</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Connect</h4>
-                            <a href="../community.html">Find Local Groups</a>
-                            <a href="#">Discussion Forums</a>
-                            <a href="#">Parent Meetups</a>
+                            <h4 data-i18n="connect">Connect</h4>
+                            <a href="../community.html" data-i18n="find_groups">Find Local Groups</a>
+                            <a href="#" data-i18n="forums">Discussion Forums</a>
+                            <a href="#" data-i18n="meetups">Parent Meetups</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Share & Learn</h4>
-                            <a href="#">Success Stories</a>
-                            <a href="#">Tips & Tricks</a>
-                            <a href="#">Photo Gallery</a>
+                            <h4 data-i18n="share_learn">Share & Learn</h4>
+                            <a href="#" data-i18n="success_stories">Success Stories</a>
+                            <a href="#" data-i18n="tips_tricks">Tips & Tricks</a>
+                            <a href="#" data-i18n="photo_gallery">Photo Gallery</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Events</h4>
-                            <a href="#">Upcoming Events</a>
-                            <a href="#">Workshops</a>
-                            <a href="#">Playgroups</a>
+                            <h4 data-i18n="events">Events</h4>
+                            <a href="#" data-i18n="upcoming_events">Upcoming Events</a>
+                            <a href="#" data-i18n="workshops">Workshops</a>
+                            <a href="#" data-i18n="playgroups">Playgroups</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="nav-item">
-                <a href="../community.html#expert-section" class="nav-link">Expert Advice</a>
+                <a href="../community.html#expert-section" class="nav-link" data-i18n="expert_advice">Expert Advice</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Consultations</h4>
-                            <a href="../community.html#expert-section">Book an Expert</a>
-                            <a href="../community.html#expert-section">Video Calls</a>
-                            <a href="../community.html#expert-section">Chat Support</a>
+                            <h4 data-i18n="consultations">Consultations</h4>
+                            <a href="../community.html#expert-section" data-i18n="book_expert">Book an Expert</a>
+                            <a href="../community.html#expert-section" data-i18n="video_calls">Video Calls</a>
+                            <a href="../community.html#expert-section" data-i18n="chat_support">Chat Support</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Resources</h4>
-                            <a href="../community.html#expert-section">Articles</a>
-                            <a href="../community.html#expert-section">Research</a>
-                            <a href="../community.html#expert-section">Guidelines</a>
+                            <h4 data-i18n="resources">Resources</h4>
+                            <a href="../community.html#expert-section" data-i18n="articles">Articles</a>
+                            <a href="../community.html#expert-section" data-i18n="research">Research</a>
+                            <a href="../community.html#expert-section" data-i18n="guidelines">Guidelines</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Learn</h4>
-                            <a href="../community.html#expert-section">Webinars</a>
-                            <a href="../community.html#expert-section">Q&A Sessions</a>
-                            <a href="../community.html#expert-section">Expert Blog</a>
+                            <h4 data-i18n="learn">Learn</h4>
+                            <a href="../community.html#expert-section" data-i18n="webinars">Webinars</a>
+                            <a href="../community.html#expert-section" data-i18n="qa_sessions">Q&A Sessions</a>
+                            <a href="../community.html#expert-section" data-i18n="expert_blog">Expert Blog</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="nav-item">
-                <a href="../shop.html" class="nav-link">Marketplace</a>
+                <a href="../shop.html" class="nav-link" data-i18n="marketplace">Marketplace</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Essential Care</h4>
-                            <a href="../shop.html?category=baby-care">Feeding</a>
-                            <a href="../shop.html?category=baby-care">Diapering</a>
-                            <a href="../shop.html?category=baby-care">Bath & Skincare</a>
+                            <h4 data-i18n="essential_care">Essential Care</h4>
+                            <a href="../shop.html?category=baby-care" data-i18n="feeding">Feeding</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="diapering">Diapering</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="bath_skincare">Bath & Skincare</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Clothing & Gear</h4>
-                            <a href="../shop.html?category=clothing">Clothing</a>
-                            <a href="../shop.html?category=baby-care">Strollers</a>
-                            <a href="../shop.html?category=baby-care">Car Seats</a>
+                            <h4 data-i18n="clothing_gear">Clothing & Gear</h4>
+                            <a href="../shop.html?category=clothing" data-i18n="clothing">Clothing</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="strollers">Strollers</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="car_seats">Car Seats</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Play & Learn</h4>
-                            <a href="../shop.html?category=toys">Toys</a>
-                            <a href="../shop.html?category=toys">Books</a>
-                            <a href="../shop.html?category=toys">Educational</a>
+                            <h4 data-i18n="play_learn">Play & Learn</h4>
+                            <a href="../shop.html?category=toys" data-i18n="toys">Toys</a>
+                            <a href="../shop.html?category=toys" data-i18n="books">Books</a>
+                            <a href="../shop.html?category=toys" data-i18n="educational">Educational</a>
                         </div>
                     </div>
                 </div>
@@ -125,6 +127,7 @@
         </div>
         
         <div class="nav-right">
+            <button class="lang-btn" onclick="toggleLanguage()" data-i18n="language">English</button>
             <!-- Profile content will be loaded here by JavaScript -->
         </div>
     </nav>
@@ -132,74 +135,69 @@
     <main>
         <div class="nutrition-care">
             <div class="nutrition-intro">
-                <h2>Baby Nutrition Guide</h2>
-                <p>Essential information and tips for healthy nutrition and feeding</p>
+                <h2 data-i18n="baby_nutrition_guide">Baby Nutrition Guide</h2>
+                <p data-i18n="nutrition_guide_subtitle">Essential information and tips for your baby's nutrition and feeding</p>
             </div>
             
             <div id="content-sections">
                 <div id="newborn" class="content-section">
                     <div class="content-card">
-                        <h3>0-3 Months Nutrition</h3>
+                        <h3 data-i18n="newborn_nutrition">0-3 Months Nutrition</h3>
                         <ul>
-                            <li>Feed 8-12 times per 24 hours (every 2-3 hours)</li>
-                            <li>Exclusive breastfeeding recommended for first 6 months</li>
-                            <li>Breastfed infants need 400 IU vitamin D daily</li>
-                            <li>Monitor wet diapers and weight gain</li>
-                            <li>Formula-fed babies: Follow package instructions exactly</li>
-                            <li>Feed on demand, watch for hunger cues</li>
-                            <li>Ensure proper latch for breastfeeding</li>
-                            <li>No water or other liquids needed</li>
+                            <li data-i18n="newborn_breastfeeding">Exclusive breastfeeding or formula feeding</li>
+                            <li data-i18n="newborn_feeding_frequency">Feed every 2-3 hours (8-12 times per day)</li>
+                            <li data-i18n="newborn_feeding_signs">Watch for hunger cues (rooting, sucking hands)</li>
+                            <li data-i18n="newborn_feeding_duration">Feeding sessions typically last 20-40 minutes</li>
+                            <li data-i18n="newborn_burping">Burp baby after each feeding</li>
+                            <li data-i18n="newborn_spit_up">Spit-up is normal</li>
+                            <li data-i18n="newborn_weight_gain">Expect 5-7 ounces weight gain per week</li>
                         </ul>
                     </div>
                 </div>
 
                 <div id="infant" class="content-section">
                     <div class="content-card">
-                        <h3>3-6 Months Nutrition</h3>
+                        <h3 data-i18n="infant_nutrition">3-6 Months Nutrition</h3>
                         <ul>
-                            <li>Continue exclusive breastfeeding or formula</li>
-                            <li>Feedings may space to every 3-4 hours</li>
-                            <li>Not ready for solids before 6 months</li>
-                            <li>Continue vitamin D for breastfed babies</li>
-                            <li>Do not add cereal to bottles unless directed by doctor</li>
-                            <li>Watch for growth spurts and increased hunger</li>
-                            <li>Digestive system still developing</li>
-                            <li>No juice or other beverages needed</li>
+                            <li data-i18n="infant_solids_intro">Introduce solid foods around 6 months</li>
+                            <li data-i18n="infant_breastfeeding">Continue breastfeeding or formula</li>
+                            <li data-i18n="infant_feeding_frequency">4-6 feedings per day</li>
+                            <li data-i18n="infant_solids_progression">Start with single-ingredient purees</li>
+                            <li data-i18n="infant_allergen_intro">Introduce common allergens one at a time</li>
+                            <li data-i18n="infant_water_intro">Can introduce small amounts of water</li>
+                            <li data-i18n="infant_feeding_skills">Develop self-feeding skills</li>
                         </ul>
                     </div>
                 </div>
 
                 <div id="older-infant" class="content-section">
                     <div class="content-card">
-                        <h3>6-12 Months Nutrition</h3>
+                        <h3 data-i18n="older_infant_nutrition">6-12 Months Nutrition</h3>
                         <ul>
-                            <li>Introduce solid foods around 6 months</li>
-                            <li>Start with single-ingredient purees or soft foods</li>
-                            <li>Introduce one new food every 3 days</li>
-                            <li>Include potential allergens in small amounts</li>
-                            <li>Breast milk/formula still primary nutrition source</li>
-                            <li>Offer solids after milk feeding</li>
-                            <li>Provide sips of water with meals</li>
-                            <li>Avoid juice and sugary drinks</li>
-                            <li>Watch for signs of food allergies</li>
+                            <li data-i18n="older_infant_meals">3 meals and 2-3 snacks per day</li>
+                            <li data-i18n="older_infant_breastfeeding">Can continue breastfeeding if desired</li>
+                            <li data-i18n="older_infant_milk_transition">Transition to whole milk (if not breastfeeding)</li>
+                            <li data-i18n="older_infant_food_variety">Offer variety of foods from all food groups</li>
+                            <li data-i18n="older_infant_portion_size">Small portions (1-2 tablespoons per food)</li>
+                            <li data-i18n="older_infant_self_feeding">Encourage self-feeding with utensils</li>
+                            <li data-i18n="older_infant_water_intake">Offer water between meals</li>
+                            <li data-i18n="older_infant_food_avoidance">Avoid honey, choking hazards, and added sugar</li>
                         </ul>
                     </div>
                 </div>
 
                 <div id="toddler" class="content-section">
                     <div class="content-card">
-                        <h3>12-24 Months Nutrition</h3>
+                        <h3 data-i18n="toddler_nutrition">12-24 Months Nutrition</h3>
                         <ul>
-                            <li>Transition to whole cow's milk at 12 months</li>
-                            <li>Three meals and 1-2 healthy snacks daily</li>
-                            <li>Encourage self-feeding with supervision</li>
-                            <li>Offer variety of foods from all food groups</li>
-                            <li>Limit juice to 4 oz per day, avoid sugary drinks</li>
-                            <li>Portions should be toddler-sized</li>
-                            <li>Continue to avoid choking hazards</li>
-                            <li>Introduce open cup for practice</li>
-                            <li>Watch for iron-rich foods</li>
-                            <li>Family mealtimes important for modeling</li>
+                            <li data-i18n="toddler_meals">3 meals and 2-3 snacks per day</li>
+                            <li data-i18n="toddler_breastfeeding">Can continue breastfeeding if desired</li>
+                            <li data-i18n="toddler_milk_transition">Transition to whole milk (if not breastfeeding)</li>
+                            <li data-i18n="toddler_food_variety">Offer variety of foods from all food groups</li>
+                            <li data-i18n="toddler_portion_size">Small portions (1-2 tablespoons per food)</li>
+                            <li data-i18n="toddler_self_feeding">Encourage self-feeding with utensils</li>
+                            <li data-i18n="toddler_water_intake">Offer water between meals</li>
+                            <li data-i18n="toddler_food_avoidance">Avoid honey, choking hazards, and added sugar</li>
                         </ul>
                     </div>
                 </div>
@@ -211,18 +209,19 @@
     <footer class="footer">
         <p>&copy; 2025 Raising Roots. All rights reserved.</p>
         <p>
-            <a href="../about.html">About Us</a> |
-            <a href="#">Facebook</a> |
-            <a href="#">Instagram</a> |
-            <a href="#">Twitter</a>
+            <a href="../about.html" data-i18n="about_us">About Us</a> |
+            <a href="#" data-i18n="facebook">Facebook</a> |
+            <a href="#" data-i18n="instagram">Instagram</a> |
+            <a href="#" data-i18n="twitter">Twitter</a>
         </p>
         <p>
-            Download our app:
-            <a href="#">Google Play</a> |
-            <a href="#">App Store</a>
+            <span data-i18n="download_app">Download our app:</span>
+            <a href="#" data-i18n="google_play">Google Play</a> |
+            <a href="#" data-i18n="app_store">App Store</a>
         </p>
     </footer>
 
     <script src="../../assets/js/BabyCare/profile.js"></script>
+    <script src="nutrition.js"></script>
 </body>
 </html>

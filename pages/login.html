@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login/Signup Form</title>
+    <title data-i18n="login_signup_title">Login/Signup Form</title>
     <link rel="stylesheet" href="../assets/css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add jQuery and i18n scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../assets/js/i18n.js"></script>
 </head>
 
 <body>
@@ -16,23 +19,23 @@
             <div class="form-side login-side">
                 <div class="form-container">
                     <form id="loginForm" class="form active">
-                        <h2>Welcome Back!</h2>
-                        <p class="form-subtitle">Please login to your account</p>
+                        <h2 data-i18n="welcome_back">Welcome Back!</h2>
+                        <p class="form-subtitle" data-i18n="login_subtitle">Please login to your account</p>
                         <div class="form-group">
-                            <input type="email" placeholder="Email" id="loginEmail" required>
+                            <input type="email" placeholder="Email" id="loginEmail" required data-i18n-placeholder="email">
                             <div class="error-message" id="loginEmailError"></div>
                         </div>
                         <div class="form-group">
                             <div class="password-container">
-                                <input type="password" placeholder="Password" id="loginPassword" required>
+                                <input type="password" placeholder="Password" id="loginPassword" required data-i18n-placeholder="password">
                                 <i class="fas fa-eye toggle-password" onclick="togglePassword('loginPassword')"></i>
                             </div>
                             <div class="error-message" id="loginPasswordError"></div>
                         </div>
                         <div class="form-feedback" id="loginFeedback"></div>
-                        <button type="submit" id="loginSubmit">Login</button>
+                        <button type="submit" id="loginSubmit" data-i18n="login">Login</button>
                         <div class="form-switch">
-                            <p>Don't have an account? <a href="#" onclick="showForm('signup'); return false;">Sign up</a></p>
+                            <p data-i18n="dont_have_account">Don't have an account? <a href="#" onclick="showForm('signup'); return false;" data-i18n="sign_up">Sign up</a></p>
                         </div>
                     </form>
                 </div>
@@ -42,19 +45,19 @@
             <div class="form-side signup-side">
                 <div class="form-container">
                     <form id="signupForm" class="form">
-                        <h2>Create Account</h2>
-                        <p class="form-subtitle">Join our community today</p>
+                        <h2 data-i18n="create_account">Create Account</h2>
+                        <p class="form-subtitle" data-i18n="signup_subtitle">Join our community today</p>
                         <div class="form-group">
-                            <input type="text" placeholder="Username" id="signupUsername" required>
+                            <input type="text" placeholder="Username" id="signupUsername" required data-i18n-placeholder="username">
                             <div class="error-message" id="signupUsernameError"></div>
                         </div>
                         <div class="form-group">
-                            <input type="email" placeholder="Email" id="signupEmail" required>
+                            <input type="email" placeholder="Email" id="signupEmail" required data-i18n-placeholder="email">
                             <div class="error-message" id="signupEmailError"></div>
                         </div>
                         <div class="form-group">
                             <div class="password-container">
-                                <input type="password" placeholder="Password" id="signupPassword" required>
+                                <input type="password" placeholder="Password" id="signupPassword" required data-i18n-placeholder="password">
                                 <i class="fas fa-eye toggle-password" onclick="togglePassword('signupPassword')"></i>
                             </div>
                             <div class="password-strength">
@@ -64,37 +67,37 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="signupBabyName">Baby Name:</label>
-                            <input type="text" id="signupBabyName" placeholder="Enter baby's name" required>
+                            <label for="signupBabyName" data-i18n="baby_name">Baby Name:</label>
+                            <input type="text" id="signupBabyName" placeholder="Enter baby's name" required data-i18n-placeholder="baby_name_placeholder">
                             <div class="error-message" id="signupBabyNameError"></div>
                         </div>
                         
                         <div class="form-group">
-                            <label for="signupBabyGender">Baby Gender:</label>
+                            <label for="signupBabyGender" data-i18n="baby_gender">Baby Gender:</label>
                             <div class="gender-options">
                                 <label class="gender-option">
                                     <input type="radio" name="babyGender" value="male" id="genderMale">
-                                    <span>Boy</span>
+                                    <span data-i18n="boy">Boy</span>
                                 </label>
                                 <label class="gender-option">
                                     <input type="radio" name="babyGender" value="female" id="genderFemale">
-                                    <span>Girl</span>
+                                    <span data-i18n="girl">Girl</span>
                                 </label>
                             </div>
                             <div class="error-message" id="signupBabyGenderError"></div>
                         </div>
                         
                         <div class="form-group">
-                            <label for="signupBirthDate">Baby Birth Date:</label>
+                            <label for="signupBirthDate" data-i18n="baby_birth_date">Baby Birth Date:</label>
                             <input type="date" id="signupBirthDate" required>
                             <div id="ageDisplay" class="age-display"></div>
                             <div class="error-message" id="signupBirthDateError"></div>
                         </div>
                         
                         <div class="form-feedback" id="signupFeedback"></div>
-                        <button type="submit" id="signupSubmit">Sign Up</button>
+                        <button type="submit" id="signupSubmit" data-i18n="signup_button">Sign Up</button>
                         <div class="form-switch">
-                            <p>Already have an account? <a href="#" onclick="showForm('login'); return false;">Login</a></p>
+                            <p data-i18n="already_have_account">Already have an account? <a href="#" onclick="showForm('login'); return false;" data-i18n="login">Login</a></p>
                         </div>
                     </form>
                 </div>
@@ -104,14 +107,14 @@
             <div class="sliding-overlay">
                 <div class="overlay-content">
                     <div class="overlay-panel overlay-left">
-                        <h2>Create Account</h2>
-                        <p>Join our community today</p>
-                        <button class="overlay-btn" onclick="showForm('signup')">Sign Up</button>
+                        <h2 data-i18n="overlay_create_account">Create Account</h2>
+                        <p data-i18n="overlay_join_community">Join our community today</p>
+                        <button class="overlay-btn" onclick="showForm('signup')" data-i18n="signup_button">Sign Up</button>
                     </div>
                     <div class="overlay-panel overlay-right">
-                        <h2>Welcome Back!</h2>
-                        <p>Please login to your account</p>
-                        <button class="overlay-btn" onclick="showForm('login')">Login</button>
+                        <h2 data-i18n="overlay_welcome_back">Welcome Back!</h2>
+                        <p data-i18n="overlay_login_account">Please login to your account</p>
+                        <button class="overlay-btn" onclick="showForm('login')" data-i18n="login_button">Login</button>
                     </div>
                 </div>
             </div>

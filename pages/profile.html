@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - Raising Roots</title>
+    <title data-i18n="profile_title">Profile - Raising Roots</title>
     <link rel="stylesheet" href="../assets/css/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../assets/js/i18n.js"></script>
 </head>
 <body>
     <!-- Simple Navigation with Logo and Title -->
@@ -14,7 +16,7 @@
             <a href="../pages/homepage.html" class="logo">
                 <img src="../images/LogoIcon.png" alt="Raising Roots">
             </a>
-            <h1 class="nav-title">Profile</h1>
+            <h1 class="nav-title" data-i18n="profile">Profile</h1>
         </div>
     </nav>
 
@@ -27,115 +29,115 @@
                 </button>
                 <input type="file" id="avatarInput" accept="image/*" style="display: none">
             </div>
-            <h2 id="username">Loading...</h2>
-            <p id="userEmail">Loading...</p>
+            <h2 id="username" data-i18n="loading">Loading...</h2>
+            <p id="userEmail" data-i18n="loading">Loading...</p>
         </div>
 
         <div class="profile-content">
             <div class="profile-section">
-                <h2>Account Information</h2>
+                <h2 data-i18n="account_info">Account Information</h2>
                 <div class="info-display">
                     <div class="info-item">
-                        <label>Display Name</label>
-                        <p id="displayNameDisplay">Loading...</p>
+                        <label data-i18n="display_name">Display Name</label>
+                        <p id="displayNameDisplay" data-i18n="loading">Loading...</p>
                     </div>
                     <div class="info-item">
-                        <label>Email</label>
-                        <p id="emailDisplay">Loading...</p>
+                        <label data-i18n="email">Email</label>
+                        <p id="emailDisplay" data-i18n="loading">Loading...</p>
                     </div>
                 </div>
                 <form id="profileForm" class="edit-form" style="display: none;">
                     <div class="form-group">
-                        <label for="displayName">Display Name</label>
-                        <input type="text" id="displayName" name="displayName">
+                        <label for="displayName" data-i18n="display_name">Display Name</label>
+                        <input type="text" id="displayName" name="displayName" data-i18n-placeholder="display_name_placeholder">
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" readonly>
+                        <label for="email" data-i18n="email">Email</label>
+                        <input type="email" id="email" name="email" readonly data-i18n-placeholder="email_placeholder">
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="save-btn">Save Changes</button>
-                        <button type="button" class="cancel-btn" onclick="toggleEdit('profile')">Cancel</button>
+                        <button type="submit" class="save-btn" data-i18n="save_changes">Save Changes</button>
+                        <button type="button" class="cancel-btn" onclick="toggleEdit('profile')" data-i18n="cancel">Cancel</button>
                     </div>
                 </form>
-                <button class="edit-btn" onclick="toggleEdit('profile')">Edit Information</button>
+                <button class="edit-btn" onclick="toggleEdit('profile')" data-i18n="edit_info">Edit Information</button>
             </div>
 
             <div class="profile-section">
-                <h2>Baby Information</h2>
+                <h2 data-i18n="baby_info">Baby Information</h2>
                 <div class="info-display">
                     <div class="info-item">
-                        <label>Baby's Name</label>
-                        <p id="babyNameDisplay">Loading...</p>
+                        <label data-i18n="baby_name">Baby's Name</label>
+                        <p id="babyNameDisplay" data-i18n="loading">Loading...</p>
                     </div>
                     <div class="info-item">
-                        <label>Baby's Gender</label>
-                        <p id="babyGenderDisplay">Loading...</p>
+                        <label data-i18n="baby_gender">Baby's Gender</label>
+                        <p id="babyGenderDisplay" data-i18n="loading">Loading...</p>
                     </div>
                     <div class="info-item">
-                        <label>Birth Date</label>
-                        <p id="birthDateDisplay">Loading...</p>
+                        <label data-i18n="birth_date">Birth Date</label>
+                        <p id="birthDateDisplay" data-i18n="loading">Loading...</p>
                     </div>
                     <div class="info-item">
-                        <label>Age</label>
-                        <p id="ageDisplay">Loading...</p>
+                        <label data-i18n="age">Age</label>
+                        <p id="ageDisplay" data-i18n="loading">Loading...</p>
                     </div>
                 </div>
                 <form id="babyForm" class="edit-form" style="display: none;">
                     <div class="form-group">
-                        <label for="babyName">Baby's Name</label>
-                        <input type="text" id="babyName" name="babyName">
+                        <label for="babyName" data-i18n="baby_name">Baby's Name</label>
+                        <input type="text" id="babyName" name="babyName" data-i18n-placeholder="baby_name_placeholder">
                     </div>
                     <div class="form-group">
-                        <label>Baby's Gender</label>
+                        <label data-i18n="baby_gender">Baby's Gender</label>
                         <div class="gender-options">
                             <label class="gender-option">
                                 <input type="radio" name="babyGender" value="male">
-                                <span>Boy</span>
+                                <span data-i18n="boy">Boy</span>
                             </label>
                             <label class="gender-option">
                                 <input type="radio" name="babyGender" value="female">
-                                <span>Girl</span>
+                                <span data-i18n="girl">Girl</span>
                             </label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="birthDate">Birth Date</label>
+                        <label for="birthDate" data-i18n="birth_date">Birth Date</label>
                         <input type="date" id="birthDate" name="birthDate">
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="save-btn">Update Baby Info</button>
-                        <button type="button" class="cancel-btn" onclick="toggleEdit('baby')">Cancel</button>
+                        <button type="submit" class="save-btn" data-i18n="update_baby_info">Update Baby Info</button>
+                        <button type="button" class="cancel-btn" onclick="toggleEdit('baby')" data-i18n="cancel">Cancel</button>
                     </div>
                 </form>
-                <button class="edit-btn" onclick="toggleEdit('baby')">Edit Baby Info</button>
+                <button class="edit-btn" onclick="toggleEdit('baby')" data-i18n="edit_baby_info">Edit Baby Info</button>
             </div>
 
             <div class="profile-section">
-                <h2>Security</h2>
+                <h2 data-i18n="security">Security</h2>
                 <form id="passwordForm">
                     <div class="form-group">
-                        <label for="currentPassword">Current Password</label>
-                        <input type="password" id="currentPassword" name="currentPassword">
+                        <label for="currentPassword" data-i18n="current_password">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" data-i18n-placeholder="current_password_placeholder">
                     </div>
                     <div class="form-group">
-                        <label for="newPassword">New Password</label>
-                        <input type="password" id="newPassword" name="newPassword">
+                        <label for="newPassword" data-i18n="new_password">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" data-i18n-placeholder="new_password_placeholder">
                     </div>
                     <div class="form-group">
-                        <label for="confirmPassword">Confirm New Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword">
+                        <label for="confirmPassword" data-i18n="confirm_password">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" data-i18n-placeholder="confirm_password_placeholder">
                     </div>
-                    <button type="submit" class="save-btn">Change Password</button>
+                    <button type="submit" class="save-btn" data-i18n="change_password">Change Password</button>
                 </form>
                 <div class="logout-section">
-                    <button id="logoutBtn" class="logout-btn" onclick="handleLogout(event)">Logout</button>
+                    <button id="logoutBtn" class="logout-btn" onclick="handleLogout(event)" data-i18n="logout">Logout</button>
                 </div>
             </div>
 
             <div class="profile-section danger-zone">
-                <h2>Danger Zone</h2>
-                <button id="deleteAccount" class="delete-btn">Delete Account</button>
+                <h2 data-i18n="danger_zone">Danger Zone</h2>
+                <button id="deleteAccount" class="delete-btn" data-i18n="delete_account">Delete Account</button>
             </div>
         </div>
     </div>

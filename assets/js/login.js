@@ -498,3 +498,38 @@ function togglePassword(inputId) {
         toggleIcon.classList.add('fa-eye');
     }
 } 
+
+// Function to update translations and layout
+function updateTranslations() {
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[currentLanguage][key]) {
+            element.textContent = translations[currentLanguage][key];
+        }
+    });
+
+    // Update all elements with data-i18n-placeholder attribute
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if (translations[currentLanguage][key]) {
+            element.placeholder = translations[currentLanguage][key];
+        }
+    });
+
+    // Update document direction based on language
+    document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+}
+
+// Function to update password strength bar
+function updatePasswordStrength(password) {
+    const strengthBar = document.getElementById('passwordStrengthBar');
+    const strength = validatePassword(password) ? 100 : 
+                    password.length >= 6 ? 50 : 
+                    password.length >= 4 ? 25 : 0;
+    
+    strengthBar.style.width = `${strength}%`;
+    strengthBar.style.backgroundColor = strength === 100 ? '#4CAF50' : 
+                                      strength === 50 ? '#FFC107' : 
+                                      strength === 25 ? '#FF9800' : '#F44336';
+} 

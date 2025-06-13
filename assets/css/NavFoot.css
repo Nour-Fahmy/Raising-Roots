@@ -344,7 +344,6 @@ body {
 }
 
 .footer a:hover {
-<<<<<<< HEAD
     text-decoration: underline;
 }
 
@@ -395,7 +394,27 @@ body {
     .dropdown-inner {
         grid-template-columns: 1fr;
     }
-=======
-    color: #ffd700;
->>>>>>> 1ed07e4af0d55db0ba87d5c6b326286064d8adeb
+}
+
+.lang-btn {
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 15px;
+    font-size: 14px;
+}
+
+.lang-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+[dir="rtl"] .lang-btn {
+    margin-left: 0;
+    margin-right: 15px;
 }
