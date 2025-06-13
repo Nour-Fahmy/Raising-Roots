@@ -1126,6 +1126,9 @@ function setLanguage(lang) {
     
     // Apply translations
     applyTranslations(lang);
+
+    // Dispatch language changed event
+    window.dispatchEvent(new Event('languageChanged'));
 }
 
 // Apply translations to all elements with data-i18n attribute

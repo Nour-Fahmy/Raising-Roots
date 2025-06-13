@@ -4,19 +4,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const token = localStorage.getItem('token');
         const heroButton = document.querySelector('.hero-buttons .primary-btn');
         const secondHeroButton = document.querySelector('.second-hero-text .primary-btn');
+        const currentLang = localStorage.getItem('language') || 'en';
 
         if (token) {
             // User is logged in
             heroButton.href = './community.html';
-            heroButton.textContent = 'Join our Community';
+            heroButton.setAttribute('data-i18n', 'join_community');
+            // Let the translation system handle the text
+            applyTranslations(currentLang);
             secondHeroButton.href = './shop.html';
-            secondHeroButton.textContent = 'Visit our Shop';
+            secondHeroButton.setAttribute('data-i18n', 'visit_shop');
+            applyTranslations(currentLang);
         } else {
-            // User is not logged in
-            heroButton.href = '../pages/login.html';
-            heroButton.textContent = 'Create your baby\'s profile';
-            secondHeroButton.href = '../pages/login.html';
-            secondHeroButton.textContent = 'Create your baby\'s Profile';
+            // User is not logged in - both buttons should go to login page
+            const loginPagePath = 'login.html';  // Since we're in the pages directory
+            heroButton.href = loginPagePath;
+            heroButton.setAttribute('data-i18n', 'create_baby_profile');
+            // Let the translation system handle the text
+            applyTranslations(currentLang);
+            secondHeroButton.href = loginPagePath;
+            secondHeroButton.setAttribute('data-i18n', 'create_baby_profile');
+            applyTranslations(currentLang);
         }
     }
 
@@ -25,9 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Listen for storage changes (for when user logs in/out in another tab)
     window.addEventListener('storage', function(e) {
-        if (e.key === 'token') {
+        if (e.key === 'token' || e.key === 'language') {
             updateButtonLinks();
         }
+    });
+
+    // Listen for language changes from the language toggle button
+    window.addEventListener('languageChanged', function() {
+        updateButtonLinks();
     });
 
     // Chat elements
