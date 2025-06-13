@@ -29,7 +29,7 @@ function isAdmin(req, res, next) {
     throw new AuthenticationError('Access denied. Please log in.');
   }
 
-  if (req.user.role !== 'admin') {
+  if (!req.user.isAdmin) {
     throw new AuthorizationError('Access denied. Admin privileges required.');
   }
 

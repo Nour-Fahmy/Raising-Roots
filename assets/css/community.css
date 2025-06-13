@@ -628,7 +628,7 @@ body {
 .like-btn:hover,
 .comment-btn:hover,
 .save-btn:hover {
-  color: var(--primary-color);
+  color: var(--accent-color);
   background: var(--hover-bg);
 }
 
@@ -1148,56 +1148,235 @@ body.dark-theme .profile-menu-options a:hover {
   background-color: #3d3d3d;
 }
 
-/* Responsive Design */
+/* Mobile Navigation */
+.mobile-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+/* Enhanced Responsive Design */
 @media (max-width: 1200px) {
   .main-content {
-    max-width: 600px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
 
 @media (max-width: 992px) {
   .sidebar {
-    width: 80px;
+    width: 60px;
+    padding: 0.5rem;
   }
   
-  .nav-item span {
-    display: none;
+  .nav-item {
+    padding: 0.6rem;
+  }
+  
+  .nav-item i {
+    font-size: 1.1rem;
   }
   
   .main-content {
-    margin-left: 80px;
+    margin-left: 60px;
+    padding: 1rem;
   }
   
   .search-bar {
-    width: 200px;
+    width: 250px;
+  }
+
+  .post-card {
+    padding: 1rem;
+  }
+
+  .post-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .post-actions {
+    align-self: flex-end;
   }
 }
 
 @media (max-width: 768px) {
+  .mobile-nav-toggle {
+    display: block;
+  }
+
   .main-header {
     padding: 0.5rem 1rem;
   }
   
+  .header-content {
+    gap: 0.5rem;
+  }
+
   .search-bar {
     display: none;
   }
   
   .sidebar {
-    display: none;
+    transform: translateX(-100%);
+    position: fixed;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    background: var(--secondary-color);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    padding: 1rem;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .sidebar .nav-item {
+    justify-content: flex-start;
+    padding: 0.8rem 1rem;
+  }
+
+  .sidebar .nav-item span {
+    display: inline;
+    opacity: 1;
+    width: auto;
   }
   
   .main-content {
     margin-left: 0;
     padding: 1rem;
   }
+
+  .posts-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .create-post-btn {
+    width: 100%;
+    justify-content: center;
+  }
   
   .dm-container {
     flex-direction: column;
+    height: calc(100vh - 120px);
   }
   
   .user-list {
     width: 100%;
     height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .chat-input {
+    padding: 0.8rem;
+  }
+
+  .chat-input input {
+    padding: 0.6rem;
+  }
+
+  .chat-input button {
+    padding: 0.6rem 1rem;
+  }
+
+  /* Enhanced Touch Interactions */
+  .post-card,
+  .user-item,
+  .nav-item,
+  .like-btn,
+  .comment-btn,
+  .save-btn {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .post-card:active,
+  .user-item:active,
+  .nav-item:active {
+    transform: scale(0.98);
+  }
+
+  .like-btn:active,
+  .comment-btn:active,
+  .save-btn:active {
+    transform: scale(1.1);
+  }
+
+  /* Improved Mobile Forms */
+  .create-post-form {
+    padding: 1rem;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 0.8rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-header {
+    padding: 0.5rem;
+  }
+
+  .logo img {
+    height: 32px;
+  }
+
+  .profile-pic {
+    width: 32px;
+    height: 32px;
+  }
+
+  .post-card {
+    margin-bottom: 1rem;
+  }
+
+  .post-engagement {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .pagination-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .pagination-info {
+    width: 100%;
+    text-align: center;
+    margin-top: 0.5rem;
   }
 }
 
@@ -1440,4 +1619,319 @@ body.dark-theme #saved-posts-section .post-footer {
 
 body.dark-theme #saved-posts-section .post-category {
   background-color: var(--hover-color);
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--light-bg);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.pagination-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  margin-left: 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Dark theme support for pagination */
+body.dark-theme .pagination-btn {
+  background: var(--secondary-color);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+body.dark-theme .pagination-btn:hover:not(:disabled) {
+  background: var(--light-bg);
+  border-color: var(--primary-color);
+}
+
+body.dark-theme .pagination-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+body.dark-theme .pagination-info {
+  color: var(--text-muted);
+}
+
+/* Responsive pagination */
+@media (max-width: 768px) {
+  .pagination {
+    gap: 0.25rem;
+  }
+
+  .pagination-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .pagination-info {
+    width: 100%;
+    text-align: center;
+    margin: 0.5rem 0 0;
+  }
+}
+
+/* Comments Section Styles */
+.comments-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.comments-section.hidden {
+  display: none;
+}
+
+.comments-list {
+  margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment {
+  padding: 0.8rem;
+  border-radius: var(--border-radius);
+  background: var(--light-bg);
+  margin-bottom: 0.5rem;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.comment-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.comment-content {
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--light-bg);
+  color: var(--text-color);
+  resize: none;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.submit-comment {
+  padding: 0.8rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  align-self: flex-end;
+}
+
+.submit-comment:hover {
+  background: var(--dark-brown);
+}
+
+/* Dark theme support for comments */
+body.dark-theme .comment {
+  background: var(--secondary-color);
+}
+
+body.dark-theme .comment-input {
+  background: var(--light-bg);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+body.dark-theme .comment-input:focus {
+  border-color: var(--primary-color);
+}
+
+/* Like and Save button animations */
+.like-animation,
+.save-animation {
+  animation: buttonAnimation 0.3s ease;
+}
+
+@keyframes buttonAnimation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Like button styles */
+.like-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.like-btn:hover {
+  color: #e74c3c;
+  background: var(--hover-bg);
+  transform: translateY(-2px);
+}
+
+.like-btn.liked {
+  color: #e74c3c;
+  animation: likePulse 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.like-btn.liked i {
+  color: #e74c3c !important;
+  font-weight: 900;
+  animation: heartBeat 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.like-btn i {
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.like-btn.liked i.fa-heart {
+  color: #e74c3c !important;
+}
+
+@keyframes likePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.2); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Dark theme overrides */
+body.dark-theme .like-btn {
+  color: var(--text-muted);
+}
+
+body.dark-theme .like-btn:hover,
+body.dark-theme .like-btn.liked {
+  color: #e74c3c;
+}
+
+body.dark-theme .like-btn.liked i,
+body.dark-theme .like-btn.liked i.fa-heart {
+  color: #e74c3c !important;
+}
+
+/* Save button styles */
+.save-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.save-btn:hover {
+  color: var(--primary-color) !important;
+  background: var(--hover-bg);
+  transform: translateY(-2px);
+}
+
+.save-btn.saved {
+  color: var(--primary-color) !important;
+  animation: savePulse 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.save-btn.saved i {
+  color: var(--primary-color) !important;
+  font-weight: 900;
+  animation: bookmarkPop 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark theme overrides for save button */
+body.dark-theme .save-btn {
+  color: var(--text-muted);
+}
+
+body.dark-theme .save-btn:hover,
+body.dark-theme .save-btn.saved {
+  color: var(--primary-color) !important;
+}
+
+body.dark-theme .save-btn.saved i {
+  color: var(--primary-color) !important;
 }

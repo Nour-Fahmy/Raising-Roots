@@ -26,6 +26,10 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  savedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   comments: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -81,5 +85,6 @@ postSchema.pre('save', function(next) {
 postSchema.index({ title: 'text', content: 'text' });
 postSchema.index({ category: 1, status: 1 });
 postSchema.index({ author: 1, createdAt: -1 });
+postSchema.index({ savedBy: 1 });
 
 module.exports = mongoose.model('Post', postSchema); 

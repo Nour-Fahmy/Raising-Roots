@@ -1,21 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const postController = require('../controllers/postController');
-const { isAdmin } = require('../middleware/auth');
+const { authenticateToken, isAdmin } = require('../middleware/auth');
 
 // Public routes
 router.get('/', postController.getAllPosts);
 
-// Admin routes - must come before /:id routes
-router.get('/stats/admin', isAdmin, postController.getPostStats);
+// Protected routes - require authentication
+router.post('/', authenticateToken, postController.createPost);
 
-// Protected routes
+// Saved posts route must come before /:id routes
+router.get('/saved', authenticateToken, postController.getSavedPosts);
+
+// Routes with :id parameter
 router.get('/:id', postController.getPost);
-router.post('/', postController.createPost);
-router.put('/:id', postController.updatePost);
-router.delete('/:id', postController.deletePost);
-router.post('/:id/report', postController.reportPost);
-router.post('/:id/like', postController.toggleLike);
-router.post('/:id/comment', postController.addComment);
+router.put('/:id', authenticateToken, postController.updatePost);
+router.delete('/:id', authenticateToken, postController.deletePost);
+router.post('/:id/report', authenticateToken, postController.reportPost);
+router.post('/:id/like', authenticateToken, postController.toggleLike);
+router.post('/:id/save', authenticateToken, postController.toggleSave);
+router.post('/:id/comment', authenticateToken, postController.addComment);
+
+// Admin routes
+router.get('/stats/admin', authenticateToken, isAdmin, postController.getPostStats);
 
 module.exports = router; 

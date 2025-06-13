@@ -88,6 +88,7 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
             {
                 userId: user._id,
                 isAdmin: user.role === 'admin',
+                role: user.role
             },
             process.env.JWT_SECRET,
             { expiresIn: '1d' } // Token lasts for 1 day
@@ -101,7 +102,8 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                isAdmin: user.role === 'admin'
             }
         });
     } catch (err) {

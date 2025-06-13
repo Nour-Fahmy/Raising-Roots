@@ -180,7 +180,7 @@ window.onload = function() {
 };
 
 // Function to show community posts (home)
-async function showCommunityPosts() {
+async function showCommunityPosts(page = 1) {
   // Hide all sections
   document.querySelector('#community-section').classList.add('hidden');
   document.querySelector('#expert-section').classList.add('hidden');
@@ -196,18 +196,65 @@ async function showCommunityPosts() {
   });
   document.querySelector('.nav-item[onclick="showCommunityPosts()"]').classList.add('active');
 
-  // Fetch posts from backend
+  // Fetch posts from backend with pagination
   try {
-    const response = await fetch('http://localhost:3000/api/v1/posts');
+    const response = await fetch(`http://localhost:3000/api/v1/posts?page=${page}&limit=10`);
     if (response.ok) {
-      const posts = await response.json();
+      const result = await response.json();
       const postsContainer = document.getElementById('posts-container');
       postsContainer.innerHTML = ''; // Clear existing posts
       
-      if (posts.data && posts.data.length > 0) {
-        posts.data.forEach(post => {
+      if (result.data && result.data.length > 0) {
+        // Add posts to container
+        result.data.forEach(post => {
           postsContainer.appendChild(createPostElement(post));
         });
+
+        // Add pagination controls
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'pagination';
+        
+        // Previous button
+        const prevButton = document.createElement('button');
+        prevButton.className = 'pagination-btn';
+        prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+        prevButton.disabled = page === 1;
+        prevButton.onclick = () => showCommunityPosts(page - 1);
+        paginationContainer.appendChild(prevButton);
+
+        // Page numbers
+        const totalPages = result.pagination.pages;
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+          const pageButton = document.createElement('button');
+          pageButton.className = `pagination-btn ${i === page ? 'active' : ''}`;
+          pageButton.textContent = i;
+          pageButton.onclick = () => showCommunityPosts(i);
+          paginationContainer.appendChild(pageButton);
+        }
+
+        // Next button
+        const nextButton = document.createElement('button');
+        nextButton.className = 'pagination-btn';
+        nextButton.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+        nextButton.disabled = page === totalPages;
+        nextButton.onclick = () => showCommunityPosts(page + 1);
+        paginationContainer.appendChild(nextButton);
+
+        // Add pagination info
+        const paginationInfo = document.createElement('div');
+        paginationInfo.className = 'pagination-info';
+        paginationInfo.textContent = `Page ${page} of ${totalPages}`;
+        paginationContainer.appendChild(paginationInfo);
+
+        postsContainer.appendChild(paginationContainer);
       } else {
         postsContainer.innerHTML = '<p class="no-posts">No posts yet. Be the first to share!</p>';
       }
@@ -401,14 +448,13 @@ async function submitPost(event) {
   const content = document.getElementById('post-content').value;
   const category = document.getElementById('post-category').value;
   
+  // Get the authentication token
   const token = localStorage.getItem('token');
   if (!token) {
     showNotification('Please login to create a post', 'error');
+    window.location.href = 'login.html?redirect=community.html';
     return;
   }
-
-  // Hide form first
-  hideCreatePostForm();
 
   try {
     const response = await fetch('http://localhost:3000/api/v1/posts', {
@@ -417,112 +463,286 @@ async function submitPost(event) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ title, content, category })
+      body: JSON.stringify({
+        title,
+        content,
+        category
+      })
     });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      // Wait for form animation to complete before showing notification
-      setTimeout(() => {
-        showNotification('Post submitted successfully! It will be visible after admin approval.', 'success');
-        // Refresh the posts list
-        showCommunityPosts();
-      }, 300);
-    } else {
-      showNotification(data.message || 'Failed to create post', 'error');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create post');
     }
+
+    const result = await response.json();
+    showNotification('Post created successfully!', 'success');
+    hideCreatePostForm();
+    showCommunityPosts(); // Refresh the posts list
   } catch (error) {
     console.error('Error creating post:', error);
-    showNotification('Error creating post', 'error');
+    showNotification(error.message || 'Failed to create post', 'error');
   }
 }
 
 // Function to create a post element
 function createPostElement(post) {
-  const article = document.createElement('article');
-  article.className = 'post-card';
-  article.dataset.postId = post._id;
-  article.dataset.category = post.category;
+  const template = document.getElementById('postCardTemplate');
+  const postElement = template.content.cloneNode(true);
+  
+  const postCard = postElement.querySelector('.post-card');
+  postCard.dataset.postId = post._id;
+  
+  // Set author info
+  postElement.querySelector('.author-avatar').src = '../images/default-avatar.png';
+  postElement.querySelector('.author-name').textContent = post.author.username;
+  postElement.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleDateString();
+  
+  // Set post content
+  postElement.querySelector('.post-title').textContent = post.title;
+  postElement.querySelector('.post-text').textContent = post.content;
+  postElement.querySelector('.post-category').textContent = post.category;
+  
+  // Set likes and comments count
+  const likesCount = postElement.querySelector('.likes-count');
+  likesCount.textContent = post.likes.length;
+  
+  const commentsCount = postElement.querySelector('.comments-count');
+  commentsCount.textContent = post.comments.length;
 
-  const token = localStorage.getItem('token');
-  const user = token ? JSON.parse(localStorage.getItem('user')) : null;
-
-  article.innerHTML = `
-    <div class="post-header">
-      <div class="post-author">
-        <img src="../images/default-avatar.png" alt="${post.author.username || 'User'}" class="author-avatar">
-        <div class="author-info">
-          <h3 class="author-name">${post.author.username || 'Anonymous'}</h3>
-          <span class="post-date">${new Date(post.createdAt).toLocaleDateString()}</span>
-        </div>
-      </div>
-      <div class="post-actions">
-        ${user ? `
-        <button class="report-btn" onclick="reportPost('${post._id}')" title="Report Post">
-          <i class="fas fa-flag"></i>
-        </button>
-        ` : ''}
-      </div>
-    </div>
-    <div class="post-content">
-      <h3 class="post-title">${post.title || 'Untitled Post'}</h3>
-      <p class="post-text">${post.content || ''}</p>
-    </div>
-    <div class="post-footer">
-      <div class="post-category">${post.category || 'Uncategorized'}</div>
-      <div class="post-engagement">
-        <button class="like-btn" onclick="likePost(this)">
-          <i class="far fa-heart"></i>
-          <span class="likes-count">${post.likes ? post.likes.length : 0}</span>
-        </button>
-        <button class="comment-btn" onclick="showComments(this)">
-          <i class="far fa-comment"></i>
-          <span class="comments-count">${post.comments ? post.comments.length : 0}</span>
-        </button>
-        <button class="save-btn" onclick="toggleSavePost(this)" title="Save Post">
-          <i class="far fa-bookmark"></i>
-        </button>
-      </div>
+  // Add save button to post footer
+  const postFooter = postElement.querySelector('.post-footer');
+  const saveButton = document.createElement('button');
+  saveButton.className = 'save-btn';
+  saveButton.innerHTML = '<i class="far fa-bookmark"></i>';
+  
+  // Check if post is saved by current user
+  const userId = localStorage.getItem('userId');
+  const isSaved = post.savedBy && post.savedBy.includes(userId);
+  if (isSaved) {
+    saveButton.classList.add('saved');
+    saveButton.querySelector('i').classList.remove('far');
+    saveButton.querySelector('i').classList.add('fas');
+  }
+  
+  saveButton.onclick = () => toggleSavePost(saveButton);
+  postFooter.querySelector('.post-engagement').appendChild(saveButton);
+  
+  // Set up like button
+  const likeButton = postElement.querySelector('.like-btn');
+  const isLiked = post.likes.includes(userId);
+  
+  if (isLiked) {
+    likeButton.classList.add('liked');
+    const icon = likeButton.querySelector('i');
+    icon.classList.remove('far');
+    icon.classList.add('fas');
+    icon.style.setProperty('color', '#e74c3c', 'important');
+  }
+  
+  // Attach like function to button with proper event handling
+  likeButton.addEventListener('click', function(e) {
+    e.preventDefault();
+    likePost(this);
+  });
+  
+  // Set up comment button
+  const commentButton = postElement.querySelector('.comment-btn');
+  commentButton.onclick = () => showComments(commentButton);
+  
+  // Add comments section
+  const commentsSection = document.createElement('div');
+  commentsSection.className = 'comments-section hidden';
+  commentsSection.innerHTML = `
+    <div class="comments-list"></div>
+    <div class="comment-form">
+      <textarea class="comment-input" placeholder="Write a comment..."></textarea>
+      <button class="submit-comment" onclick="submitComment('${post._id}', this.previousElementSibling)">Comment</button>
     </div>
   `;
-  return article;
+  postCard.appendChild(commentsSection);
+  
+  return postElement;
 }
 
 // Function to like a post
 async function likePost(button) {
-  const postId = button.dataset.postId;
-  const token = localStorage.getItem('token');
-  
-  if (!token) {
-    alert('Please login to like posts');
-    return;
-  }
-
   try {
+    const postId = button.closest('.post-card').dataset.postId;
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    
+    if (!token) {
+      showNotification('Please login to like posts', 'error');
+      return;
+    }
+    
     const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/like`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
-
-    if (response.ok) {
-      const updatedPost = await response.json();
-      const likeCount = updatedPost.data.likes.length;
-      button.innerHTML = `<i class="fas fa-heart"></i> Like (${likeCount})`;
-    } else {
-      const error = await response.json();
-      alert(error.message || 'Failed to like post');
+    
+    if (!response.ok) {
+      throw new Error('Failed to like post');
     }
+    
+    const result = await response.json();
+    const likesCount = button.querySelector('.likes-count');
+    
+    // Check if result.data exists (API response structure)
+    const likes = result.data ? result.data.likes : result.likes;
+    if (!likes) {
+      throw new Error('Invalid response format from server');
+    }
+    
+    likesCount.textContent = likes.length;
+    
+    // Toggle like state
+    const isLiked = likes.includes(userId);
+    
+    // Update button and icon classes
+    if (isLiked) {
+      button.classList.add('liked');
+      const icon = button.querySelector('i');
+      icon.classList.remove('far');
+      icon.classList.add('fas');
+      icon.style.setProperty('color', '#e74c3c', 'important');
+    } else {
+      button.classList.remove('liked');
+      const icon = button.querySelector('i');
+      icon.classList.remove('fas');
+      icon.classList.add('far');
+      icon.style.removeProperty('color');
+    }
+    
+    // Add animation
+    const icon = button.querySelector('i');
+    icon.classList.add('like-animation');
+    setTimeout(() => {
+      icon.classList.remove('like-animation');
+    }, 300);
+    
   } catch (error) {
     console.error('Error liking post:', error);
-    alert('Failed to like post. Please try again.');
+    showNotification('Failed to like post', 'error');
   }
 }
 
 function showComments(button) {
-  // Implementation for showing comments
+  const postCard = button.closest('.post-card');
+  const postId = postCard.dataset.postId;
+  const commentsSection = postCard.querySelector('.comments-section');
+  
+  if (!commentsSection) {
+    // Create comments section if it doesn't exist
+    const newCommentsSection = document.createElement('div');
+    newCommentsSection.className = 'comments-section';
+    newCommentsSection.innerHTML = `
+      <div class="comments-list"></div>
+      <div class="comment-form">
+        <textarea placeholder="Write a comment..." class="comment-input"></textarea>
+        <button class="submit-comment">Post</button>
+      </div>
+    `;
+    postCard.appendChild(newCommentsSection);
+    
+    // Add event listener for comment submission
+    const submitButton = newCommentsSection.querySelector('.submit-comment');
+    const commentInput = newCommentsSection.querySelector('.comment-input');
+    
+    submitButton.addEventListener('click', () => submitComment(postId, commentInput));
+  } else {
+    // Toggle comments section visibility
+    commentsSection.classList.toggle('hidden');
+  }
+  
+  // Load comments if they haven't been loaded yet
+  if (!commentsSection || !commentsSection.dataset.loaded) {
+    loadComments(postId);
+  }
+}
+
+async function loadComments(postId) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to load comments');
+    }
+
+    const data = await response.json();
+    const commentsList = document.querySelector(`[data-post-id="${postId}"] .comments-list`);
+    
+    if (commentsList) {
+      commentsList.innerHTML = data.data.comments.map(comment => `
+        <div class="comment">
+          <div class="comment-header">
+            <span class="comment-author">${comment.user.username}</span>
+            <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+          </div>
+          <div class="comment-content">${comment.content}</div>
+        </div>
+      `).join('');
+      
+      commentsList.dataset.loaded = 'true';
+    }
+  } catch (error) {
+    console.error('Error loading comments:', error);
+    showNotification('Failed to load comments', 'error');
+  }
+}
+
+async function submitComment(postId, inputElement) {
+  try {
+    const content = inputElement.value.trim();
+    if (!content) {
+      showNotification('Please enter a comment', 'error');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification('Please login to comment', 'error');
+      return;
+    }
+
+    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/comment`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to post comment');
+    }
+
+    const data = await response.json();
+    inputElement.value = '';
+    
+    // Reload comments to show the new one
+    loadComments(postId);
+    
+    // Update comment count
+    const commentCount = document.querySelector(`[data-post-id="${postId}"] .comments-count`);
+    if (commentCount) {
+      commentCount.textContent = data.data.comments.length;
+    }
+    
+    showNotification('Comment posted successfully', 'success');
+  } catch (error) {
+    console.error('Error posting comment:', error);
+    showNotification('Failed to post comment', 'error');
+  }
 }
 
 function filterPosts() {
@@ -682,112 +902,121 @@ document.getElementById('dm-input')?.addEventListener('keypress', function(e) {
 });
 
 // Save/Unsave Post Functionality
-function toggleSavePost(button) {
-  const postCard = button.closest('.post-card');
-  const postId = postCard.dataset.postId;
-  const postTitle = postCard.querySelector('.post-title').textContent;
-  const postContent = postCard.querySelector('.post-text').textContent;
-  const postAuthor = postCard.querySelector('.author-name').textContent;
-  const postDate = postCard.querySelector('.post-date').textContent;
-  const postCategory = postCard.querySelector('.post-category').textContent;
+async function toggleSavePost(button) {
+  try {
+    const postCard = button.closest('.post-card');
+    if (!postCard) {
+      throw new Error('Post card not found');
+    }
 
-  // Get saved posts from localStorage
-  const savedPosts = JSON.parse(localStorage.getItem('savedPosts')) || {};
-  
-  if (savedPosts[postId]) {
-    // Remove from saved posts
-    delete savedPosts[postId];
-    button.classList.remove('saved');
-    button.querySelector('i').classList.remove('fas');
-    button.querySelector('i').classList.add('far');
-    showNotification('Post removed from saved posts', 'info');
-  } else {
-    // Add to saved posts
-    savedPosts[postId] = {
-      title: postTitle,
-      content: postContent,
-      author: postAuthor,
-      date: postDate,
-      category: postCategory
-    };
-    button.classList.add('saved');
-    button.querySelector('i').classList.remove('far');
-    button.querySelector('i').classList.add('fas');
-    showNotification('Post saved successfully', 'success');
+    const postId = postCard.dataset.postId;
+    if (!postId) {
+      throw new Error('Post ID not found');
+    }
+
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    
+    if (!token) {
+      showNotification('Please login to save posts', 'error');
+      return;
+    }
+    
+    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/save`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to save post');
+    }
+    
+    const result = await response.json();
+    
+    // Check if result.data exists (API response structure)
+    const savedBy = result.data ? result.data.savedBy : result.savedBy;
+    if (!savedBy) {
+      throw new Error('Invalid response format from server');
+    }
+    
+    const isSaved = savedBy.includes(userId);
+    
+    // Update button state
+    button.classList.toggle('saved', isSaved);
+    const icon = button.querySelector('i');
+    icon.classList.toggle('far', !isSaved);
+    icon.classList.toggle('fas', isSaved);
+    
+    // Add animation
+    icon.classList.add('save-animation');
+    setTimeout(() => {
+      icon.classList.remove('save-animation');
+    }, 300);
+    
+  } catch (error) {
+    console.error('Error saving post:', error);
+    showNotification('Failed to save post', 'error');
   }
-  
-  // Update localStorage
-  localStorage.setItem('savedPosts', JSON.stringify(savedPosts));
 }
 
-function showSavedPosts() {
-  // Hide all sections
-  document.querySelector('#community-posts').classList.add('hidden');
-  document.querySelector('#community-section').classList.add('hidden');
-  document.querySelector('#expert-section').classList.add('hidden');
-  document.querySelector('#dm-section').classList.add('hidden');
-  
-  // Show saved posts section
-  document.querySelector('#saved-posts-section').classList.remove('hidden');
-  
-  // Update active state in sidebar
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.remove('active');
-  });
-  document.querySelector('.nav-item[onclick="showSavedPosts()"]').classList.add('active');
+async function showSavedPosts() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification('Please login to view saved posts', 'error');
+      return;
+    }
 
-  // Load saved posts
-  const container = document.getElementById('saved-posts-container');
-  container.innerHTML = '';
-  const savedPosts = JSON.parse(localStorage.getItem('savedPosts')) || {};
-  const keys = Object.keys(savedPosts);
-  
-  if (keys.length === 0) {
-    container.innerHTML = '<p style="padding:2rem; text-align:center; color:var(--text-muted);">No saved posts yet.</p>';
+    // Hide all sections
+    document.querySelectorAll('section').forEach(section => {
+      section.classList.add('hidden');
+    });
+
+    // Show saved posts section
+    const savedPostsSection = document.getElementById('saved-posts-section');
+    savedPostsSection.classList.remove('hidden');
+
+    // Update active state in sidebar
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    document.querySelector('.nav-item[onclick="showSavedPosts()"]').classList.add('active');
+
+    // Fetch saved posts from server
+    const response = await fetch('http://localhost:3000/api/v1/posts/saved', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch saved posts');
+    }
+
+    const result = await response.json();
+    const savedPosts = result.data;
+
+    // Clear existing posts
+    const container = document.getElementById('saved-posts-container');
+    container.innerHTML = '';
+
+    if (savedPosts.length === 0) {
+      container.innerHTML = '<p class="no-posts">No saved posts yet</p>';
+      return;
+    }
+
+    // Add saved posts to container
+    savedPosts.forEach(post => {
+      const postElement = createPostElement(post);
+      container.appendChild(postElement);
+    });
+
+  } catch (error) {
+    console.error('Error loading saved posts:', error);
+    showNotification('Failed to load saved posts', 'error');
   }
-
-  keys.reverse().forEach(key => {
-    const post = savedPosts[key];
-    const article = document.createElement('article');
-    article.className = 'post-card';
-    article.innerHTML = `
-      <div class="post-header">
-        <div class="post-author">
-          <img src="../images/default-avatar.png" alt="${post.author}" class="author-avatar">
-          <div class="author-info">
-            <h3 class="author-name">${post.author}</h3>
-            <span class="post-date">${post.date}</span>
-          </div>
-        </div>
-        <div class="post-actions">
-          <button class="report-btn" onclick="reportPost('${key}')" title="Report Post">
-            <i class="fas fa-flag"></i>
-          </button>
-        </div>
-      </div>
-      <div class="post-content">
-        <h3 class="post-title">${post.title}</h3>
-        <p class="post-text">${post.content}</p>
-      </div>
-      <div class="post-footer">
-        <div class="post-category">${post.category}</div>
-        <div class="post-engagement">
-          <button class="like-btn" onclick="likePost(this)">
-            <i class="far fa-heart"></i>
-            <span class="likes-count">0</span>
-          </button>
-          <button class="comment-btn" onclick="showComments(this)">
-            <i class="far fa-comment"></i>
-            <span class="comments-count">0</span>
-          </button>
-          <button class="save-btn saved" onclick="toggleSavePost(this)" title="Remove from Saved">
-            <i class="fas fa-bookmark"></i>
-          </button>
-        </div>
-      </div>
-    `;
-    container.appendChild(article);
-  });
 }
 
 // Initialize profile menu on page load
@@ -847,165 +1076,3 @@ function handleHeaderSearch(event) {
     user.style.display = isVisible ? 'flex' : 'none';
   });
 }
-
-// Function to show expert application form
-function showExpertApplicationForm() {
-    const form = document.getElementById('expertApplicationForm');
-    if (form) {
-        form.style.display = 'block';
-        // Add event listener for clicking outside the form
-        document.addEventListener('click', handleOutsideClick);
-    }
-}
-
-// Function to hide expert application form
-function hideExpertApplicationForm() {
-    const form = document.getElementById('expertApplicationForm');
-    if (form) {
-        form.style.display = 'none';
-        // Remove event listener when hiding the form
-        document.removeEventListener('click', handleOutsideClick);
-    }
-}
-
-// Function to handle clicks outside the form
-function handleOutsideClick(event) {
-    const form = document.getElementById('expertApplicationForm');
-    const applyButton = document.querySelector('.apply-expert-btn');
-    
-    // Check if click is outside both the form and the apply button
-    if (form && !form.contains(event.target) && !applyButton.contains(event.target)) {
-        hideExpertApplicationForm();
-    }
-}
-
-// Add cleanup when navigating away
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-        hideExpertApplicationForm();
-    }
-});
-
-// Add cleanup when the page is unloaded
-window.addEventListener('beforeunload', () => {
-    hideExpertApplicationForm();
-});
-
-// Function to create post card
-function createPostCard(post) {
-    const template = document.getElementById('postCardTemplate');
-    const card = template.content.cloneNode(true);
-    
-    // Set post content
-    card.querySelector('.post-title').textContent = post.title;
-    card.querySelector('.post-text').textContent = post.content;
-    card.querySelector('.post-category').textContent = post.category;
-    card.querySelector('.author-name').textContent = post.author.username;
-    card.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleDateString();
-    
-    // Add report functionality
-    const reportBtn = card.querySelector('.report-btn');
-    reportBtn.addEventListener('click', () => reportPost(post._id));
-    
-    return card;
-}
-
-// Function to report a post
-async function reportPost(postId) {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showNotification('Please login to report posts', 'error');
-      return;
-    }
-
-    const reason = prompt('Please enter the reason for reporting this post:');
-    if (!reason) return;
-
-    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/report`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ reason })
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      showNotification('Post reported successfully', 'success');
-    } else {
-      showNotification(data.message || 'Failed to report post', 'error');
-    }
-  } catch (error) {
-    console.error('Error reporting post:', error);
-    showNotification('An error occurred while reporting the post', 'error');
-  }
-}
-
-// Expert Application Functions
-function showExpertApplicationSection() {
-  // Hide all sections
-  document.querySelector('#community-posts').classList.add('hidden');
-  document.querySelector('#community-section').classList.add('hidden');
-  document.querySelector('#expert-section').classList.add('hidden');
-  document.querySelector('#dm-section').classList.add('hidden');
-  document.querySelector('#saved-posts-section').classList.add('hidden');
-  
-  // Show expert application section
-  document.querySelector('#expert-application-section').classList.remove('hidden');
-  
-  // Update active state in sidebar
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.remove('active');
-  });
-  document.querySelector('.nav-item[onclick="showExpertApplicationSection()"]').classList.add('active');
-}
-
-// Handle expert application form submission
-document.getElementById('expert-application-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  
-  const formData = new FormData();
-  formData.append('name', document.getElementById('expert-name').value);
-  formData.append('email', document.getElementById('expert-email').value);
-  formData.append('number', document.getElementById('expert-number').value);
-  formData.append('cv', document.getElementById('expert-cv').files[0]);
-
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showNotification('Please log in to submit an application', 'error');
-      return;
-    }
-
-    const response = await fetch('http://localhost:3000/api/v1/experts/apply', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData
-    });
-
-    // Show success message regardless of response type since we know it worked
-    document.getElementById('expert-application-success').classList.remove('hidden');
-    document.getElementById('expert-application-form').reset();
-    
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      document.getElementById('expert-application-success').classList.add('hidden');
-    }, 3000);
-
-    showNotification('Application submitted successfully!', 'success');
-
-  } catch (error) {
-    console.error('Application submission error:', error);
-    // Only show error if we're certain it failed
-    if (!document.getElementById('expert-application-success').classList.contains('hidden')) {
-      showNotification('There was an error submitting your application. Please try again.', 'error');
-    }
-  }
-});
-
-
