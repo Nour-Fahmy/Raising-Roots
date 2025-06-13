@@ -336,23 +336,14 @@ async function handleSuccessfulLogin(userData) {
     localStorage.setItem('token', userData.token);
     localStorage.setItem('user', JSON.stringify(userData.user));
     
-    // Get redirect URL
-    const redirectUrl = getRedirectUrl();
-    
-    // If user is admin and trying to access admin panel, redirect there
-    if (userData.user.role === 'admin' && redirectUrl.includes('admin')) {
-        window.location.href = redirectUrl;
+    // If user is admin, redirect to admin dashboard
+    if (userData.user.role === 'admin') {
+        window.location.href = 'admin/index.html';
         return;
     }
     
-    // For non-admin users trying to access admin panel, show error
-    if (redirectUrl.includes('admin') && userData.user.role !== 'admin') {
-        showFormFeedback('login', 'Access denied. Admin privileges required.');
-        return;
-    }
-    
-    // Redirect to the appropriate page
-    window.location.href = redirectUrl;
+    // For regular users, redirect to homepage
+    window.location.href = 'homepage.html';
 }
 
 // Login form submission
