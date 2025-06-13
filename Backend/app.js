@@ -75,4 +75,8 @@ app.use((err, req, res, next) => {
 const productRoutes = require('./routes/products');
 app.use('/api/v1/products', productRoutes);
 
+const chatRoute = require('./routes/chat');
+app.use('/api/v1/chat', chatRoute);
+
+
 module.exports = app;
