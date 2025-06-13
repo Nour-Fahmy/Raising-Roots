@@ -70,7 +70,7 @@ exports.createPost = catchAsync(async (req, res) => {
 // Update a post
 exports.updatePost = catchAsync(async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, comments } = req.body;
     
     // Add debug logging
     console.log('Request body:', req.body);
@@ -97,6 +97,9 @@ exports.updatePost = catchAsync(async (req, res) => {
     // Update the post
     try {
       post.status = status;
+      if (comments) {
+        post.comments = comments;
+      }
       const savedPost = await post.save();
       console.log('Post saved successfully:', savedPost);
       
@@ -266,5 +269,40 @@ exports.getPostStats = catchAsync(async (req, res) => {
       statusBreakdown: stats,
       topCategories: categoryStats
     }
+  });
+});
+
+// Toggle save/unsave a post
+exports.toggleSave = catchAsync(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    throw new AppError('Post not found', 404);
+  }
+
+  const saveIndex = post.savedBy.indexOf(req.user.userId);
+  
+  if (saveIndex === -1) {
+    post.savedBy.push(req.user.userId);
+  } else {
+    post.savedBy.splice(saveIndex, 1);
+  }
+
+  await post.save();
+
+  res.status(200).json({
+    success: true,
+    data: post
+  });
+});
+
+// Get user's saved posts
+exports.getSavedPosts = catchAsync(async (req, res) => {
+  const posts = await Post.find({ savedBy: req.user.userId })
+    .populate('author', 'username')
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    data: posts
   });
 }); 

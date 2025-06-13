@@ -868,6 +868,7 @@ async function handlePostAction(button, postId, action) {
 function createPostCard(post) {
     const card = document.createElement('div');
     card.className = 'post-card';
+    card.dataset.postId = post._id; // Add post ID to the card
     
     // Format date
     const postDate = new Date(post.createdAt).toLocaleDateString('en-US', {
@@ -895,12 +896,49 @@ function createPostCard(post) {
         `;
     }
 
+    // Create comments section
+    let commentsHtml = '';
+    if (post.comments && post.comments.length > 0) {
+        commentsHtml = `
+            <div class="post-comments">
+                <h4>Comments (${post.comments.length})</h4>
+                <div class="comments-list">
+                    ${post.comments.map(comment => {
+                        // Safely handle missing user information
+                        const userName = comment.user?.username || 'Unknown User';
+                        const userAvatar = comment.user?.avatar || '../../images/default-avatar.png';
+                        
+                        return `
+                            <div class="comment" data-comment-id="${comment._id}">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <img src="${userAvatar}" alt="${userName}" class="comment-avatar">
+                                        <span>${userName}</span>
+                                    </div>
+                                    <div class="comment-actions">
+                                        <button class="btn danger-btn btn-sm" onclick="handleCommentAction(this, '${post._id}', '${comment._id}', 'delete')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="comment-content">
+                                    <p>${comment.content || ''}</p>
+                                    <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     card.innerHTML = `
         <div class="post-header">
             <div class="post-author">
-                <img src="${post.author.avatar || '../../images/default-avatar.png'}" alt="${post.author.username}" class="author-avatar">
+                <img src="${post.author?.avatar || '../../images/default-avatar.png'}" alt="${post.author?.username || 'Unknown User'}" class="author-avatar">
                 <div class="post-author-info">
-                    <h4>${post.author.username}</h4>
+                    <h4>${post.author?.username || 'Unknown User'}</h4>
                     <p>${postDate}</p>
                 </div>
             </div>
@@ -914,6 +952,7 @@ function createPostCard(post) {
             <span><i class="fas fa-heart"></i> ${post.likes?.length || 0}</span>
             <span><i class="fas fa-comment"></i> ${post.comments?.length || 0}</span>
         </div>
+        ${commentsHtml}
         <div class="post-actions">
             ${actionButtons}
         </div>
@@ -922,12 +961,99 @@ function createPostCard(post) {
     return card;
 }
 
+// Function to handle comment actions (delete)
+async function handleCommentAction(button, postId, commentId, action) {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showNotification('Please login to perform this action', 'error');
+            return;
+        }
+
+        if (action === 'delete') {
+            const confirmDelete = confirm('Are you sure you want to delete this comment?');
+            if (!confirmDelete) return;
+
+            console.log('Deleting comment:', { postId, commentId });
+
+            // First get the current post to get its status
+            const getResponse = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!getResponse.ok) {
+                throw new Error('Failed to get post details');
+            }
+
+            const postData = await getResponse.json();
+            const currentStatus = postData.data.status;
+
+            // Update the post to remove the comment from its comments array
+            const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: currentStatus,
+                    comments: postData.data.comments.filter(comment => comment._id !== commentId)
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: 'Failed to delete comment' }));
+                throw new Error(errorData.message || 'Failed to delete comment');
+            }
+
+            const data = await response.json();
+            console.log('Delete comment response:', data);
+
+            showNotification('Comment deleted successfully', 'success');
+            
+            // Remove the comment from the DOM immediately
+            const commentElement = button.closest('.comment');
+            if (commentElement) {
+                commentElement.remove();
+                
+                // Update the comment count
+                const commentsCount = document.querySelector(`.post-card[data-post-id="${postId}"] .post-stats span:last-child i.fa-comment`).nextSibling;
+                if (commentsCount) {
+                    const currentCount = parseInt(commentsCount.textContent.trim());
+                    commentsCount.textContent = ` ${currentCount - 1}`;
+                }
+
+                // If this was the last comment, remove the comments section
+                const commentsList = commentElement.closest('.comments-list');
+                if (commentsList && commentsList.children.length === 0) {
+                    const commentsSection = commentsList.closest('.post-comments');
+                    if (commentsSection) {
+                        commentsSection.remove();
+                    }
+                }
+            }
+
+            // Refresh the posts list after a short delay
+            setTimeout(() => {
+                fetchPosts();
+            }, 500);
+        }
+    } catch (error) {
+        console.error('Error handling comment action:', error);
+        showNotification(error.message || 'Error deleting comment', 'error');
+    }
+}
+
 async function fetchCommunity() {
     let targetContainer;
     try {
         const token = localStorage.getItem('token');
         if (!token) {
             showNotification('Please login to view community members', 'error');
+            window.location.href = '../login.html?redirect=admin/index.html';
             return;
         }
 
@@ -988,12 +1114,17 @@ async function fetchCommunity() {
         targetContainer.innerHTML = '';
 
         if (!response.ok) {
-            throw new Error('Failed to fetch community members');
-        }
-
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Server returned non-JSON response');
+            const errorData = await response.json();
+            if (response.status === 401) {
+                showNotification('Your session has expired. Please login again.', 'error');
+                window.location.href = '../login.html?redirect=admin/index.html';
+                return;
+            }
+            if (response.status === 403) {
+                showNotification('You do not have permission to view community members.', 'error');
+                return;
+            }
+            throw new Error(errorData.message || 'Failed to fetch community members');
         }
 
         const data = await response.json();
@@ -1024,37 +1155,63 @@ function createMemberCard(member) {
     const card = document.createElement('div');
     card.className = 'member-card';
     
-    // Format join date
-    const joinDate = new Date(member.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-
-    // Determine member status and role display
-    const statusClass = member.status === 'active' ? 'active' : 'pending';
+    // Determine role display
     const roleDisplay = member.role === 'doctor' ? 'Doctor' : 
                        member.role === 'user' ? 'Client' : member.role;
+
+    // Format birth date if available
+    let birthDateDisplay = '';
+    if (member.birthDate) {
+        try {
+            birthDateDisplay = new Date(member.birthDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        } catch (error) {
+            console.error('Error formatting birth date:', error);
+        }
+    }
 
     card.innerHTML = `
         <div class="member-header">
             <img src="${member.avatar || '../../images/default-avatar.png'}" alt="${member.username}" class="member-avatar">
             <div class="member-info">
                 <h4>${member.username}</h4>
-                <span class="member-role ${statusClass}">${roleDisplay}</span>
+                <span class="member-role">${roleDisplay}</span>
             </div>
         </div>
         <div class="member-details">
-            <p><i class="fas fa-envelope"></i> ${member.email}</p>
-            ${member.specialty ? `<p><i class="fas fa-stethoscope"></i> ${member.specialty}</p>` : ''}
-            <p><i class="fas fa-calendar"></i> Joined ${joinDate}</p>
+            <div class="detail-row">
+                <i class="fas fa-envelope"></i>
+                <span>${member.email}</span>
+            </div>
+            ${member.specialty ? `
+                <div class="detail-row">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>${member.specialty}</span>
+                </div>
+            ` : ''}
+            ${member.babyName ? `
+                <div class="detail-row">
+                    <i class="fas fa-baby"></i>
+                    <span>Baby: ${member.babyName}</span>
+                </div>
+            ` : ''}
+            ${member.babyGender ? `
+                <div class="detail-row">
+                    <i class="fas fa-${member.babyGender === 'male' ? 'mars' : 'venus'}"></i>
+                    <span>Baby's Gender: ${member.babyGender.charAt(0).toUpperCase() + member.babyGender.slice(1)}</span>
+                </div>
+            ` : ''}
+            ${birthDateDisplay ? `
+                <div class="detail-row">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Baby's Birth Date: ${birthDateDisplay}</span>
+                </div>
+            ` : ''}
         </div>
         <div class="member-actions">
-            ${member.status === 'pending' ? `
-                <button class="btn primary-btn" onclick="handleMemberAction(this, '${member._id}', 'approve')">
-                    <i class="fas fa-check"></i> Approve
-                </button>
-            ` : ''}
             <button class="btn danger-btn" onclick="handleMemberAction(this, '${member._id}', 'delete')">
                 <i class="fas fa-trash"></i> Delete
             </button>
@@ -1064,7 +1221,7 @@ function createMemberCard(member) {
     return card;
 }
 
-// Update handleMemberAction function to use the correct endpoint
+// Update handleMemberAction function to only handle delete action
 async function handleMemberAction(button, memberId, action) {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -1075,7 +1232,7 @@ async function handleMemberAction(button, memberId, action) {
     const card = button.closest('.member-card');
     const memberName = card.querySelector('h4').textContent;
 
-    if (!confirm(`Are you sure you want to ${action} this member: "${memberName}"?`)) {
+    if (!confirm(`Are you sure you want to delete this member: "${memberName}"?`)) {
         return;
     }
 
@@ -1085,43 +1242,22 @@ async function handleMemberAction(button, memberId, action) {
             'Authorization': `Bearer ${token}`
         };
 
-        let response;
-        switch (action) {
-            case 'approve':
-                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}`, {
-                    method: 'PUT',
-                    headers: headers,
-                    body: JSON.stringify({ status: 'active' })
-                });
-                break;
-            case 'delete':
-                response = await fetch(`http://localhost:3000/api/v1/users/${memberId}`, {
-                    method: 'DELETE',
-                    headers: headers
-                });
-                break;
-            default:
-                throw new Error('Invalid action');
-        }
+        const response = await fetch(`http://localhost:3000/api/v1/users/${memberId}`, {
+            method: 'DELETE',
+            headers: headers
+        });
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || `Failed to ${action} member`);
+            throw new Error(errorData.message || 'Failed to delete member');
         }
 
-        showNotification(`Member ${action}d successfully`, 'success');
-
-        // Update UI
-        if (action === 'delete') {
-            card.remove();
-        } else {
-            // Refresh the community members list
-            await fetchCommunity();
-        }
+        showNotification('Member deleted successfully', 'success');
+        card.remove();
 
     } catch (error) {
-        console.error(`Error ${action}ing member:`, error);
-        showNotification(error.message || `Error ${action}ing member`, 'error');
+        console.error('Error deleting member:', error);
+        showNotification(error.message || 'Error deleting member', 'error');
     }
 }
 
