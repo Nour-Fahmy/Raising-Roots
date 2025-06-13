@@ -11,6 +11,9 @@ Raising Roots is built to empower new parents by offering:
 - 💬 **Interactive Community Forums** where parents and experts share experiences and advice.
 - 🚨 **Emergency Chat** to instantly connect with healthcare professionals.
 - 🛒 **Curated Baby Shop** for newborn essentials—from clothing to healthcare products.
+- 🤖 **AI-Powered Chatbot** to answer baby-related questions in English and Arabic.
+- 🧠 **Expert Application System** for users to apply as professional contributors (with admin review).
+- 🗂️ **Admin Dashboard** for managing users, experts, and orders securely.
 
 ---
 
@@ -20,6 +23,8 @@ Raising Roots is built to empower new parents by offering:
 - 👪 **Parenting Community** – Ask, share, and support one another in a trusted space.
 - 📞 **Real-Time Emergency Help** – Chat directly with professionals during urgent moments.
 - 🛍️ **All-in-One Marketplace** – Carefully selected items to make early parenting smoother.
+- 📦 **Product Management** – Dynamic categories, auto-calculated orders, and secure uploads.
+- 🌐 **Multi-Language Support** – Chatbot can answer in both English and Arabic for accessibility.
 
 ---
 
@@ -38,7 +43,7 @@ Raising Roots is built to empower new parents by offering:
 ## 🚧 Project Status
 
 🟢 **In Progress**  
-This project is actively being developed. Stay tuned for updates!
+This project is actively being developed. Key modules (shop, expert system, chatbot) are implemented. Ongoing improvements include cart checkout and deployment.
 
 ---
 
