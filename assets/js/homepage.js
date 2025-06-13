@@ -48,38 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatArea = document.getElementById('chatArea');
     const closeChat = document.querySelector('.close-chat');
     const chatQuestions = document.querySelector('.chat-questions');
-    
-    let questionCount = 0;
-    const MAX_QUESTIONS = 3;
-
-    // Predefined questions and answers
-    const predefinedQuestions = [
-        {
-            id: 1,
-            question: "Need help with baby care?",
-            answer: "Our expert team can help you with feeding schedules, sleep training, and general baby care advice. Would you like to schedule a consultation?"
-        },
-        {
-            id: 2,
-            question: "Having trouble with the website?",
-            answer: "I can help you navigate our website. What specific feature are you having trouble with?"
-        },
-        {
-            id: 3,
-            question: "Looking for expert advice?",
-            answer: "We have certified pediatricians and child development experts available. Would you like to connect with one of our experts?"
-        },
-        {
-            id: 4,
-            question: "Want to join a community?",
-            answer: "Our community is a great place to connect with other parents. Would you like to join our parent support group?"
-        },
-        {
-            id: 5,
-            question: "Need help with your account?",
-            answer: "I can help you with account-related issues. What specific problem are you experiencing?"
-        }
-    ];
+    const userInputField = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
 
     // Create chat message element
     function createChatMessage(content, isUser = false) {
@@ -89,68 +59,59 @@ document.addEventListener('DOMContentLoaded', function() {
         return messageDiv;
     }
 
-    // Show final message after max questions
-    function showFinalMessage() {
-        const finalMessage = createChatMessage("One of our team members will contact you shortly. Please wait!");
-        chatQuestions.innerHTML = '';
-        chatQuestions.appendChild(finalMessage);
-    }
-
-    // Handle question click
-    function handleQuestionClick(questionId, questionText) {
-        if (questionCount >= MAX_QUESTIONS) {
-            showFinalMessage();
-            return;
-        }
-
-        const question = predefinedQuestions.find(q => q.id === questionId);
-        if (!question) return;
-
-        // Add user's question
-        chatQuestions.appendChild(createChatMessage(questionText, true));
-        
-        // Add bot's answer after a short delay
-        setTimeout(() => {
-            chatQuestions.appendChild(createChatMessage(question.answer));
-            questionCount++;
-            
-            if (questionCount >= MAX_QUESTIONS) {
-                setTimeout(showFinalMessage, 1000);
-            }
-        }, 500);
-    }
-
-    // Initialize chat questions
-    function initializeChatQuestions() {
-        chatQuestions.innerHTML = '';
-        predefinedQuestions.forEach(q => {
-            const button = document.createElement('button');
-            button.className = 'chat-question';
-            button.textContent = q.question;
-            button.addEventListener('click', () => handleQuestionClick(q.id, q.question));
-            chatQuestions.appendChild(button);
-        });
-    }
-
-    // Initialize chat when page loads
-    initializeChatQuestions();
-
     // Chat button click handler
     chatButton.addEventListener('click', function() {
-        chatArea.classList.toggle('active');
-        if (!chatArea.classList.contains('active')) {
-            // Reset chat when closed
-            questionCount = 0;
-            initializeChatQuestions();
+        if (chatArea.classList.contains('active')) {
+            chatArea.classList.remove('active');
+        } else {
+            chatArea.classList.add('active');
         }
     });
 
     // Close chat button click handler
-    closeChat.addEventListener('click', function() {
+    closeChat.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent any default behavior
+        e.stopPropagation(); // Stop event bubbling
         chatArea.classList.remove('active');
-        // Reset chat when closed
-        questionCount = 0;
-        initializeChatQuestions();
+    });
+
+    // Close chat when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!chatArea.contains(e.target) && !chatButton.contains(e.target)) {
+            chatArea.classList.remove('active');
+        }
+    });
+
+    // Dynamic chat implementation
+    async function sendChatQuestion() {
+        const userQuestion = userInputField.value.trim();
+        if (!userQuestion) return;
+
+        chatQuestions.appendChild(createChatMessage(userQuestion, true));
+        userInputField.value = '';
+        sendBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/v1/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: userQuestion })
+            });
+
+            const data = await response.json();
+            const botReply = data.answer || "Sorry, I couldn't understand that.";
+            chatQuestions.appendChild(createChatMessage(botReply));
+        } catch (err) {
+            chatQuestions.appendChild(createChatMessage("⚠️ Chatbot error. Please try again later."));
+            console.error('Chat Error:', err);
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
+
+    sendBtn.addEventListener('click', sendChatQuestion);
+    userInputField.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendChatQuestion();
     });
 
     // Smooth scroll for navigation links

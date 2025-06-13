@@ -81,11 +81,12 @@
                 <button class="close-chat"><i class="fas fa-times"></i></button>
             </div>
             <div class="chat-questions">
-                <button class="chat-question" data-i18n="help_baby_care">Need help with baby care?</button>
-                <button class="chat-question" data-i18n="help_website">Having trouble with the website?</button>
-                <button class="chat-question" data-i18n="help_expert">Looking for expert advice?</button>
-                <button class="chat-question" data-i18n="help_community">Want to join a community?</button>
-                <button class="chat-question" data-i18n="help_account">Need help with your account?</button>
+                <!-- Messages will be added here dynamically -->
+            </div>
+            <!-- Chat Input Area - Moved outside chat-questions -->
+            <div class="chat-input-area">
+                <input type="text" id="userInput" placeholder="Ask about baby care..." />
+                <button id="sendBtn">Send</button>
             </div>
         </div>
         <button class="chat-button" id="chatButton">
