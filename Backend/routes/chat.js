@@ -5,15 +5,20 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   const userQuestion = req.body.question;
 
-  // Filter by baby care topics
-  const allowedTopics = ['baby', 'child', 'feeding', 'sleep', 'mother', 'newborn', 'parent', 'pregnant'];
+
+  const allowedTopics = [
+    'baby', 'child', 'sleep', 'newborn', 'feeding', 'mother', 'parent', 'pregnant',
+    'طفل', 'مولود', 'بنتي', 'ابني', 'نوم', 'رضاعة', 'حامل', 'أم', 'البيبي'
+  ];
+  
   const isRelevant = allowedTopics.some(topic => userQuestion.toLowerCase().includes(topic));
 
   if (!isRelevant) {
     return res.json({
-      answer: "I'm here to help with baby care, parenting, and motherhood topics only 😊"
+      answer: "I'm here to help with baby care, parenting, and motherhood topics only 😊\nأنا هنا لمساعدتك في أمور رعاية الأطفال والأمومة فقط."
     });
   }
+  
 
   try {
     const response = await axios.post(
@@ -21,7 +26,11 @@ router.post('/', async (req, res) => {
       {
         model: 'openai/gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: 'You are a parenting support assistant who only talks about newborns, parenting, and baby health topics.' },
+            { 
+                role: 'system',
+                content: 'You are a helpful assistant who only answers questions related to baby care, parenting, and health for newborns (0–2 years). You can respond in either Arabic or English depending on the user\'s language.'
+              },
+            
           { role: 'user', content: userQuestion }
         ]
       },
