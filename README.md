@@ -25,7 +25,13 @@ Raising Roots is built to empower new parents by offering:
 
 ## 🛠️ Tech Stack
 
-> _Coming soon_ – A breakdown of the technologies used (e.g. React, Node.js, Firebase, etc.)
+- Frontend: HTML, CSS, JavaScript
+- Backend: Node.js, Express.js
+- Database: MongoDB
+- File Uploads: Multer
+- Authentication: JWT
+- AI Integration: OpenRouter API (secure, topic-limited)
+- Deployment: Netlifyer / Railway (HTTPS-enabled)
 
 ---
 
