@@ -8,7 +8,7 @@ async function loadProfileContent() {
     const token = localStorage.getItem('token');
     if (token) {
         try {
-            const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+            const response = await fetch('https://localhost:3000/api/v1/users/profile', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -62,8 +62,8 @@ async function loadProfileContent() {
         }
     } else {
         navRight.innerHTML = `
-            <a href="../login.html?redirect=../pages/BabyCare/${window.location.pathname.split('/').pop()}" class="login-btn">Login</a>
-            <a href="../login.html?redirect=../pages/BabyCare/${window.location.pathname.split('/').pop()}" class="signup-btn">Sign Up</a>
+            <a href="../login.html?redirect=BabyCare/${window.location.pathname.split('/').pop()}" class="login-btn">Login</a>
+            <a href="../login.html?redirect=BabyCare/${window.location.pathname.split('/').pop()}" class="signup-btn">Sign Up</a>
         `;
     }
 }
@@ -77,7 +77,7 @@ async function handleLogout(e) {
         localStorage.removeItem('token');
         
         // Try to notify the server about logout
-        const response = await fetch('http://localhost:3000/api/v1/users/logout', {
+        const response = await fetch('https://localhost:3000/api/v1/users/logout', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`

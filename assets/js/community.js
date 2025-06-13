@@ -39,7 +39,7 @@ async function loadProfileContent() {
   const token = localStorage.getItem('token');
   if (token) {
     try {
-      const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+      const response = await fetch('https://localhost:3000/api/v1/users/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -110,7 +110,7 @@ async function handleLogout(e) {
     localStorage.removeItem('token');
     
     // Try to notify the server about logout
-    const response = await fetch('http://localhost:3000/api/v1/users/logout', {
+    const response = await fetch('https://localhost:3000/api/v1/users/logout', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -198,7 +198,7 @@ async function showCommunityPosts(page = 1) {
 
   // Fetch posts from backend with pagination
   try {
-    const response = await fetch(`http://localhost:3000/api/v1/posts?page=${page}&limit=10`);
+    const response = await fetch(`https://localhost:3000/api/v1/posts?page=${page}&limit=10`);
     if (response.ok) {
       const result = await response.json();
       const postsContainer = document.getElementById('posts-container');
@@ -457,7 +457,7 @@ async function submitPost(event) {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/v1/posts', {
+    const response = await fetch('https://localhost:3000/api/v1/posts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -577,7 +577,7 @@ async function likePost(button) {
       return;
     }
     
-    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/like`, {
+    const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}/like`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -667,7 +667,7 @@ function showComments(button) {
 async function loadComments(postId) {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+    const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -713,7 +713,7 @@ async function submitComment(postId, inputElement) {
       return;
     }
 
-    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/comment`, {
+    const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}/comment`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -922,7 +922,7 @@ async function toggleSavePost(button) {
       return;
     }
     
-    const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}/save`, {
+    const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}/save`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -985,7 +985,7 @@ async function showSavedPosts() {
     document.querySelector('.nav-item[onclick="showSavedPosts()"]').classList.add('active');
 
     // Fetch saved posts from server
-    const response = await fetch('http://localhost:3000/api/v1/posts/saved', {
+    const response = await fetch('https://localhost:3000/api/v1/posts/saved', {
       headers: {
         'Authorization': `Bearer ${token}`
       }

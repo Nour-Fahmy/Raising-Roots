@@ -203,9 +203,8 @@ body {
 }
 
 .signup-btn {
-    background-color: rgb(94, 56, 41); /* Changed from #007bff to yellow */
-    color:rgb(238, 238, 216); /* Changed from white to dark */
-    border: none;
+    background-color: rgb(94, 56, 41);
+    color: rgb(238, 238, 216);
 }
 
 /* Hero Section Styles */

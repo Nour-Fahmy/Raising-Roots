@@ -211,7 +211,6 @@ body {
 .signup-btn {
     background-color: white;
     color: rgb(94, 56, 41);
-    border: 2px solid white;
 }
 
 .signup-btn:hover {
@@ -398,8 +397,8 @@ body {
 
 .lang-btn {
     background-color: #f8f9fa;
-    color: #007bff;
-    border: 2px solid #007bff;
+    color: rgb(196, 113, 123);
+    border: 2px solid rgb(196, 113, 123);
     border-radius: 4px;
     padding: 8px 16px;
     font-weight: 600;
@@ -410,7 +409,7 @@ body {
 }
 
 .lang-btn:hover {
-    background-color: #007bff;
+    background-color: rgb(196, 113, 123);
     color: white;
 }
 

@@ -319,7 +319,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // Function to get redirect URL from query parameters
 function getRedirectUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('redirect') || 'homepage.html';
+    let redirectUrl = urlParams.get('redirect') || 'homepage.html';
+    
+    // Remove any leading slashes or parent directory references
+    redirectUrl = redirectUrl.replace(/^[\/\.]+/, '');
+    
+    // If the URL contains 'pages/', remove it since we're already in the pages directory
+    redirectUrl = redirectUrl.replace(/^pages\//, '');
+    
+    return redirectUrl;
 }
 
 // Function to handle successful login
@@ -371,7 +379,7 @@ loginForm.addEventListener('submit', async function(e) {
     }
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/login', {
+        const response = await fetch('https://localhost:3000/api/v1/users/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -443,7 +451,7 @@ signupForm.addEventListener('submit', async function(e) {
     }
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/register', {
+        const response = await fetch('https://localhost:3000/api/v1/users/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

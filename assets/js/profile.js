@@ -8,7 +8,7 @@ window.handleLogout = async function(e) {
         localStorage.removeItem('token');
         
         // Then try to notify the server
-        const response = await fetch('http://localhost:3000/api/v1/users/logout', {
+        const response = await fetch('https://localhost:3000/api/v1/users/logout', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Verify token is valid by trying to load user data
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+        const response = await fetch('https://localhost:3000/api/v1/users/profile', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -93,7 +93,7 @@ async function loadUserData() {
             return;
         }
 
-        const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+        const response = await fetch('https://localhost:3000/api/v1/users/profile', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -209,7 +209,7 @@ async function handleProfileUpdate(e) {
     const displayName = document.getElementById('displayName').value;
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+        const response = await fetch('https://localhost:3000/api/v1/users/profile', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -238,7 +238,7 @@ async function handleBabyInfoUpdate(e) {
     const birthDate = document.getElementById('birthDate').value;
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/baby-info', {
+        const response = await fetch('https://localhost:3000/api/v1/users/baby-info', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -271,7 +271,7 @@ async function handlePasswordChange(e) {
     }
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/change-password', {
+        const response = await fetch('https://localhost:3000/api/v1/users/change-password', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -298,7 +298,7 @@ async function handleDeleteAccount() {
     }
     
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/delete-account', {
+        const response = await fetch('https://localhost:3000/api/v1/users/delete-account', {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -326,7 +326,7 @@ async function handleAvatarChange(e) {
     formData.append('avatar', file);
 
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/avatar', {
+        const response = await fetch('https://localhost:3000/api/v1/users/avatar', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`

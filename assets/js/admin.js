@@ -462,7 +462,7 @@ async function fetchApplications() {
         const searchTerm = document.getElementById('searchApplications')?.value.toLowerCase() || '';
         const statusFilter = document.getElementById('applicationStatus')?.value || 'all';
 
-        const response = await fetch('http://localhost:3000/api/v1/experts');
+        const response = await fetch('https://localhost:3000/api/v1/experts');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -533,7 +533,7 @@ async function handleApplicationAction(button, status) {
 
     if (confirm(confirmMessage)) {
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/experts/${applicationId}/status`, {
+            const response = await fetch(`https://localhost:3000/api/v1/experts/${applicationId}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -782,7 +782,7 @@ async function fetchPosts() {
         }
 
         // Fetch posts from backend
-        const response = await fetch(`http://localhost:3000/api/v1/posts?status=${status}`, {
+        const response = await fetch(`https://localhost:3000/api/v1/posts?status=${status}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -818,7 +818,7 @@ async function handlePostAction(button, postId, action) {
             return;
         }
 
-        let url = `http://localhost:3000/api/v1/posts/${postId}`;
+        let url = `https://localhost:3000/api/v1/posts/${postId}`;
         let method = 'PUT';
         let body = {};
 
@@ -977,7 +977,7 @@ async function handleCommentAction(button, postId, commentId, action) {
             console.log('Deleting comment:', { postId, commentId });
 
             // First get the current post to get its status
-            const getResponse = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+            const getResponse = await fetch(`https://localhost:3000/api/v1/posts/${postId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -992,7 +992,7 @@ async function handleCommentAction(button, postId, commentId, action) {
             const currentStatus = postData.data.status;
 
             // Update the post to remove the comment from its comments array
-            const response = await fetch(`http://localhost:3000/api/v1/posts/${postId}`, {
+            const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -1099,8 +1099,8 @@ async function fetchCommunity() {
 
         // Fetch users from backend
         const url = role === 'all' 
-            ? 'http://localhost:3000/api/v1/users'
-            : `http://localhost:3000/api/v1/users?role=${role}`;
+            ? 'https://localhost:3000/api/v1/users'
+            : `https://localhost:3000/api/v1/users?role=${role}`;
 
         const response = await fetch(url, {
             method: 'GET',
@@ -1242,7 +1242,7 @@ async function handleMemberAction(button, memberId, action) {
             'Authorization': `Bearer ${token}`
         };
 
-        const response = await fetch(`http://localhost:3000/api/v1/users/${memberId}`, {
+        const response = await fetch(`https://localhost:3000/api/v1/users/${memberId}`, {
             method: 'DELETE',
             headers: headers
         });

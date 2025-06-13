@@ -15,7 +15,7 @@ async function loadNavigation() {
     const token = localStorage.getItem('token');
     if (token) {
         try {
-            const response = await fetch('http://localhost:3000/api/v1/users/profile', {
+            const response = await fetch('https://localhost:3000/api/v1/users/profile', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -163,7 +163,7 @@ async function loadNavigation() {
                             <img src="${userData?.profilePicture || pathPrefix + '../images/default-avatar.png'}" 
                                  alt="Profile" 
                                  class="profile-img">
-                            <span data-i18n="profile">Profile</span>
+                            <span>${userData?.username || 'Profile'}</span>
                         </button>
                         <div class="dropdown-content">
                             <a href="${pathPrefix}profile.html" data-i18n="view_profile">View Profile</a>
@@ -260,25 +260,36 @@ window.handleLogout = async function(e) {
         localStorage.removeItem('token');
         
         // Try to notify the server about logout
-        const response = await fetch('http://localhost:3000/api/v1/users/logout', {
+        const response = await fetch('https://localhost:3000/api/v1/users/logout', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
 
-        // Get current page path
+        // Get current page path and determine the correct redirect
         const currentPath = window.location.pathname;
-        const isShopPage = currentPath.includes('shop.html');
+        let redirectPath;
 
-        // Redirect based on current page
-        console.log('Logging out and redirecting...');
-        window.location.href = isShopPage ? './shop.html' : '../pages/homepage.html';
+        if (currentPath.includes('shop.html')) {
+            redirectPath = './shop.html';
+        } else if (currentPath.includes('BabyCare')) {
+            redirectPath = window.location.pathname;
+        } else if (currentPath.includes('community.html')) {
+            redirectPath = './community.html';
+        } else if (currentPath.includes('profile.html')) {
+            redirectPath = './homepage.html';
+        } else {
+            // For homepage and other pages
+            redirectPath = './homepage.html';
+        }
+
+        // Redirect to the appropriate page
+        console.log('Logging out and redirecting to:', redirectPath);
+        window.location.href = redirectPath;
     } catch (error) {
         console.error('Error during logout:', error);
-        // Still redirect based on current page even if server logout fails
-        const currentPath = window.location.pathname;
-        const isShopPage = currentPath.includes('shop.html');
-        window.location.href = isShopPage ? './shop.html' : '../pages/homepage.html';
+        // Still redirect even if server logout fails
+        window.location.href = './homepage.html';
     }
 } 
