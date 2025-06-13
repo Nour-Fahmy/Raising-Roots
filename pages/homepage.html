@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raising Roots</title>
+    <title data-i18n="home">Raising Roots</title>
     <link rel="stylesheet" href="../assets/css/homepage.css">
     <link rel="stylesheet" href="../assets/css/NavFoot.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../assets/js/i18n.js"></script>
 </head>  
 <body>
     <!-- Navigation will be loaded here -->
@@ -15,11 +17,11 @@
     <!-- Hero Section -->
     <section class="hero" style="background-image: url('../images/Img1.jpeg');">
         <div class="hero-content">
-            <h1>Your trusted guide for baby care & support</h1>
-            <p>Personalized guidance, expert advice, and a supportive community for moms with babies aged 0-2 years</p>
+            <h1 data-i18n="hero_title">Your trusted guide for baby care & support</h1>
+            <p data-i18n="hero_subtitle">Personalized guidance, expert advice, and a supportive community for moms with babies aged 0-2 years</p>
             <div class="hero-buttons">
-                <a href="./community.html" class="btn primary-btn">Join our Community</a>
-                <a href="./community.html#expert-section" class="btn secondary-btn">Talk to an expert</a>
+                <a href="./community.html" class="btn primary-btn" data-i18n="join_community">Join our Community</a>
+                <a href="./community.html#expert-section" class="btn secondary-btn" data-i18n="talk_expert">Talk to an expert</a>
             </div>
         </div>
     </section>
@@ -29,33 +31,33 @@
         <div class="flashcards-container">
             <div class="flashcard">
                 <i class="fas fa-moon"></i>
-                <h3>Baby Sleep Support</h3>
-                <p>Expert tips and guidance for better sleep routines</p>
+                <h3 data-i18n="sleep_support">Baby Sleep Support</h3>
+                <p data-i18n="sleep_support_desc">Expert tips and guidance for better sleep routines</p>
             </div>
             <div class="flashcard">
                 <i class="fas fa-utensils"></i>
-                <h3>Feeding Tips</h3>
-                <p>Nutrition advice and feeding schedules</p>
+                <h3 data-i18n="feeding_tips">Feeding Tips</h3>
+                <p data-i18n="feeding_tips_desc">Nutrition advice and feeding schedules</p>
             </div>
             <div class="flashcard">
                 <i class="fas fa-baby"></i>
-                <h3>Development Milestones</h3>
-                <p>Track your baby's growth and development</p>
+                <h3 data-i18n="development_milestones">Development Milestones</h3>
+                <p data-i18n="development_milestones_desc">Track your baby's growth and development</p>
             </div>
             <div class="flashcard">
                 <i class="fas fa-syringe"></i>
-                <h3>Checkups & Vaccines</h3>
-                <p>Stay updated with vaccination schedules</p>
+                <h3 data-i18n="checkups_vaccines">Checkups & Vaccines</h3>
+                <p data-i18n="checkups_vaccines_desc">Stay updated with vaccination schedules</p>
             </div>
             <div class="flashcard">
                 <i class="fas fa-user-md"></i>
-                <h3>Ask an Expert</h3>
-                <p>Get answers from pediatric specialists</p>
+                <h3 data-i18n="ask_expert">Ask an Expert</h3>
+                <p data-i18n="ask_expert_desc">Get answers from pediatric specialists</p>
             </div>
             <div class="flashcard">
                 <i class="fas fa-users"></i>
-                <h3>Community Support</h3>
-                <p>Connect with other parents</p>
+                <h3 data-i18n="community_support">Community Support</h3>
+                <p data-i18n="community_support_desc">Connect with other parents</p>
             </div>
         </div>
     </section>
@@ -64,9 +66,9 @@
     <section class="second-hero" style="background-image: url('../images/Img2.jpeg');">
         <div class="second-hero-content">
             <div class="second-hero-text">
-                <h2>Start Your Parenting Journey Today</h2>
-                <p>Create a personalized profile for your baby and get access to tailored advice, tracking tools, and community support.</p>
-                <a href="./shop.html" class="btn primary-btn">Visit our Shop</a>
+                <h2 data-i18n="start_journey">Start Your Parenting Journey Today</h2>
+                <p data-i18n="start_journey_desc">Create a personalized profile for your baby and get access to tailored advice, tracking tools, and community support.</p>
+                <a href="./shop.html" class="btn primary-btn" data-i18n="visit_shop">Visit our Shop</a>
             </div>
         </div>
     </section>
@@ -75,15 +77,15 @@
     <div class="chat-container">
         <div class="chat-area" id="chatArea">
             <div class="chat-header">
-                <h3>How can we help you?</h3>
+                <h3 data-i18n="how_can_help">How can we help you?</h3>
                 <button class="close-chat"><i class="fas fa-times"></i></button>
             </div>
             <div class="chat-questions">
-                <button class="chat-question">Need help with baby care?</button>
-                <button class="chat-question">Having trouble with the website?</button>
-                <button class="chat-question">Looking for expert advice?</button>
-                <button class="chat-question">Want to join a community?</button>
-                <button class="chat-question">Need help with your account?</button>
+                <button class="chat-question" data-i18n="help_baby_care">Need help with baby care?</button>
+                <button class="chat-question" data-i18n="help_website">Having trouble with the website?</button>
+                <button class="chat-question" data-i18n="help_expert">Looking for expert advice?</button>
+                <button class="chat-question" data-i18n="help_community">Want to join a community?</button>
+                <button class="chat-question" data-i18n="help_account">Need help with your account?</button>
             </div>
         </div>
         <button class="chat-button" id="chatButton">

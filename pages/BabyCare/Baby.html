@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baby Care - Raising Roots</title>
+    <title data-i18n="baby_care_title">Baby Care - Raising Roots</title>
     <link rel="stylesheet" href="../../assets/css/NavFoot.css">
     <link rel="stylesheet" href="../../assets/css/BabyCare/Baby.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../assets/js/i18n.js"></script>
     <style>
         .navbar {
             background-color: rgb(94, 56, 41) !important;
@@ -23,101 +25,101 @@
         
         <div class="nav-center">
             <div class="nav-item">
-                <a href="./Baby.html" class="nav-link">Baby Care</a>
+                <a href="./Baby.html" class="nav-link" data-i18n="baby_care">Baby Care</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Daily Care</h4>
-                            <a href="./nutrition.html">Feeding Guide</a>
-                            <a href="./sleep.html">Sleep Schedule</a>
-                            <a href="./health.html">Diapering Tips</a>
+                            <h4 data-i18n="daily_care">Daily Care</h4>
+                            <a href="./nutrition.html" data-i18n="feeding_guide">Feeding Guide</a>
+                            <a href="./sleep.html" data-i18n="sleep_schedule">Sleep Schedule</a>
+                            <a href="./health.html" data-i18n="diapering_tips">Diapering Tips</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Health & Safety</h4>
-                            <a href="#">First Aid</a>
-                            <a href="#">Baby-Proofing</a>
-                            <a href="#">Common Concerns</a>
+                            <h4 data-i18n="health_safety">Health & Safety</h4>
+                            <a href="#" data-i18n="first_aid">First Aid</a>
+                            <a href="#" data-i18n="baby_proofing">Baby-Proofing</a>
+                            <a href="#" data-i18n="common_concerns">Common Concerns</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Development</h4>
-                            <a href="#">Milestones</a>
-                            <a href="#">Activities</a>
-                            <a href="#">Learning</a>
+                            <h4 data-i18n="development">Development</h4>
+                            <a href="#" data-i18n="milestones">Milestones</a>
+                            <a href="#" data-i18n="activities">Activities</a>
+                            <a href="#" data-i18n="learning">Learning</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="nav-item">
-                <a href="../community.html" class="nav-link">Community</a>
+                <a href="../community.html" class="nav-link" data-i18n="community">Community</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Connect</h4>
-                            <a href="../community.html">Find Local Groups</a>
-                            <a href="#">Discussion Forums</a>
-                            <a href="#">Parent Meetups</a>
+                            <h4 data-i18n="connect">Connect</h4>
+                            <a href="../community.html" data-i18n="find_groups">Find Local Groups</a>
+                            <a href="#" data-i18n="forums">Discussion Forums</a>
+                            <a href="#" data-i18n="meetups">Parent Meetups</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Share & Learn</h4>
-                            <a href="#">Success Stories</a>
-                            <a href="#">Tips & Tricks</a>
-                            <a href="#">Photo Gallery</a>
+                            <h4 data-i18n="share_learn">Share & Learn</h4>
+                            <a href="#" data-i18n="success_stories">Success Stories</a>
+                            <a href="#" data-i18n="tips_tricks">Tips & Tricks</a>
+                            <a href="#" data-i18n="photo_gallery">Photo Gallery</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Events</h4>
-                            <a href="#">Upcoming Events</a>
-                            <a href="#">Workshops</a>
-                            <a href="#">Playgroups</a>
+                            <h4 data-i18n="events">Events</h4>
+                            <a href="#" data-i18n="upcoming_events">Upcoming Events</a>
+                            <a href="#" data-i18n="workshops">Workshops</a>
+                            <a href="#" data-i18n="playgroups">Playgroups</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="nav-item">
-                <a href="../community.html#expert-section" class="nav-link">Expert Advice</a>
+                <a href="../community.html#expert-section" class="nav-link" data-i18n="expert_advice">Expert Advice</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Consultations</h4>
-                            <a href="../community.html#expert-section">Book an Expert</a>
-                            <a href="../community.html#expert-section">Video Calls</a>
-                            <a href="../community.html#expert-section">Chat Support</a>
+                            <h4 data-i18n="consultations">Consultations</h4>
+                            <a href="../community.html#expert-section" data-i18n="book_expert">Book an Expert</a>
+                            <a href="../community.html#expert-section" data-i18n="video_calls">Video Calls</a>
+                            <a href="../community.html#expert-section" data-i18n="chat_support">Chat Support</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Resources</h4>
-                            <a href="../community.html#expert-section">Articles</a>
-                            <a href="../community.html#expert-section">Research</a>
-                            <a href="../community.html#expert-section">Guidelines</a>
+                            <h4 data-i18n="resources">Resources</h4>
+                            <a href="../community.html#expert-section" data-i18n="articles">Articles</a>
+                            <a href="../community.html#expert-section" data-i18n="research">Research</a>
+                            <a href="../community.html#expert-section" data-i18n="guidelines">Guidelines</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Learn</h4>
-                            <a href="../community.html#expert-section">Webinars</a>
-                            <a href="../community.html#expert-section">Q&A Sessions</a>
-                            <a href="../community.html#expert-section">Expert Blog</a>
+                            <h4 data-i18n="learn">Learn</h4>
+                            <a href="../community.html#expert-section" data-i18n="webinars">Webinars</a>
+                            <a href="../community.html#expert-section" data-i18n="qa_sessions">Q&A Sessions</a>
+                            <a href="../community.html#expert-section" data-i18n="expert_blog">Expert Blog</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="nav-item">
-                <a href="../shop.html" class="nav-link">Marketplace</a>
+                <a href="../shop.html" class="nav-link" data-i18n="marketplace">Marketplace</a>
                 <div class="dropdown">
                     <div class="dropdown-inner">
                         <div class="dropdown-section">
-                            <h4>Essential Care</h4>
-                            <a href="../shop.html?category=baby-care">Feeding</a>
-                            <a href="../shop.html?category=baby-care">Diapering</a>
-                            <a href="../shop.html?category=baby-care">Bath & Skincare</a>
+                            <h4 data-i18n="essential_care">Essential Care</h4>
+                            <a href="../shop.html?category=baby-care" data-i18n="feeding">Feeding</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="diapering">Diapering</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="bath_skincare">Bath & Skincare</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Clothing & Gear</h4>
-                            <a href="../shop.html?category=clothing">Clothing</a>
-                            <a href="../shop.html?category=baby-care">Strollers</a>
-                            <a href="../shop.html?category=baby-care">Car Seats</a>
+                            <h4 data-i18n="clothing_gear">Clothing & Gear</h4>
+                            <a href="../shop.html?category=clothing" data-i18n="clothing">Clothing</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="strollers">Strollers</a>
+                            <a href="../shop.html?category=baby-care" data-i18n="car_seats">Car Seats</a>
                         </div>
                         <div class="dropdown-section">
-                            <h4>Play & Learn</h4>
-                            <a href="../shop.html?category=toys">Toys</a>
-                            <a href="../shop.html?category=toys">Books</a>
-                            <a href="../shop.html?category=toys">Educational</a>
+                            <h4 data-i18n="play_learn">Play & Learn</h4>
+                            <a href="../shop.html?category=toys" data-i18n="toys">Toys</a>
+                            <a href="../shop.html?category=toys" data-i18n="books">Books</a>
+                            <a href="../shop.html?category=toys" data-i18n="educational">Educational</a>
                         </div>
                     </div>
                 </div>
@@ -125,68 +127,71 @@
         </div>
         
         <div class="nav-right">
+            <button class="lang-btn" onclick="toggleLanguage()" data-i18n="language">English</button>
             <!-- Profile content will be loaded here by JavaScript -->
         </div>
     </nav>
 
+    <main>
     <div class="baby-care">
         <div class="baby-intro">
-            <h2>Essential Baby Care Guide</h2>
-            <p>Discover comprehensive care tips and expert advice for your baby's well-being</p>
+                <h2 data-i18n="essential_baby_care">Essential Baby Care Guide</h2>
+                <p data-i18n="baby_care_subtitle">Discover comprehensive care tips and expert advice for your baby's well-being</p>
         </div>
         
         <div class="baby-cards">
             <div class="baby-card" onclick="location.href='nutrition.html'">
                 <div class="card-image nutrition-img"></div>
                 <div class="card-content">
-                    <h3>Nutrition</h3>
-                    <p>Essential feeding guides and nutritional advice for your growing baby</p>
-                    <a href="nutrition.html" class="card-button">Learn More</a>
+                        <h3 data-i18n="nutrition">Nutrition</h3>
+                        <p data-i18n="nutrition_desc">Essential feeding guides and nutritional advice for your growing baby</p>
+                        <a href="nutrition.html" class="card-button" data-i18n="learn_more">Learn More</a>
                 </div>
             </div>
 
             <div class="baby-card" onclick="location.href='sleep.html'">
                 <div class="card-image sleep-img"></div>
                 <div class="card-content">
-                    <h3>Sleep</h3>
-                    <p>Create healthy sleep habits and routines for your little one</p>
-                    <a href="sleep.html" class="card-button">Learn More</a>
+                        <h3 data-i18n="sleep">Sleep</h3>
+                        <p data-i18n="sleep_desc">Create healthy sleep habits and routines for your little one</p>
+                        <a href="sleep.html" class="card-button" data-i18n="learn_more">Learn More</a>
                 </div>
             </div>
 
             <div class="baby-card" onclick="location.href='health.html'">
                 <div class="card-image health-img"></div>
                 <div class="card-content">
-                    <h3>Health</h3>
-                    <p>Keep your baby healthy with expert medical advice and care tips</p>
-                    <a href="health.html" class="card-button">Learn More</a>
+                        <h3 data-i18n="health">Health</h3>
+                        <p data-i18n="health_desc">Keep your baby healthy with expert medical advice and care tips</p>
+                        <a href="health.html" class="card-button" data-i18n="learn_more">Learn More</a>
                 </div>
             </div>
 
             <div class="baby-card" onclick="location.href='safety.html'">
                 <div class="card-image safety-img"></div>
                 <div class="card-content">
-                    <h3>Safety</h3>
-                    <p>Essential safety measures to protect your baby at home and beyond</p>
-                    <a href="safety.html" class="card-button">Learn More</a>
+                        <h3 data-i18n="safety">Safety</h3>
+                        <p data-i18n="safety_desc">Essential safety measures to protect your baby at home and beyond</p>
+                        <a href="safety.html" class="card-button" data-i18n="learn_more">Learn More</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
         <p>&copy; 2025 Raising Roots. All rights reserved.</p>
         <p>
-            <a href="../about.html">About Us</a> |
-            <a href="#">Facebook</a> |
-            <a href="#">Instagram</a> |
-            <a href="#">Twitter</a>
+            <a href="../about.html" data-i18n="about_us">About Us</a> |
+            <a href="#" data-i18n="facebook">Facebook</a> |
+            <a href="#" data-i18n="instagram">Instagram</a> |
+            <a href="#" data-i18n="twitter">Twitter</a>
         </p>
         <p>
-            Download our app:
-            <a href="#">Google Play</a> |
-            <a href="#">App Store</a>
+            <span data-i18n="download_app">Download our app:</span>
+            <a href="#" data-i18n="google_play">Google Play</a> |
+            <a href="#" data-i18n="app_store">App Store</a>
         </p>
     </footer>
 

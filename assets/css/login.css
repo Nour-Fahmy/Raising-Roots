@@ -642,4 +642,63 @@ input:focus {
 button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+/* RTL specific styles */
+[dir="rtl"] .forms-container {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .login-side {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .signup-side {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .sliding-overlay {
+    left: 0;
+    right: auto;
+}
+
+[dir="rtl"] .overlay-content {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .overlay-panel.overlay-left {
+    transform: translateX(100%);
+}
+
+[dir="rtl"] .overlay-panel.overlay-right {
+    transform: translateX(-100%);
+}
+
+[dir="rtl"] .slide-right .sliding-overlay {
+    transform: translateX(100%);
+}
+
+[dir="rtl"] .slide-right .overlay-content {
+    transform: translateX(50%);
+}
+
+[dir="rtl"] .form-switch a {
+    margin-right: 0;
+    margin-left: 5px;
+}
+
+[dir="rtl"] .toggle-password {
+    left: 10px;
+    right: auto;
+}
+
+[dir="rtl"] .password-container input {
+    padding-right: 10px;
+    padding-left: 40px;
+}
+
+[dir="rtl"] .gender-options {
+    flex-direction: row-reverse;
 } 

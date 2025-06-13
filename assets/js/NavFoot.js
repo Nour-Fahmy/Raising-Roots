@@ -37,106 +37,113 @@ async function loadNavigation() {
     // Get current page path
     const currentPath = window.location.pathname;
     const isShopPage = currentPath.includes('shop.html');
+    const isBabyCarePage = currentPath.includes('BabyCare');
 
     // Get current cart count from localStorage
     const savedCart = localStorage.getItem('cart');
     const cartCount = savedCart ? JSON.parse(savedCart).reduce((total, item) => total + item.quantity, 0) : 0;
 
+    // Get current language
+    const currentLang = localStorage.getItem('language') || 'en';
+
+    // Determine the correct path prefix based on current page
+    const pathPrefix = isBabyCarePage ? '../' : './';
+
     const navHtml = `
         <nav class="navbar">
             <div class="nav-left">
-                <a href="homepage.html" class="logo">
-                    <img src="../images/LogoIcon.png" alt="Home">
+                <a href="${pathPrefix}homepage.html" class="logo">
+                    <img src="${pathPrefix}../images/LogoIcon.png" alt="Home">
                 </a>
             </div>
             
             <div class="nav-center">
                 <div class="nav-item">
-                    <a href="./BabyCare/Baby.html" class="nav-link">Baby Care</a>
+                    <a href="${pathPrefix}BabyCare/Baby.html" class="nav-link" data-i18n="baby_care">Baby Care</a>
                     <div class="dropdown">
                         <div class="dropdown-inner">
                             <div class="dropdown-section">
-                                <h4>Daily Care</h4>
-                                <a href="./BabyCare/nutrition.html">Feeding Guide</a>
-                                <a href="./BabyCare/sleep.html">Sleep Schedule</a>
-                                <a href="./BabyCare/health.html">Diapering Tips</a>
+                                <h4 data-i18n="daily_care">Daily Care</h4>
+                                <a href="${pathPrefix}BabyCare/nutrition.html" data-i18n="feeding_guide">Feeding Guide</a>
+                                <a href="${pathPrefix}BabyCare/sleep.html" data-i18n="sleep_schedule">Sleep Schedule</a>
+                                <a href="${pathPrefix}BabyCare/health.html" data-i18n="diapering_tips">Diapering Tips</a>
                             </div>
                             <div class="dropdown-section">
-                                <h4>Health & Safety</h4>
-                                <a href="#">First Aid</a>
-                                <a href="#">Baby-Proofing</a>
-                                <a href="#">Common Concerns</a>
+                                <h4 data-i18n="health_safety">Health & Safety</h4>
+                                <a href="#" data-i18n="first_aid">First Aid</a>
+                                <a href="#" data-i18n="baby_proofing">Baby-Proofing</a>
+                                <a href="#" data-i18n="common_concerns">Common Concerns</a>
                             </div>
                             <div class="dropdown-section">
-                                <h4>Development</h4>
-                                <a href="#">Milestones</a>
-                                <a href="#">Activities</a>
-                                <a href="#">Learning</a>
+                                <h4 data-i18n="development">Development</h4>
+                                <a href="#" data-i18n="milestones">Milestones</a>
+                                <a href="#" data-i18n="activities">Activities</a>
+                                <a href="#" data-i18n="learning">Learning</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="nav-item">
-                    <a href="./community.html" class="nav-link">Community</a>
+                    <a href="${pathPrefix}community.html" class="nav-link" data-i18n="community">Community</a>
                     <div class="dropdown">
                         <div class="dropdown-inner">
                             <div class="dropdown-section">
-                                <h4>Connect</h4>
-                                <a href="./community.html">Find Local Groups</a>
-                                <a href="#">Discussion Forums</a>
-                                <a href="#">Parent Meetups</a>
+                                <h4 data-i18n="connect">Connect</h4>
+                                <a href="${pathPrefix}community.html" data-i18n="find_groups">Find Local Groups</a>
+                                <a href="#" data-i18n="discussion_forums">Discussion Forums</a>
+                                <a href="#" data-i18n="parent_meetups">Parent Meetups</a>
                             </div>
                             <div class="dropdown-section">
-                                <h4>Share & Learn</h4>
-                                <a href="#">Success Stories</a>
-                                <a href="#">Tips & Tricks</a>
-                                <a href="#">Photo Gallery</a>
+                                <h4 data-i18n="share_learn">Share & Learn</h4>
+                                <a href="#" data-i18n="success_stories">Success Stories</a>
+                                <a href="#" data-i18n="tips_tricks">Tips & Tricks</a>
+                                <a href="#" data-i18n="photo_gallery">Photo Gallery</a>
                             </div>
                             <div class="dropdown-section">
-                                <h4>Events</h4>
-                                <a href="#">Upcoming Events</a>
-                                <a href="#">Workshops</a>
-                                <a href="#">Playgroups</a>
+                                <h4 data-i18n="events">Events</h4>
+                                <a href="#" data-i18n="upcoming_events">Upcoming Events</a>
+                                <a href="#" data-i18n="workshops">Workshops</a>
+                                <a href="#" data-i18n="playgroups">Playgroups</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="nav-item">
-                    <a href="./community.html#expert-section" class="nav-link">Expert Advice</a>
+                    <a href="${pathPrefix}community.html#expert-section" class="nav-link" data-i18n="expert_advice">Expert Advice</a>
                     <div class="dropdown">
                         <div class="dropdown-inner">
                             <div class="dropdown-section">
-                                <h4>Consultations</h4>
-                                <a href="./community.html#expert-section">Book an Expert</a>
-                                <a href="./community.html#expert-section">Video Calls</a>
-                                <a href="./community.html#expert-section">Chat Support</a>
+                                <h4 data-i18n="consultations">Consultations</h4>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="book_expert">Book an Expert</a>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="video_calls">Video Calls</a>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="chat_support">Chat Support</a>
                             </div>
                             <div class="dropdown-section">
-                                <h4>Resources</h4>
-                                <a href="./community.html#expert-section">Articles</a>
-                                <a href="./community.html#expert-section">Research</a>
-                                <a href="./community.html#expert-section">Guidelines</a>
+                                <h4 data-i18n="resources">Resources</h4>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="articles">Articles</a>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="research">Research</a>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="guidelines">Guidelines</a>
                             </div>
                             <div class="dropdown-section">
-                                <h4>Learn</h4>
-                                <a href="./community.html#expert-section">Webinars</a>
-                                <a href="./community.html#expert-section">Q&A Sessions</a>
-                                <a href="./community.html#expert-section">Expert Blog</a>
+                                <h4 data-i18n="learn">Learn</h4>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="webinars">Webinars</a>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="qa_sessions">Q&A Sessions</a>
+                                <a href="${pathPrefix}community.html#expert-section" data-i18n="expert_blog">Expert Blog</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="nav-item">
-                    <a href="./shop.html" class="nav-link">Marketplace</a>
+                    <a href="${pathPrefix}shop.html" class="nav-link" data-i18n="marketplace">Marketplace</a>
                     <div class="dropdown">
                         <div class="dropdown-inner">
                             <div class="dropdown-section">
-                                <h4>Marketplace</h4>
-                                <a href="./shop.html">Shop All Products</a>
-                                <a href="./shop.html?category=baby-care">Baby Care</a>
-                                <a href="./shop.html?category=toys">Toys & Games</a>
-                                <a href="./shop.html?category=clothing">Clothing</a>
-                                <a href="./shop.html?category=feeding">Feeding</a>
+                                <h4 data-i18n="marketplace">Marketplace</h4>
+                                <a href="${pathPrefix}shop.html" data-i18n="shop_all">Shop All Products</a>
+                                <a href="${pathPrefix}shop.html?category=baby-care" data-i18n="baby_care_products">Baby Care</a>
+                                <a href="${pathPrefix}shop.html?category=toys" data-i18n="toys_games">Toys & Games</a>
+                                <a href="${pathPrefix}shop.html?category=clothing" data-i18n="clothing">Clothing</a>
+                                <a href="${pathPrefix}shop.html?category=feeding" data-i18n="feeding">Feeding</a>
                             </div>
                         </div>
                     </div>
@@ -153,16 +160,16 @@ async function loadNavigation() {
                     ` : ''}
                     <div class="profile-dropdown">
                         <button class="profile-btn">
-                            <img src="${userData?.profilePicture || '../images/default-avatar.png'}" 
+                            <img src="${userData?.profilePicture || pathPrefix + '../images/default-avatar.png'}" 
                                  alt="Profile" 
                                  class="profile-img">
-                            <span>${userData?.username || 'Profile'}</span>
+                            <span data-i18n="profile">Profile</span>
                         </button>
                         <div class="dropdown-content">
-                            <a href="profile.html">View Profile</a>
-                            <a href="profile.html#baby-info">Baby's Profile</a>
-                            <a href="shop.html">My Orders</a>
-                            <a href="#" onclick="window.handleLogout(event)">Logout</a>
+                            <a href="${pathPrefix}profile.html" data-i18n="view_profile">View Profile</a>
+                            <a href="${pathPrefix}profile.html#baby-info" data-i18n="baby_profile">Baby's Profile</a>
+                            <a href="${pathPrefix}shop.html" data-i18n="my_orders">My Orders</a>
+                            <a href="#" onclick="window.handleLogout(event)" data-i18n="logout">Logout</a>
                         </div>
                     </div>
                 ` : `
@@ -172,9 +179,10 @@ async function loadNavigation() {
                             <span class="cart-count">${cartCount}</span>
                         </div>
                     ` : ''}
-                    <a href="login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="login-btn">Login</a>
-                    <a href="login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="signup-btn">Sign Up</a>
+                    <a href="${pathPrefix}login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="login-btn" data-i18n="login">Login</a>
+                    <a href="${pathPrefix}login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="signup-btn" data-i18n="signup">Sign Up</a>
                 `}
+                <button class="lang-btn" onclick="window.setLanguage(localStorage.getItem('language') === 'en' ? 'ar' : 'en')">${currentLang === 'en' ? 'العربية' : 'English'}</button>
             </div>
         </nav>
     `;
@@ -211,6 +219,11 @@ async function loadNavigation() {
     if (isShopPage) {
         // Dispatch a custom event to notify shop.js that navigation has been updated
         window.dispatchEvent(new CustomEvent('navigationUpdated'));
+    }
+
+    // Apply translations if available
+    if (window.applyTranslations) {
+        window.applyTranslations(currentLang);
     }
 }
 
