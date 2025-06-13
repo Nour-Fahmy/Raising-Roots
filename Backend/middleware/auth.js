@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { AuthenticationError } = require('./errorHandling');
+const { AuthenticationError, AuthorizationError } = require('./errorHandling');
 
 function authenticateToken(req, res, next) {
   try {
@@ -24,4 +24,19 @@ function authenticateToken(req, res, next) {
   }
 }
 
-module.exports = authenticateToken;
+function isAdmin(req, res, next) {
+  if (!req.user) {
+    throw new AuthenticationError('Access denied. Please log in.');
+  }
+
+  if (req.user.role !== 'admin') {
+    throw new AuthorizationError('Access denied. Admin privileges required.');
+  }
+
+  next();
+}
+
+module.exports = {
+  authenticateToken,
+  isAdmin
+};

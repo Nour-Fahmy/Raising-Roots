@@ -26,10 +26,23 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Product category is required']
   },
- // image: {
-   // type: String, // Will store the image file path
-   // required: false
-  //},
+  stock: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  image: {
+    type: String,
+    required: false
+  },
+  subcategory: {
+    type: String,
+    required: false
+  },
+  subSubcategory: {
+    type: String,
+    required: false
+  },
   createdAt: {
     type: Date,
     default: Date.now

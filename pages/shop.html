@@ -97,29 +97,8 @@
             <!-- Adult Products -->
             <div class="category-section active" id="adult-products">
                 <h2>Adult Products</h2>
-                <div class="products-grid">
-                    <!-- Product Card 1 -->
-                    <div class="product-card" data-product-id="adult-stroller">
-                        <img src="../images/stroller.png" alt="Adult Product 1" class="product-image">
-                        <div class="product-info">
-                            <h3 class="product-title">Stroller</h3>
-                            <p class="product-description">Comfortable and lightweight stroller with adjustable handle and storage basket.</p>
-                            <p class="product-price">EGP 29.99</p>
-                            <p class="stock-info">In Stock: 15</p>
-                            <button class="add-to-cart">Add to Cart</button>
-                        </div>
-                    </div>
-                    <!-- Product Card 2 -->
-                    <div class="product-card" data-product-id="adult-baby-holder">
-                        <img src="../images/baby_holder.png" alt="Adult Product 2" class="product-image">
-                        <div class="product-info">
-                            <h3 class="product-title">Baby Holder</h3>
-                            <p class="product-description">Ergonomic baby carrier with multiple carrying positions and adjustable straps.</p>
-                            <p class="product-price">EGP 49.99</p>
-                            <p class="stock-info">In Stock: 10</p>
-                            <button class="add-to-cart">Add to Cart</button>
-                        </div>
-                    </div>
+                <div class="products-grid" id="adult-products-grid">
+                    <!-- Products will be loaded dynamically -->
                 </div>
             </div>
 
@@ -143,54 +122,16 @@
                 <!-- Boys Fashion -->
                 <div class="sub-subcategory-section active" id="boys-fashion-section">
                     <h2 class="category-title">Boys Fashion</h2>
-                    <div class="products-grid">
-                        <div class="product-card" data-product-id="boys-fashion-outfit">
-                            <img src="../images/Beach_set.png" alt="Boys Fashion 1" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Boys Casual Outfit</h3>
-                                <p class="product-description">Comfortable cotton blend casual outfit for everyday wear.</p>
-                                <p class="product-price">EGP 29.99</p>
-                                <p class="stock-info">In Stock: 20</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
-                        <div class="product-card" data-product-id="boys-formal-wear">
-                            <img src="../images/boy_formal_set.png" alt="Boys Fashion 2" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Boys Formal Wear</h3>
-                                <p class="product-description">Stylish formal wear perfect for special occasions.</p>
-                                <p class="product-price">EGP 39.99</p>
-                                <p class="stock-info">In Stock: 12</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
+                    <div class="products-grid" id="boys-fashion-grid">
+                        <!-- Products will be loaded dynamically -->
                     </div>
                 </div>
 
                 <!-- Boys Toys -->
                 <div class="sub-subcategory-section" id="boys-toys-section">
                     <h2 class="category-title">Boys Toys</h2>
-                    <div class="products-grid">
-                        <div class="product-card" data-product-id="boys-lion-doll">
-                            <img src="../images/lion_doll.png" alt="Boys Toys 1" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Lion doll</h3>
-                                <p class="product-description">Soft and cuddly lion plush toy, perfect for playtime.</p>
-                                <p class="product-price">EGP 24.99</p>
-                                <p class="stock-info">In Stock: 25</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
-                        <div class="product-card" data-product-id="boys-spiderman-gun">
-                            <img src="../images/spiderman_game.png" alt="Boys Toys 2" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Spiderman Gun</h3>
-                                <p class="product-description">Interactive Spiderman-themed water gun for outdoor fun.</p>
-                                <p class="product-price">EGP 19.99</p>
-                                <p class="stock-info">In Stock: 18</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
+                    <div class="products-grid" id="boys-toys-grid">
+                        <!-- Products will be loaded dynamically -->
                     </div>
                 </div>
 
@@ -198,7 +139,7 @@
                 <div class="category-section" id="girls-products">
                     <h2>Girls Products</h2>
                     <div class="subcategories">
-                        <div class="subcategory" data-category="girls-fashion">
+                        <div class="subcategory active" data-category="girls-fashion">
                             <i class="fas fa-tshirt"></i>
                             <span>Fashion</span>
                         </div>
@@ -212,108 +153,32 @@
                 <!-- Girls Fashion -->
                 <div class="sub-subcategory-section" id="girls-fashion-section">
                     <h2 class="category-title">Girls Fashion</h2>
-                    <div class="products-grid">
-                        <div class="product-card" data-product-id="girls-casual-outfit">
-                            <img src="../images/black_whie_girl_dress.png" alt="Girls Fashion 1" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Girls Casual Outfit</h3>
-                                <p class="product-description">Comfortable and stylish casual outfit for everyday wear.</p>
-                                <p class="product-price">EGP 29.99</p>
-                                <p class="stock-info">In Stock: 22</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
-                        <div class="product-card" data-product-id="girls-party-dress">
-                            <img src="../images/sunshine_dress.png" alt="Girls Fashion 2" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Girls Party Dress</h3>
-                                <p class="product-description">Beautiful party dress with matching accessories.</p>
-                                <p class="product-price">EGP 34.99</p>
-                                <p class="stock-info">In Stock: 15</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
+                    <div class="products-grid" id="girls-fashion-grid">
+                        <!-- Products will be loaded dynamically -->
                     </div>
                 </div>
 
                 <!-- Girls Toys -->
                 <div class="sub-subcategory-section" id="girls-toys-section">
                     <h2 class="category-title">Girls Toys</h2>
-                    <div class="products-grid">
-                        <div class="product-card" data-product-id="girls-doll">
-                            <img src="../images/girl_doll.png" alt="Girls Toys 1" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Girl Doll</h3>
-                                <p class="product-description">Interactive doll with multiple outfits and accessories.</p>
-                                <p class="product-price">EGP 24.99</p>
-                                <p class="stock-info">In Stock: 20</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
-                        <div class="product-card" data-product-id="girls-house-cubes">
-                            <img src="../images/house_cube.png" alt="Girls Toys 2" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Girl House cubes</h3>
-                                <p class="product-description">Creative building blocks set for constructing doll houses.</p>
-                                <p class="product-price">EGP 29.99</p>
-                                <p class="stock-info">In Stock: 16</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
+                    <div class="products-grid" id="girls-toys-grid">
+                        <!-- Products will be loaded dynamically -->
                     </div>
                 </div>
 
                 <!-- Feeding Products -->
                 <div class="subcategory-section" id="feeding-section">
                     <h2 class="category-title">Feeding Products</h2>
-                    <div class="products-grid">
-                        <div class="product-card" data-product-id="feeding-carrot-jam">
-                            <img src="../images/carrot_jam.png" alt="Feeding Product 1" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Carrot Jam</h3>
-                                <p class="product-description">Natural carrot jam made with organic ingredients.</p>
-                                <p class="product-price">EGP 19.99</p>
-                                <p class="stock-info">In Stock: 30</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
-                        <div class="product-card" data-product-id="feeding-strawberry-jam">
-                            <img src="../images/strawberry_jam.png" alt="Feeding Product 2" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Strawberry Jam</h3>
-                                <p class="product-description">Delicious strawberry jam made with fresh fruits.</p>
-                                <p class="product-price">EGP 89.99</p>
-                                <p class="stock-info">In Stock: 25</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
+                    <div class="products-grid" id="feeding-grid">
+                        <!-- Products will be loaded dynamically -->
                     </div>
                 </div>
 
                 <!-- Health & Care Products -->
                 <div class="subcategory-section" id="health-section">
                     <h2 class="category-title">Health & Care Products</h2>
-                    <div class="products-grid">
-                        <div class="product-card" data-product-id="health-baby-diaper">
-                            <img src="../images/baby_diaper.png" alt="Health Product 1" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Baby Diaber</h3>
-                                <p class="product-description">Gentle and effective baby diaper for sensitive skin.</p>
-                                <p class="product-price">EGP 39.99</p>
-                                <p class="stock-info">In Stock: 40</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
-                        <div class="product-card" data-product-id="health-baby-powder">
-                            <img src="../images/baby_powder.png" alt="Health Product 2" class="product-image">
-                            <div class="product-info">
-                                <h3 class="product-title">Baby Powder</h3>
-                                <p class="product-description">Hypoallergenic baby powder for sensitive skin.</p>
-                                <p class="product-price">EGP 29.99</p>
-                                <p class="stock-info">In Stock: 35</p>
-                                <button class="add-to-cart">Add to Cart</button>
-                            </div>
-                        </div>
+                    <div class="products-grid" id="health-grid">
+                        <!-- Products will be loaded dynamically -->
                     </div>
                 </div>
             </section>
@@ -424,23 +289,10 @@
         <p>Order placed successfully!</p>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2025 Raising Roots. All rights reserved.</p>
-        <p>
-        <a href="about.html">About Us</a> |
-          <a href="#">Facebook</a> |
-          <a href="#">Instagram</a> |
-          <a href="#">Twitter</a>
-        </p>
-        <p>
-          Download our app:
-          <a href="#">Google Play</a> |
-          <a href="#">App Store</a>
-        </p>
-      </footer>
-    
+    <!-- Footer will be loaded here -->
+    <div id="footer-placeholder"></div>
 
+    <!-- Scripts -->
     <script src="../assets/js/NavFoot.js"></script>
     <script src="../assets/js/shop.js"></script>
 </body>

@@ -221,7 +221,7 @@ exports.addComment = catchAsync(async (req, res) => {
   });
 });
 
-// Get post statistics for admin dashboard
+// Get post statistics for admin
 exports.getPostStats = catchAsync(async (req, res) => {
   const stats = await Post.aggregate([
     {
@@ -232,20 +232,39 @@ exports.getPostStats = catchAsync(async (req, res) => {
     }
   ]);
 
+  // Get total posts
+  const totalPosts = await Post.countDocuments();
+
+  // Get recent posts (last 7 days)
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentPosts = await Post.countDocuments({
+    createdAt: { $gte: sevenDaysAgo }
+  });
+
+  // Get most active categories
   const categoryStats = await Post.aggregate([
     {
       $group: {
         _id: '$category',
         count: { $sum: 1 }
       }
+    },
+    {
+      $sort: { count: -1 }
+    },
+    {
+      $limit: 5
     }
   ]);
 
   res.status(200).json({
     success: true,
     data: {
-      statusStats: stats,
-      categoryStats
+      totalPosts,
+      recentPosts,
+      statusBreakdown: stats,
+      topCategories: categoryStats
     }
   });
 }); 

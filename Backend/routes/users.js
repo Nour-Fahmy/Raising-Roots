@@ -5,15 +5,7 @@ const { User } = require('../models/user');
 const { validateLogin } = require('../middleware/validation');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const jwt = require('jsonwebtoken');
-const authenticateToken = require('../middleware/auth');
-
-// Middleware to check if user is admin
-const isAdmin = (req, res, next) => {
-    if (!req.user.isAdmin) {
-        return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
-    }
-    next();
-};
+const { authenticateToken, isAdmin } = require('../middleware/auth');
 
 // POST /api/v1/users/register
 router.post('/register', async (req, res) => {

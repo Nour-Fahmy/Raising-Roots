@@ -177,8 +177,10 @@
                             <textarea id="productDescription" required placeholder="Enter product description"></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="productImage"><i class="fas fa-image"></i> Image URL</label>
-                            <input type="url" id="productImage" required placeholder="Enter image URL">
+                            <label for="productImage"><i class="fas fa-image"></i> Product Image</label>
+                            <input type="file" id="productImage" accept="image/*" class="form-control">
+                            <img id="imagePreview" src="" alt="Preview" style="max-width: 200px; margin-top: 10px; display: none;">
+                            <small class="form-text text-muted">Upload an image (JPG, PNG, or GIF, max 5MB)</small>
                         </div>
                         <div class="form-group">
                             <label for="productCategory"><i class="fas fa-list"></i> Category</label>

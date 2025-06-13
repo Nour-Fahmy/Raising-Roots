@@ -170,6 +170,8 @@ function navigateToSection(sectionId) {
             fetchCommunity();
         } else if (sectionId === 'expert-applications') {
             initExpertApplications();
+        } else if (sectionId === 'products') {
+            loadProducts(); // Load products when products section is shown
         }
     }
     
@@ -1143,3 +1145,282 @@ function searchCommunity(searchTerm) {
 document.getElementById('searchCommunity')?.addEventListener('input', (e) => {
     searchCommunity(e.target.value.toLowerCase());
 });
+
+// Product Form Handling
+document.addEventListener('DOMContentLoaded', function() {
+    const addProductBtn = document.getElementById('addProductBtn');
+    const productForm = document.querySelector('.product-form');
+    const addItemForm = document.getElementById('addItemForm');
+    const cancelAddBtn = document.getElementById('cancelAddBtn');
+    const productCategory = document.getElementById('productCategory');
+    const subcategoryGroup = document.getElementById('subcategoryGroup');
+    const subSubcategoryGroup = document.getElementById('subSubcategoryGroup');
+    const productSubcategory = document.getElementById('productSubcategory');
+    const productSubSubcategory = document.getElementById('productSubSubcategory');
+
+    // Show/Hide product form
+    addProductBtn.addEventListener('click', () => {
+        productForm.style.display = 'block';
+    });
+
+    cancelAddBtn.addEventListener('click', () => {
+        productForm.style.display = 'none';
+        addItemForm.reset();
+    });
+
+    // Handle main category selection
+    productCategory.addEventListener('change', function() {
+        const selectedCategory = this.value;
+        
+        // Reset subcategory and sub-subcategory
+        productSubcategory.value = '';
+        productSubSubcategory.value = '';
+        
+        if (selectedCategory === 'kids') {
+            subcategoryGroup.style.display = 'block';
+            subSubcategoryGroup.style.display = 'none';
+        } else {
+            subcategoryGroup.style.display = 'none';
+            subSubcategoryGroup.style.display = 'none';
+        }
+    });
+
+    // Handle subcategory selection
+    productSubcategory.addEventListener('change', function() {
+        const selectedSubcategory = this.value;
+        
+        // Reset sub-subcategory
+        productSubSubcategory.value = '';
+        
+        if (selectedSubcategory === 'boys' || selectedSubcategory === 'girls') {
+            subSubcategoryGroup.style.display = 'block';
+        } else {
+            subSubcategoryGroup.style.display = 'none';
+        }
+    });
+
+    // Filter sub-subcategory options based on selected subcategory
+    productSubcategory.addEventListener('change', function() {
+        const selectedSubcategory = this.value;
+        const subSubcategoryOptions = productSubSubcategory.options;
+        
+        // Hide all options first
+        for (let i = 0; i < subSubcategoryOptions.length; i++) {
+            subSubcategoryOptions[i].style.display = 'none';
+        }
+        
+        // Show relevant options based on subcategory
+        if (selectedSubcategory === 'boys') {
+            for (let i = 0; i < subSubcategoryOptions.length; i++) {
+                if (subSubcategoryOptions[i].value.startsWith('boys-')) {
+                    subSubcategoryOptions[i].style.display = '';
+                }
+            }
+        } else if (selectedSubcategory === 'girls') {
+            for (let i = 0; i < subSubcategoryOptions.length; i++) {
+                if (subSubcategoryOptions[i].value.startsWith('girls-')) {
+                    subSubcategoryOptions[i].style.display = '';
+                }
+            }
+        }
+    });
+
+    // Handle form submission
+    addItemForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('name', document.getElementById('productName').value);
+        formData.append('description', document.getElementById('productDescription').value);
+        formData.append('price', document.getElementById('productPrice').value);
+        formData.append('stock', document.getElementById('productStock').value);
+        formData.append('category', document.getElementById('productCategory').value);
+        formData.append('subcategory', document.getElementById('productSubcategory').value);
+        formData.append('subSubcategory', document.getElementById('productSubSubcategory').value);
+
+        // Handle image file
+        const imageInput = document.getElementById('productImage');
+        if (imageInput.files.length > 0) {
+            formData.append('image', imageInput.files[0]);
+        }
+
+        try {
+            const response = await fetch('/api/v1/products', {
+                method: 'POST',
+                body: formData // FormData will automatically set the correct Content-Type
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add product');
+            }
+
+            const result = await response.json();
+            alert('Product added successfully!');
+            productForm.style.display = 'none';
+            addItemForm.reset();
+            loadProducts(); // Refresh the product list
+        } catch (error) {
+            console.error('Error adding product:', error);
+            alert('Failed to add product. Please try again.');
+        }
+    });
+});
+
+// Load and display products
+async function loadProducts() {
+    try {
+        const response = await fetch('/api/v1/products');
+        if (!response.ok) {
+            throw new Error('Failed to fetch products');
+        }
+        
+        const products = await response.json();
+        const productsGrid = document.getElementById('productsGrid');
+        
+        if (!productsGrid) {
+            console.error('Products grid element not found');
+            return;
+        }
+
+        if (products.length === 0) {
+            productsGrid.innerHTML = '<p class="no-products">No products found</p>';
+            return;
+        }
+
+        productsGrid.innerHTML = products.map(product => `
+            <div class="product-card" data-product-id="${product._id}">
+                <img src="${product.image || '../images/placeholder.png'}" alt="${product.name}" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">${product.name}</h3>
+                    <p class="product-description">${product.description || ''}</p>
+                    <p class="product-price">EGP ${product.price}</p>
+                    <p class="stock-info ${product.stock < 10 ? 'low' : ''}">In Stock: ${product.stock}</p>
+                    <div class="product-categories">
+                        <span class="category-tag">${product.category}</span>
+                        ${product.subcategory ? `<span class="category-tag">${product.subcategory}</span>` : ''}
+                        ${product.subSubcategory ? `<span class="category-tag">${product.subSubcategory}</span>` : ''}
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn edit-btn" onclick="editProduct('${product._id}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn delete-btn" onclick="deleteProduct('${product._id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading products:', error);
+        const productsGrid = document.getElementById('productsGrid');
+        if (productsGrid) {
+            productsGrid.innerHTML = '<p class="error-message">Failed to load products. Please try again later.</p>';
+        }
+    }
+}
+
+// Edit product function
+async function editProduct(productId) {
+    try {
+        const response = await fetch(`/api/v1/products/${productId}`);
+        const product = await response.json();
+
+        // Populate form with product data
+        document.getElementById('productName').value = product.name;
+        document.getElementById('productDescription').value = product.description;
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('productStock').value = product.stock;
+        document.getElementById('productCategory').value = product.category;
+        document.getElementById('productSubcategory').value = product.subcategory || '';
+        document.getElementById('productSubSubcategory').value = product.subSubcategory || '';
+        
+        // Show current image preview if exists
+        const imagePreview = document.getElementById('imagePreview');
+        if (imagePreview) {
+            imagePreview.src = product.image || '../images/placeholder.png';
+            imagePreview.style.display = product.image ? 'block' : 'none';
+        }
+
+        // Show/hide subcategory and sub-subcategory fields based on category
+        const subcategoryGroup = document.getElementById('subcategoryGroup');
+        const subSubcategoryGroup = document.getElementById('subSubcategoryGroup');
+        
+        if (product.category === 'kids') {
+            subcategoryGroup.style.display = 'block';
+            if (product.subcategory === 'boys' || product.subcategory === 'girls') {
+                subSubcategoryGroup.style.display = 'block';
+            }
+        }
+
+        // Show the form
+        document.querySelector('.product-form').style.display = 'block';
+        
+        // Update form submission to handle edit
+        const form = document.getElementById('addItemForm');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('productName').value);
+            formData.append('description', document.getElementById('productDescription').value);
+            formData.append('price', document.getElementById('productPrice').value);
+            formData.append('stock', document.getElementById('productStock').value);
+            formData.append('category', document.getElementById('productCategory').value);
+            formData.append('subcategory', document.getElementById('productSubcategory').value);
+            formData.append('subSubcategory', document.getElementById('productSubSubcategory').value);
+
+            // Handle image file
+            const imageInput = document.getElementById('productImage');
+            if (imageInput.files.length > 0) {
+                formData.append('image', imageInput.files[0]);
+            }
+
+            try {
+                const updateResponse = await fetch(`/api/v1/products/${productId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                if (!updateResponse.ok) {
+                    throw new Error('Failed to update product');
+                }
+
+                alert('Product updated successfully!');
+                document.querySelector('.product-form').style.display = 'none';
+                form.reset();
+                loadProducts(); // Refresh the product list
+            } catch (error) {
+                console.error('Error updating product:', error);
+                alert('Failed to update product. Please try again.');
+            }
+        };
+    } catch (error) {
+        console.error('Error loading product for edit:', error);
+        alert('Failed to load product details. Please try again.');
+    }
+}
+
+// Delete product function
+async function deleteProduct(productId) {
+    if (confirm('Are you sure you want to delete this product?')) {
+        try {
+            const response = await fetch(`/api/v1/products/${productId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete product');
+            }
+
+            alert('Product deleted successfully!');
+            loadProducts(); // Refresh the product list
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            alert('Failed to delete product. Please try again.');
+        }
+    }
+}
+
+// Load products when the page loads
+document.addEventListener('DOMContentLoaded', loadProducts);
