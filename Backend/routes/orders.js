@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
 const Product = require('../models/product');
+const orderController = require('../controllers/orderController');
 
 // Create order with auto-calculated total
 router.post('/', async (req, res) => {
@@ -46,5 +47,8 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to create order', details: err.message });
   }
 });
+
+// Route to get the total count of orders
+router.get('/count', orderController.getOrderCount);
 
 module.exports = router;

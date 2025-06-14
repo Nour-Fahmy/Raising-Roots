@@ -24,4 +24,7 @@ router.post('/:id/comment', authenticateToken, postController.addComment);
 // Admin routes
 router.get('/stats/admin', authenticateToken, isAdmin, postController.getPostStats);
 
+// Route to get total post count for admin dashboard
+router.get('/count', authenticateToken, isAdmin, postController.getPostsCount);
+
 module.exports = router; 

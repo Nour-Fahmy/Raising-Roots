@@ -7,6 +7,7 @@ const { validateLogin } = require('../middleware/validation');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const jwt = require('jsonwebtoken');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
+const userController = require('../controllers/userController'); // Import the userController
 
 // POST /api/v1/users/register
 router.post('/register', async (req, res) => {
@@ -225,5 +226,8 @@ router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
         res.status(500).json({ message: 'Error deleting user' });
     }
 });
+
+// Route to get the total count of users
+router.get('/count', authenticateToken, isAdmin, userController.getUserCount);
 
 module.exports = router;

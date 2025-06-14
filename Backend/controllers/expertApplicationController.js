@@ -1,6 +1,7 @@
 const ExpertApplication = require('../models/ExpertApplication');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs'); // Import fs for file system operations
 
 // Configure Multer for file storage
 const storage = multer.diskStorage({
@@ -61,7 +62,14 @@ exports.submitApplication = async (req, res, next) => {
 // Controller function to get all applications (for admin dashboard)
 exports.getAllApplications = async (req, res, next) => {
   try {
-    const applications = await ExpertApplication.find({});
+    const { status } = req.query; // Get status from query parameters
+    let query = {};
+
+    if (status) {
+      query.status = status; // Add status to query if provided
+    }
+
+    const applications = await ExpertApplication.find(query);
     res.status(200).json(applications);
   } catch (error) {
     console.error('Error fetching applications:', error);
@@ -93,5 +101,38 @@ exports.updateApplicationStatus = async (req, res, next) => {
   } catch (error) {
     console.error('Error updating application status:', error);
     res.status(500).json({ message: 'Server error. Could not update application status.' });
+  }
+};
+
+// Controller function to delete an expert application
+exports.deleteApplication = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const application = await ExpertApplication.findById(id);
+
+    if (!application) {
+      return res.status(404).json({ message: 'Expert application not found.' });
+    }
+
+    // Delete the CV file from the server if it exists
+    if (application.cvFile) {
+      const filePath = path.join(__dirname, '..', application.cvFile); // Construct absolute path
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Error deleting CV file ${filePath}:`, err);
+          // Continue with database deletion even if file deletion fails
+        } else {
+          console.log(`Successfully deleted CV file: ${filePath}`);
+        }
+      });
+    }
+
+    await ExpertApplication.findByIdAndDelete(id);
+
+    res.status(200).json({ message: 'Expert application deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting expert application:', error);
+    res.status(500).json({ message: 'Server error. Could not delete expert application.' });
   }
 }; 

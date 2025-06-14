@@ -11,4 +11,7 @@ router.get('/', expertApplicationController.getAllApplications);
 // Route to update the status of an expert application (for admin)
 router.patch('/:id/status', expertApplicationController.updateApplicationStatus);
 
+// Route to delete an expert application by ID (for admin)
+router.delete('/:id', expertApplicationController.deleteApplication);
+
 module.exports = router; 

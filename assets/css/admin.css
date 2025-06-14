@@ -409,7 +409,7 @@ textarea {
     color: white;
 }
 
-.members-grid, .doctors-grid, .clients-grid {
+.members-grid, .experts-grid, .clients-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
@@ -753,7 +753,7 @@ textarea {
     }
     
     .members-grid,
-    .doctors-grid,
+    .experts-grid,
     .clients-grid {
         grid-template-columns: 1fr;
     }

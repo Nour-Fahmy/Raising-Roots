@@ -186,22 +186,58 @@ function navigateToSection(sectionId) {
 }
 
 // Update dashboard statistics
-function updateStatistics() {
-    // This would typically fetch data from an API
-    const stats = {
-        orders: 150,
-        users: 2450,
-        doctors: 45,
-        posts: 320
-    };
-    
-    // Update the UI with the stats
-    Object.entries(stats).forEach(([key, value]) => {
-        const statElement = document.querySelector(`.stat-card:nth-child(${getStatIndex(key)}) .stat-number`);
-        if (statElement) {
-            statElement.textContent = formatNumber(value);
-        }
-    });
+async function updateStatistics() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error('No token found for fetching dashboard stats.');
+        return;
+    }
+
+    try {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+
+        // Fetch Orders Count
+        const ordersResponse = await fetch('https://localhost:3000/api/v1/orders/count', { headers });
+        const ordersData = await ordersResponse.json();
+        const ordersCount = ordersData.success ? ordersData.count : 0;
+
+        // Fetch Users Count
+        const usersResponse = await fetch('https://localhost:3000/api/v1/users/count', { headers });
+        const usersData = await usersResponse.json();
+        const usersCount = usersData.success ? usersData.count : 0;
+
+        // Fetch Approved Experts Count
+        const expertsResponse = await fetch('https://localhost:3000/api/v1/experts?status=approved', { headers });
+        const expertsData = await expertsResponse.json();
+        const expertsCount = Array.isArray(expertsData) ? expertsData.length : 0;
+
+        // Fetch Posts Count
+        const postsResponse = await fetch('https://localhost:3000/api/v1/posts/count', { headers });
+        const postsData = await postsResponse.json();
+        const postsCount = postsData.success && postsData.totalPosts !== undefined ? postsData.totalPosts : 0; // Assuming getPostStats returns totalPosts
+
+        const stats = {
+            orders: ordersCount,
+            users: usersCount,
+            experts: expertsCount,
+            posts: postsCount
+        };
+        
+        // Update the UI with the fetched stats
+        Object.entries(stats).forEach(([key, value]) => {
+            const statElement = document.querySelector(`.stat-card:nth-child(${getStatIndex(key)}) .stat-number`);
+            if (statElement) {
+                statElement.textContent = formatNumber(value);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error updating dashboard statistics:', error);
+        showNotification('Failed to load dashboard statistics.', 'error');
+    }
 }
 
 // Get the index for each stat card
@@ -209,7 +245,7 @@ function getStatIndex(key) {
     const indices = {
         orders: 1,
         users: 2,
-        doctors: 3,
+        experts: 3,
         posts: 4
     };
     return indices[key] || 1;
@@ -278,8 +314,8 @@ function switchTab(tabContainer, tabId) {
         selectedPane.style.display = 'block'; // Show only the selected pane
     }
 
-    // If switching to doctors or clients tab, ensure the data is loaded
-    if (tabId === 'doctors' || tabId === 'clients') {
+    // If switching to experts or clients tab, ensure the data is loaded
+    if (tabId === 'experts' || tabId === 'clients') {
         fetchCommunity();
     }
     // If switching to reported or pending posts, ensure the data is loaded
@@ -499,7 +535,7 @@ async function fetchApplications() {
                     <div class="documents-section">
                         <h4><i class="fas fa-file-alt"></i> Documents</h4>
                         <div class="document-links">
-                            <a href="http://localhost:3000/uploads/cvs/${filename}" target="_blank" class="document-link"><i class="fas fa-file-pdf"></i> View CV</a>
+                            <a href="https://localhost:3000/uploads/cvs/${filename}" target="_blank" class="document-link"><i class="fas fa-file-pdf"></i> View CV</a>
                         </div>
                     </div>
                 </div>
@@ -1063,8 +1099,8 @@ async function fetchCommunity() {
 
         // Get the appropriate container based on active tab
         switch(activeTabId) {
-            case 'doctors':
-                targetContainer = document.querySelector('#doctors-tab .doctors-grid');
+            case 'experts':
+                targetContainer = document.querySelector('#experts-tab .experts-grid');
                 break;
             case 'clients':
                 targetContainer = document.querySelector('#clients-tab .clients-grid');
@@ -1081,64 +1117,107 @@ async function fetchCommunity() {
         // Clear existing content
         targetContainer.innerHTML = '';
 
-        // Build query parameters based on active tab
-        let role;
-        switch(activeTabId) {
-            case 'doctors':
-                role = 'doctor';
-                break;
-            case 'clients':
-                role = 'user';
-                break;
-            default:
-                role = 'all';
-        }
+        // Fetch data based on active tab
+        let url;
+        let responseData;
 
-        // Show loading state
-        targetContainer.innerHTML = '<div class="loading">Loading members...</div>';
-
-        // Fetch users from backend
-        const url = role === 'all' 
-            ? 'https://localhost:3000/api/v1/users'
-            : `https://localhost:3000/api/v1/users?role=${role}`;
-
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        // Clear loading state
-        targetContainer.innerHTML = '';
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            if (response.status === 401) {
-                showNotification('Your session has expired. Please login again.', 'error');
-                window.location.href = '../login.html?redirect=admin/index.html';
-                return;
-            }
-            if (response.status === 403) {
-                showNotification('You do not have permission to view community members.', 'error');
-                return;
-            }
-            throw new Error(errorData.message || 'Failed to fetch community members');
-        }
-
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error(data.message || 'Failed to fetch community members');
-        }
-
-        if (data.data && data.data.length > 0) {
-            data.data.forEach(user => {
-                targetContainer.appendChild(createMemberCard(user));
+        if (activeTabId === 'experts') {
+            url = 'https://localhost:3000/api/v1/experts?status=approved';
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
-        } else {
-            targetContainer.innerHTML = `<p class="no-members">No ${activeTabId} found</p>`;
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch approved experts');
+            }
+            responseData = await response.json();
+            
+            if (responseData && responseData.length > 0) {
+                responseData.forEach(expert => {
+                    targetContainer.appendChild(createExpertCard(expert));
+                });
+            } else {
+                targetContainer.innerHTML = `<p class="no-members">No approved experts found</p>`;
+            }
+
+        } else { // For 'all' and 'clients' tabs, fetch from users endpoint
+            
+            // Fetch users
+            let usersUrl = activeTabId === 'all' ? 'https://localhost:3000/api/v1/users' : `https://localhost:3000/api/v1/users?role=user`;
+            const usersResponse = await fetch(usersUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!usersResponse.ok) {
+                const errorData = await usersResponse.json();
+                if (usersResponse.status === 401) {
+                    showNotification('Your session has expired. Please login again.', 'error');
+                    window.location.href = '../login.html?redirect=admin/index.html';
+                    return;
+                }
+                if (usersResponse.status === 403) {
+                    showNotification('You do not have permission to view community members.', 'error');
+                    return;
+                }
+                throw new Error(errorData.message || 'Failed to fetch community members');
+            }
+            let usersData = await usersResponse.json();
+            if (!usersData.success) {
+                throw new Error(usersData.message || 'Failed to fetch community members');
+            }
+            let combinedData = usersData.data || [];
+
+            // If on 'all' tab, also fetch approved experts
+            if (activeTabId === 'all') {
+                const expertsUrl = 'https://localhost:3000/api/v1/experts?status=approved';
+                const expertsResponse = await fetch(expertsUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!expertsResponse.ok) {
+                    console.warn('Could not fetch approved experts for All Members tab:', expertsResponse.status);
+                    // Continue even if expert fetch fails for this tab
+                }
+
+                const expertsData = await expertsResponse.json();
+                if (expertsData && expertsData.length > 0) {
+                    // Add a distinguishing property to experts so createMemberCard can handle them
+                    const expertsAsUsers = expertsData.map(expert => ({ 
+                        _id: expert._id, 
+                        username: expert.name, 
+                        email: expert.email, 
+                        role: 'expert', 
+                        isExpertApplication: true, // New flag
+                        cvFile: expert.cvFile, 
+                        number: expert.number
+                    }));
+                    combinedData = combinedData.concat(expertsAsUsers);
+                }
+            }
+            
+            if (combinedData && combinedData.length > 0) {
+                combinedData.forEach(member => {
+                    if (member.isExpertApplication) {
+                        targetContainer.appendChild(createExpertCard(member));
+                    } else {
+                        targetContainer.appendChild(createMemberCard(member));
+                    }
+                });
+            } else {
+                targetContainer.innerHTML = `<p class="no-members">No ${activeTabId} found</p>`;
+            }
         }
 
     } catch (error) {
@@ -1150,13 +1229,54 @@ async function fetchCommunity() {
     }
 }
 
+// New function to create an expert card from an approved expert application
+function createExpertCard(expert) {
+    const card = document.createElement('div');
+    card.className = 'member-card'; // Reusing member-card styling
+    
+    const filename = expert.cvFile ? expert.cvFile.split('/').pop() : '';
+
+    card.innerHTML = `
+        <div class="member-header">
+            <img src="../../images/default-avatar.png" alt="${expert.name}" class="member-avatar">
+            <div class="member-info">
+                <h4>${expert.name}</h4>
+                <span class="member-role">Expert</span>
+            </div>
+        </div>
+        <div class="member-details">
+            <div class="detail-row">
+                <i class="fas fa-envelope"></i>
+                <span>${expert.email}</span>
+            </div>
+            <div class="detail-row">
+                <i class="fas fa-phone"></i>
+                <span>${expert.number}</span>
+            </div>
+            ${expert.cvFile ? `
+            <div class="detail-row">
+                <i class="fas fa-file-pdf"></i>
+                <a href="https://localhost:3000/${expert.cvFile}" target="_blank">View CV</a>
+            </div>
+            ` : ''}
+        </div>
+        <div class="member-actions">
+            <button class="btn danger-btn" onclick="handleMemberAction(this, '${expert._id}', 'delete', 'expert')">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    `;
+
+    return card;
+}
+
 // Update createMemberCard function to match the backend data structure
 function createMemberCard(member) {
     const card = document.createElement('div');
     card.className = 'member-card';
     
     // Determine role display
-    const roleDisplay = member.role === 'doctor' ? 'Doctor' : 
+    const roleDisplay = member.role === 'expert' ? 'Expert' : 
                        member.role === 'user' ? 'Client' : member.role;
 
     // Format birth date if available
@@ -1222,7 +1342,7 @@ function createMemberCard(member) {
 }
 
 // Update handleMemberAction function to only handle delete action
-async function handleMemberAction(button, memberId, action) {
+async function handleMemberAction(button, memberId, action, type = 'user') {
     const token = localStorage.getItem('token');
     if (!token) {
         showNotification('Please login to perform this action', 'error');
@@ -1232,7 +1352,7 @@ async function handleMemberAction(button, memberId, action) {
     const card = button.closest('.member-card');
     const memberName = card.querySelector('h4').textContent;
 
-    if (!confirm(`Are you sure you want to delete this member: "${memberName}"?`)) {
+    if (!confirm(`Are you sure you want to delete ${type === 'expert' ? 'this expert application' : 'this member'}: "${memberName}"?`)) {
         return;
     }
 
@@ -1242,22 +1362,30 @@ async function handleMemberAction(button, memberId, action) {
             'Authorization': `Bearer ${token}`
         };
 
-        const response = await fetch(`https://localhost:3000/api/v1/users/${memberId}`, {
+        let url;
+        if (type === 'expert') {
+            url = `https://localhost:3000/api/v1/experts/${memberId}`;
+        } else {
+            url = `https://localhost:3000/api/v1/users/${memberId}`;
+        }
+
+        const response = await fetch(url, {
             method: 'DELETE',
             headers: headers
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to delete member');
+            throw new Error(errorData.message || `Failed to delete ${type === 'expert' ? 'expert application' : 'member'}.`);
         }
 
-        showNotification('Member deleted successfully', 'success');
+        // Remove the card from the UI
         card.remove();
+        showNotification(`${type === 'expert' ? 'Expert application' : 'Member'} "${memberName}" deleted successfully!`, 'success');
 
     } catch (error) {
-        console.error('Error deleting member:', error);
-        showNotification(error.message || 'Error deleting member', 'error');
+        console.error(`Error deleting ${type === 'expert' ? 'expert application' : 'member'}:`, error);
+        showNotification(error.message || `Error deleting ${type === 'expert' ? 'expert application' : 'member'}.`, 'error');
     }
 }
 
