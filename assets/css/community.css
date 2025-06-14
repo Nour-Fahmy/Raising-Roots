@@ -1935,3 +1935,89 @@ body.dark-theme .save-btn.saved {
 body.dark-theme .save-btn.saved i {
   color: var(--primary-color) !important;
 }
+
+.auth-message {
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.auth-message p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.users {
+  padding: 10px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 5px;
+}
+
+.user-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.user-item.active {
+  background-color: rgba(94, 56, 41, 0.1);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.user-info .status {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.no-results {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.search-users {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.search-users input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.search-users input:focus {
+  outline: none;
+  border-color: rgb(94, 56, 41);
+}

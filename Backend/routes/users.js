@@ -7,7 +7,6 @@ const { validateLogin } = require('../middleware/validation');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const jwt = require('jsonwebtoken');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
-const userController = require('../controllers/userController'); // Import the userController
 
 // POST /api/v1/users/register
 router.post('/register', async (req, res) => {
@@ -227,7 +226,28 @@ router.delete('/:id', authenticateToken, isAdmin, async (req, res) => {
     }
 });
 
-// Route to get the total count of users
-router.get('/count', authenticateToken, isAdmin, userController.getUserCount);
+// GET /api/v1/users/search - Search users by username or email
+router.get('/search', authenticateToken, async (req, res) => {
+    try {
+        const query = req.query.query;
+        if (!query) {
+            return res.status(400).json({ message: 'Search query is required' });
+        }
+
+        // Find users whose username or email matches the query
+        // Using a regex for case-insensitive search
+        const users = await User.find({
+            $or: [
+                { username: { $regex: query, $options: 'i' } },
+                { email: { $regex: query, $options: 'i' } }
+            ]
+        }).select('-passwordHash'); // Exclude password hash from results
+
+        res.status(200).json(users);
+    } catch (err) {
+        console.error('Error searching users:', err);
+        res.status(500).json({ message: `Error searching users: ${process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'}` });
+    }
+});
 
 module.exports = router;

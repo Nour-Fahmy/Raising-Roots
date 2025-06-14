@@ -1,597 +1,588 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize translations
-    initializeTranslations();
+// This is a test comment to check file write access.
+// --- Core Shop State & DOM Elements ---
+let categoryButtons;
+let subcategoryButtons;
+let subSubcategoryButtons;
+let productsGrids;
 
-    const categoryButtons = document.querySelectorAll('.category-button');
-    const subcategoryButtons = document.querySelectorAll('.subcategory-button');
-    const subSubcategoryButtons = document.querySelectorAll('.sub-subcategory-button');
-    const subcategories = document.querySelectorAll('.subcategory');
+let cartContainer;
+let cartIcon;
+let closeCart;
+let cartItemsContainer;
+let totalPriceElement;
+let cartCountElement;
 
-    // Function to hide all content sections and deactivate all sidebar items
-    function resetAllStates() {
-        // Hide all content sections
-        document.querySelectorAll('.category-section, .subcategory-section, .sub-subcategory-section').forEach(section => {
-            section.classList.remove('active');
-        });
-
-        // Deactivate all sidebar buttons
-        document.querySelectorAll('.category-button, .subcategory-button, .sub-subcategory-button').forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-        // Deactivate all sidebar list items (li) explicitly
-        document.querySelectorAll('.category-item, .subcategory-item, .sub-subcategory-item').forEach(item => {
-            item.classList.remove('active');
-        });
-
-        // Deactivate all subcategories
-        document.querySelectorAll('.subcategory').forEach(sub => {
-            sub.classList.remove('active');
-        });
+// Initialize cart from localStorage or empty array
+let cart = [];
+function initializeCart() {
+    try {
+        const savedCart = localStorage.getItem('cart');
+        cart = savedCart ? JSON.parse(savedCart) : [];
+        console.log('Cart initialized:', cart);
+        
+        // Update cart UI immediately after initialization
+        updateCart();
+        updateCartCount();
+    } catch (error) {
+        console.error('Error initializing cart:', error);
+        cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
     }
+}
 
-    // Function to load products for a specific category
-    async function loadProducts(category, subcategory = null, subSubcategory = null) {
-        try {
-            let url = '/api/v1/products';
-            const params = new URLSearchParams();
-            
-            if (category) params.append('category', category);
-            if (subcategory) params.append('subcategory', subcategory);
-            if (subSubcategory) params.append('subSubcategory', subSubcategory);
-            
-            if (params.toString()) {
-                url += `?${params.toString()}`;
-            }
-
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Failed to fetch products');
-            }
-
-            const products = await response.json();
-            return products;
-        } catch (error) {
-            console.error('Error loading products:', error);
-            return [];
-        }
+// Listen for storage changes (login/logout)
+window.addEventListener('storage', function(e) {
+    if (e.key === 'token') {
+        // Re-initialize cart when login state changes
+        console.log('Login state changed, reinitializing cart');
+        initializeCart();
     }
+});
 
-    // Function to create a product card
-    function createProductCard(product) {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.dataset.productId = product._id;
+// Call initializeCart immediately
+initializeCart();
 
-        card.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" class="product-image">
+// Function to handle clicks outside the cart
+function handleClickOutside(event) {
+    // Don't close if clicking on cart buttons, add to cart buttons, or their children
+    if (event.target.closest('.cart-item-quantity') || 
+        event.target.closest('.remove-item') ||
+        event.target.closest('.cart-icon') ||
+        event.target.closest('.add-to-cart') ||
+        event.target.closest('.product-card')) {
+        return;
+    }
+    
+    if (cartContainer && cartIcon && !cartContainer.contains(event.target) && !cartIcon.contains(event.target)) {
+        cartContainer.classList.remove('active');
+    }
+}
+
+// --- Utility Functions ---
+
+// Function to show a temporary notification
+function showNotification(message, type = 'success') {
+    const notificationElement = document.createElement('div');
+    notificationElement.className = `notification ${type}`;
+    notificationElement.textContent = message;
+    document.body.appendChild(notificationElement);
+
+    // Automatically remove after 3 seconds
+    setTimeout(() => {
+        notificationElement.remove();
+    }, 3000);
+}
+
+// Function to hide all content sections and deactivate all sidebar items
+function resetAllStates() {
+    document.querySelectorAll('.category-section, .subcategory-section, .sub-subcategory-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none'; // Explicitly hide sections
+    });
+    document.querySelectorAll('.category-button, .subcategory-button, .sub-subcategory-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelectorAll('.category-item, .subcategory-item, .sub-subcategory-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelectorAll('.subcategory').forEach(sub => {
+        sub.classList.remove('active');
+    });
+}
+
+// --- Product Card Rendering ---
+function renderShopProductCard(product) {
+    const pid = product.productId || product._id;
+    // Get stock from localStorage; if not present, use product.stock from DB
+    let stock = localStorage.getItem(`stock_${pid}`);
+    if (stock === null) {
+        stock = product.stock;
+        localStorage.setItem(`stock_${pid}`, stock);
+    } else {
+        stock = parseInt(stock);
+    }
+    const imageUrl = product.image ? `https://localhost:3000${product.image}` : '../images/default-avatar.png';
+    return `
+        <div class="product-card" data-product-id="${pid}">
+            <div class="product-image">
+                <img src="${imageUrl}" alt="${product.name}">
+            </div>
             <div class="product-info">
                 <h3 class="product-title">${product.name}</h3>
-                <p class="product-description">${product.description}</p>
-                <p class="product-price">EGP ${product.price}</p>
-                <p class="stock-info" data-i18n="in_stock">In Stock: ${product.stock}</p>
-                <button class="add-to-cart" ${product.stock <= 0 ? 'disabled' : ''}>
-                    ${product.stock <= 0 ? translate('out_of_stock') : translate('add_to_cart')}
+                <p class="product-price">EGP ${product.price.toFixed(2)}</p>
+                <p class="product-description">${product.description || ''}</p>
+                <p class="stock-info${stock < 10 ? ' low' : ''}">In Stock: ${stock}</p>
+                <button class="add-to-cart" type="button" ${stock <= 0 ? 'disabled' : ''}>
+                    ${stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
                 </button>
+            </div>
+        </div>
+    `;
+}
+
+// --- Cart Logic ---
+
+function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    console.log('Cart saved to localStorage:', cart); // Debug log
+    updateCartCount(); // Update count whenever cart is saved
+}
+
+function updateCartCount() {
+    // Get all cart count elements (there might be multiple in the navigation)
+    const cartCountElements = document.querySelectorAll('.cart-count');
+    if (!cartCountElements.length) {
+        console.warn('No cart count elements found');
+        return;
+    }
+
+    // Calculate total items in cart
+    const totalItems = cart.reduce((total, item) => total + (item.quantity || 0), 0);
+    console.log('Updating cart count to:', totalItems); // Debug log
+
+    // Update all cart count elements
+    cartCountElements.forEach(element => {
+        element.textContent = totalItems;
+        // Show/hide the count based on whether there are items
+        element.style.display = totalItems > 0 ? 'block' : 'none';
+    });
+}
+
+function updateCart() {
+    if (!cartItemsContainer || !totalPriceElement) {
+        console.warn('Cart container elements not found');
+        return;
+    }
+
+    // Ensure cart variable is updated with latest from localStorage
+    try {
+        const savedCart = localStorage.getItem('cart');
+        cart = savedCart ? JSON.parse(savedCart) : [];
+        console.log('Cart loaded from localStorage:', cart); // Debug log
+    } catch (error) {
+        console.error('Error loading cart from localStorage:', error);
+        cart = [];
+    }
+
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+    let count = 0;
+
+    cart.forEach(item => {
+        // Add validation for cart item structure
+        if (!item.id || !item.title || !item.price || !item.image) {
+            console.error('Invalid cart item detected:', item);
+            return;
+        }
+
+        const itemTotal = item.price * (item.quantity || 0);
+        total += itemTotal;
+        count += (item.quantity || 0);
+
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+            <div class="item-details">
+                <h3 class="cart-item-title">${item.title}</h3>
+                <p class="cart-item-price">EGP ${item.price.toFixed(2)}</p>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn decrease" type="button">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="quantity-btn increase" type="button">+</button>
+                    <button class="remove-item" type="button">Remove</button>
+                </div>
             </div>
         `;
 
-        // Add click event listener for add to cart button
-        const addToCartBtn = card.querySelector('.add-to-cart');
-        if (addToCartBtn && product.stock > 0) {
-            addToCartBtn.addEventListener('click', () => {
-                addToCart(
-                    product._id,
-                    product.name,
-                    product.price,
-                    product.image
-                );
-            });
-        }
-
-        return card;
-    }
-
-    // Function to display products in a grid
-    function displayProducts(products, gridId) {
-        const grid = document.getElementById(gridId);
-        if (!grid) return;
-
-        grid.innerHTML = '';
-        if (products.length === 0) {
-            grid.innerHTML = `<p class="no-products" data-i18n="no_products">No products found in this category.</p>`;
-            return;
-        }
-
-        products.forEach(product => {
-            const card = createProductCard(product);
-            grid.appendChild(card);
-        });
-    }
-
-    // Function to handle category changes
-    async function handleCategoryChange(category, subcategory = null, subSubcategory = null) {
-        const products = await loadProducts(category, subcategory, subSubcategory);
-        
-        // Determine which grid to update based on the category
-        let gridId;
-        if (category === 'adult') {
-            gridId = 'adult-products-grid';
-        } else if (category === 'kids') {
-            if (subcategory === 'boys') {
-                if (subSubcategory === 'fashion') {
-                    gridId = 'boys-fashion-grid';
-                } else if (subSubcategory === 'toys') {
-                    gridId = 'boys-toys-grid';
-                }
-            } else if (subcategory === 'girls') {
-                if (subSubcategory === 'fashion') {
-                    gridId = 'girls-fashion-grid';
-                } else if (subSubcategory === 'toys') {
-                    gridId = 'girls-toys-grid';
-                }
-            } else if (subcategory === 'feeding') {
-                gridId = 'feeding-grid';
-            } else if (subcategory === 'health') {
-                gridId = 'health-grid';
-            }
-        }
-
-        if (gridId) {
-            displayProducts(products, gridId);
-        }
-    }
-
-    // Handle category button clicks
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const category = this.getAttribute('data-category');
-            const parentItem = this.closest('.category-item');
-
-            // If clicked button is already active, deactivate it and show adult products
-            if (this.classList.contains('active')) {
-                this.classList.remove('active');
-                parentItem?.classList.remove('active');
-                document.getElementById(`${category}-section`)?.classList.remove('active');
-                
-                // Show adult products when closing kids products
-                const adultButton = document.querySelector('[data-category="adult"]');
-                const adultSection = document.getElementById('adult-products');
-                if (adultButton && adultSection) {
-                    adultButton.classList.add('active');
-                    adultButton.closest('.category-item')?.classList.add('active');
-                    adultSection.classList.add('active');
-                }
-                return;
-            }
-
-            // Reset all other states first
-            resetAllStates();
-
-            // Activate the clicked category button and its parent li
-            this.classList.add('active');
-            parentItem?.classList.add('active');
-
-            // Show corresponding content section
-            document.getElementById(`${category}-section`)?.classList.add('active');
-
-            // If it's the kids category, show all subcategory sections
-            if (category === 'kids') {
-                // Show all subcategory sections
-                const subcategorySections = [
-                    'boys-fashion-section',
-                    'boys-toys-section',
-                    'girls-fashion-section',
-                    'girls-toys-section',
-                    'feeding-section',
-                    'health-section'
-                ];
-
-                subcategorySections.forEach(sectionId => {
-                    const section = document.getElementById(sectionId);
-                    if (section) {
-                        section.classList.add('active');
+        // Attach event listeners to quantity buttons for cart items
+        cartItem.querySelector('.decrease').addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            if (item.quantity > 1) {
+                item.quantity -= 1;
+                // Update stock on the main product card
+                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+                if (productCard) {
+                    const stockInfoElement = productCard.querySelector('.stock-info');
+                    let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+                    currentStock++;
+                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
+                    localStorage.setItem(`stock_${item.id}`, currentStock);
+                    const addToCartButton = productCard.querySelector('.add-to-cart');
+                    if (addToCartButton) {
+                        addToCartButton.textContent = 'Add to Cart';
+                        addToCartButton.disabled = false;
+                        addToCartButton.style.backgroundColor = '';
+                        addToCartButton.style.cursor = '';
                     }
-                });
+                }
+                saveCart();
+                updateCart();
+                updateCartCount();
             }
         });
-    });
 
-    // Handle subcategory button clicks
-    subcategoryButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event from bubbling to parent category
-
-            const subcategory = this.getAttribute('data-subcategory');
-            const parentItem = this.closest('.subcategory-item');
-
-            // Only allow toggle behavior for boys and girls products
-            if (this.classList.contains('active') && (subcategory === 'boys' || subcategory === 'girls')) {
-                this.classList.remove('active');
-                parentItem?.classList.remove('active');
-                document.getElementById(`${subcategory}-section`)?.classList.remove('active');
-                return;
-            }
-
-            // Reset all other states first
-            resetAllStates();
-
-            // Activate parent category button ('kids') and its section/list
-            const kidsCategoryButton = document.querySelector('.category-button[data-category="kids"]');
-            if (kidsCategoryButton) {
-                kidsCategoryButton.classList.add('active');
-                kidsCategoryButton.closest('.category-item')?.classList.add('active');
-                document.getElementById('kids-section')?.classList.add('active');
-            }
-
-            // Activate the clicked subcategory button and its parent li
-            this.classList.add('active');
-            parentItem?.classList.add('active');
-
-            // Show corresponding subcategory content section
-            document.getElementById(`${subcategory}-section`)?.classList.add('active');
-
-            // If it's boys products, show both fashion and toys sections
-            if (subcategory === 'boys') {
-                const boysFashionSection = document.getElementById('boys-fashion-section');
-                const boysToysSection = document.getElementById('boys-toys-section');
-                if (boysFashionSection && boysToysSection) {
-                    boysFashionSection.classList.add('active');
-                    boysToysSection.classList.add('active');
-                }
-            }
-            // If it's girls products, show both fashion and toys sections
-            else if (subcategory === 'girls') {
-                const girlsFashionSection = document.getElementById('girls-fashion-section');
-                const girlsToysSection = document.getElementById('girls-toys-section');
-                if (girlsFashionSection && girlsToysSection) {
-                    girlsFashionSection.classList.add('active');
-                    girlsToysSection.classList.add('active');
+        cartItem.querySelector('.increase').addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+            if (productCard) {
+                const stockInfoElement = productCard.querySelector('.stock-info');
+                let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+                if (currentStock > 0) {
+                    item.quantity += 1;
+                    currentStock--;
+                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
+                    localStorage.setItem(`stock_${item.id}`, currentStock);
+                    if (currentStock === 0) {
+                        const addToCartButton = productCard.querySelector('.add-to-cart');
+                        if (addToCartButton) {
+                            addToCartButton.textContent = 'Out of Stock';
+                            addToCartButton.disabled = true;
+                            addToCartButton.style.backgroundColor = '#ccc';
+                            addToCartButton.style.cursor = '';
+                        }
+                    }
+                    saveCart();
+                    updateCart();
+                    updateCartCount();
                 }
             }
         });
-    });
 
-    // Handle sub-subcategory button clicks
-    subSubcategoryButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent event from bubbling to parent subcategory
-
-            const subSubcategory = this.getAttribute('data-sub-subcategory');
-            const parentItem = this.closest('.sub-subcategory-item');
-
-            // Reset all other states first
-            resetAllStates();
-
-            // Activate parent category ('kids') and its section/list
-            const kidsCategoryButton = document.querySelector('.category-button[data-category="kids"]');
-            if (kidsCategoryButton) {
-                kidsCategoryButton.classList.add('active');
-                kidsCategoryButton.closest('.category-item')?.classList.add('active');
-                document.getElementById('kids-section')?.classList.add('active');
+        cartItem.querySelector('.remove-item').addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            // Remove item from cart
+            cart = cart.filter(cartItem => cartItem.id !== item.id);
+            // Update stock on the main product card
+            const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
+            if (productCard) {
+                const stockInfoElement = productCard.querySelector('.stock-info');
+                let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
+                currentStock += item.quantity;
+                stockInfoElement.textContent = `In Stock: ${currentStock}`;
+                localStorage.setItem(`stock_${item.id}`, currentStock);
+                const addToCartButton = productCard.querySelector('.add-to-cart');
+                if (addToCartButton) {
+                    addToCartButton.textContent = 'Add to Cart';
+                    addToCartButton.disabled = false;
+                    addToCartButton.style.backgroundColor = '';
+                    addToCartButton.style.cursor = '';
+                }
             }
-
-            // Activate immediate parent subcategory button and its section/list
-            const parentSubcategoryButton = this.closest('.sub-subcategory-list')?.previousElementSibling;
-            if (parentSubcategoryButton) {
-                parentSubcategoryButton.classList.add('active');
-                parentSubcategoryButton.closest('.subcategory-item')?.classList.add('active');
-                document.getElementById(`${parentSubcategoryButton.getAttribute('data-subcategory')}-section`)?.classList.add('active');
-            }
-
-            // Activate the clicked sub-subcategory button and its parent li
-            this.classList.add('active');
-            parentItem?.classList.add('active');
-
-            // Show corresponding sub-subcategory content section
-            document.getElementById(`${subSubcategory}-section`)?.classList.add('active');
-        });
-    });
-
-    // Initialize the shop by clicking the first category button (Adult Products)
-    const firstCategoryButton = document.querySelector('.category-button');
-    if (firstCategoryButton) {
-        firstCategoryButton.click();
-    }
-
-    // Add click event listener to adult products button
-    const adultButton = document.querySelector('[data-category="adult"]');
-    const adultSection = document.getElementById('adult-products');
-    const adultProductsGrid = adultSection.querySelector('.products-grid');
-
-    adultButton.addEventListener('click', function() {
-        // Toggle active class on button
-        categoryButtons.forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
-
-        // Show adult section and hide others
-        document.querySelectorAll('.category-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        adultSection.classList.add('active');
-
-        // Toggle products grid visibility
-        adultProductsGrid.style.display = adultProductsGrid.style.display === 'none' ? 'grid' : 'grid';
-    });
-
-    // Initialize cart count from localStorage if it exists
-    const cartCount = document.querySelector('.cart-count');
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-        const cart = JSON.parse(savedCart);
-        cartCount.textContent = cart.length;
-    }
-
-    // Cart functionality
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    // Function to update cart in localStorage
-    function updateCartStorage() {
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    // Function to add item to cart
-    function addToCart(productId, name, price, image) {
-        const existingItem = cart.find(item => item.id === productId);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({
-                id: productId,
-                name: name,
-                price: price,
-                image: image,
-                quantity: 1
-            });
-        }
-        
-        updateCartStorage();
-        updateCartUI();
-        showNotification(translate('item_added_to_cart'));
-    }
-
-    // Function to remove item from cart
-    function removeFromCart(productId) {
-        cart = cart.filter(item => item.id !== productId);
-        updateCartStorage();
-        updateCartUI();
-        showNotification(translate('item_removed_from_cart'));
-    }
-
-    // Function to update item quantity
-    function updateQuantity(productId, newQuantity) {
-        const item = cart.find(item => item.id === productId);
-        if (item) {
-            item.quantity = Math.max(0, newQuantity);
-            if (item.quantity === 0) {
-                removeFromCart(productId);
-            } else {
-                updateCartStorage();
-                updateCartUI();
-            }
-        }
-    }
-
-    // Function to update cart UI
-    function updateCartUI() {
-        const cartCount = document.querySelector('.cart-count');
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        cartCount.textContent = totalItems;
-    }
-
-    // Function to show notification
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
-
-    // Toggle cart visibility
-    const cartIcon = document.querySelector('.cart-icon');
-    const closeCart = document.querySelector('.close-cart');
-    const cartItems = document.querySelector('.cart-items');
-    const totalPrice = document.querySelector('.total-price');
-
-    cartIcon.addEventListener('click', () => {
-        cartContainer.classList.add('active');
-        // Reset payment method to cash and hide credit card fields
-        document.querySelector('input[name="payment"][value="cash"]').checked = true;
-        document.querySelector('.credit-card-fields').style.display = 'none';
-    });
-
-    closeCart.addEventListener('click', () => {
-        cartContainer.classList.remove('active');
-    });
-
-    // Checkout functionality
-    const checkoutBtn = document.querySelector('.checkout-btn');
-    const checkoutModal = document.querySelector('.checkout-modal');
-    const closeCheckout = document.querySelector('.close-checkout');
-    const checkoutForm = document.getElementById('checkout-form');
-    const orderSuccessMessage = document.getElementById('orderSuccessMessage');
-
-    checkoutBtn.addEventListener('click', () => {
-        if (cart.length === 0) {
-            showNotification(translate('cart_empty'));
-            return;
-        }
-        
-        // Check if user is logged in
-        const token = localStorage.getItem('token');
-        if (!token) {
-            // Redirect to login page if not logged in
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        checkoutModal.classList.add('active');
-    });
-
-    closeCheckout.addEventListener('click', () => {
-        checkoutModal.classList.remove('active');
-    });
-
-    // Close modal when clicking outside
-    checkoutModal.addEventListener('click', (e) => {
-        if (e.target === checkoutModal) {
-            checkoutModal.classList.remove('active');
-        }
-    });
-
-    // Handle payment method selection
-    const paymentOptions = document.querySelectorAll('input[name="payment"]');
-    const creditCardFields = document.querySelector('.credit-card-fields');
-    const phoneInput = document.getElementById('phone');
-    const phoneError = document.getElementById('phoneError');
-    const apartmentInput = document.getElementById('apartment');
-    const apartmentError = document.getElementById('apartmentError');
-
-    paymentOptions.forEach(option => {
-        option.addEventListener('change', (e) => {
-            if (e.target.value === 'card') {
-                creditCardFields.style.display = 'block';
-                // Make credit card fields required
-                document.getElementById('cardNumber').required = true;
-                document.getElementById('cardName').required = true;
-                document.getElementById('expiryDate').required = true;
-                document.getElementById('cvv').required = true;
-            } else {
-                creditCardFields.style.display = 'none';
-                // Remove required attribute
-                document.getElementById('cardNumber').required = false;
-                document.getElementById('cardName').required = false;
-                document.getElementById('expiryDate').required = false;
-                document.getElementById('cvv').required = false;
-            }
-        });
-    });
-
-    // Format card number with spaces
-    const cardNumber = document.getElementById('cardNumber');
-    cardNumber.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        value = value.replace(/(\d{4})/g, '$1 ').trim();
-        e.target.value = value;
-    });
-
-    // Format expiry date
-    const expiryDate = document.getElementById('expiryDate');
-    expiryDate.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length >= 2) {
-            value = value.slice(0, 2) + '/' + value.slice(2);
-        }
-        e.target.value = value;
-    });
-
-    // Only allow numbers in CVV
-    const cvv = document.getElementById('cvv');
-    cvv.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/\D/g, '');
-    });
-
-    // Handle form submission
-    checkoutForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // Validate form
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        
-        // Validate phone number
-        const phoneRegex = /^01[0125][0-9]{8}$/;
-        if (!phoneRegex.test(data.phone)) {
-            document.getElementById('phoneError').textContent = translate('invalid_phone');
-            return;
-        }
-
-        // Validate apartment number
-        if (data.apartment && (data.apartment < 1 || data.apartment > 999)) {
-            document.getElementById('apartmentError').textContent = translate('invalid_apartment');
-            return;
-        }
-
-        try {
-            // Create order
-            const orderResponse = await fetch('/api/v1/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    items: cart,
-                    shippingInfo: data,
-                    paymentMethod: data.payment,
-                }),
-            });
-
-            if (!orderResponse.ok) {
-                throw new Error('Failed to create order');
-            }
-
-            const order = await orderResponse.json();
-
-            // Clear cart
-            cart.length = 0;
-            updateCart();
             saveCart();
+            updateCart();
+            updateCartCount();
+            showNotification(getTranslation('item_removed_from_cart'), 'success');
+        });
 
-            // Close checkout modal
-            document.querySelector('.checkout-modal').classList.remove('active');
+        cartItemsContainer.appendChild(cartItem);
+    });
 
-            // Show success message
-            showNotification(translate('order_success'));
+    totalPriceElement.textContent = `EGP ${total.toFixed(2)}`;
+    updateCartCount(); // Update count after cart update
+}
 
-            // Redirect to order confirmation page
-            window.location.href = `/order-confirmation/${order._id}`;
-        } catch (error) {
-            console.error('Error creating order:', error);
-            showNotification(translate('error_creating_order'));
+// --- Event Delegation for Product Grids ---
+function setupGridDelegation() {
+    // Get all product grids
+    const productGrids = document.querySelectorAll('.products-grid');
+    console.log('Setting up grid delegation for', productGrids.length, 'grids');
+
+    productGrids.forEach(grid => {
+        // Remove any existing listeners to prevent duplicates by cloning and replacing
+        const oldGrid = document.querySelector(`#${grid.id}`);
+        if (oldGrid) { // Ensure the old grid exists before trying to replace
+            const newGrid = oldGrid.cloneNode(true);
+            oldGrid.replaceWith(newGrid);
+            newGrid.addEventListener('click', async (e) => {
+                const addToCartButton = e.target.closest('.add-to-cart');
+                if (addToCartButton) {
+                    e.stopPropagation(); // Prevent event bubbling
+                    const productCard = addToCartButton.closest('.product-card');
+                    if (!productCard) return;
+
+                    console.log('Add to cart clicked for product:', productCard.dataset.productId);
+
+                    const productId = productCard.dataset.productId;
+                    const productTitle = productCard.querySelector('.product-title').textContent;
+                    const productPrice = parseFloat(productCard.querySelector('.product-price').textContent.replace('EGP ', ''));
+                    const productImage = productCard.querySelector('.product-image img').src;
+                    const stockInfo = productCard.querySelector('.stock-info');
+                    let currentStock = parseInt(stockInfo.textContent.replace('In Stock: ', ''));
+
+                    if (currentStock <= 0) {
+                        showNotification(getTranslation('out_of_stock'), 'error');
+                        return;
+                    }
+
+                    // Check if product is already in cart
+                    const existingItem = cart.find(item => item.id === productId);
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({
+                            id: productId,
+                            title: productTitle,
+                            price: productPrice,
+                            image: productImage,
+                            quantity: 1
+                        });
+                    }
+
+                    // Update stock
+                    currentStock--;
+                    stockInfo.textContent = `In Stock: ${currentStock}`;
+                    localStorage.setItem(`stock_${productId}`, currentStock);
+
+                    // Update UI
+                    if (currentStock === 0) {
+                        addToCartButton.textContent = 'Out of Stock';
+                        addToCartButton.disabled = true;
+                        addToCartButton.style.backgroundColor = '#ccc';
+                        addToCartButton.style.cursor = 'not-allowed';
+                    }
+
+                    saveCart();
+                    updateCart();
+                    updateCartCount();
+                    showNotification(getTranslation('item_added_to_cart'), 'success');
+                }
+            });
+        }
+    });
+}
+
+// --- Fetch & Render Products for Specific Grids ---
+async function fetchAndRenderProductsForGrid(gridId, category, subcategory = null, subSubcategory = null) {
+    try {
+        let url = `https://localhost:3000/api/v1/products?category=${category}`;
+        if (subcategory) url += `&subcategory=${subcategory}`;
+        if (subSubcategory) {
+            // Handle the sub-subcategory parameter correctly
+            // For fashion and toys, we need to use the full identifier (e.g., girls-fashion, boys-toys)
+            url += `&subSubcategory=${subSubcategory}`;
+        }
+
+        console.log(`Fetching products for ${gridId} from URL: ${url}`); // Debug log
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            mode: 'cors',
+            credentials: 'include',
+            cache: 'no-cache'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch products for ${category}/${subcategory || ''}/${subSubcategory || ''}`);
+        }
+
+        const products = await response.json();
+        console.log(`Fetched ${products.length} products for ${gridId}:`, products); // Debug log with products
+
+        const targetGrid = document.querySelector(gridId);
+        if (!targetGrid) {
+            console.error(`Target grid not found: ${gridId}`);
+            return;
+        }
+
+        // Ensure the parent section is visible
+        const parentSection = targetGrid.closest('.category-section, .subcategory-section, .sub-subcategory-section');
+        if (parentSection) {
+            parentSection.style.display = 'block';
+            parentSection.classList.add('active');
+        }
+
+        if (products.length > 0) {
+            targetGrid.innerHTML = products.map(renderShopProductCard).join('');
+            console.log(`Rendered ${products.length} products in ${gridId}`);
+            // Setup event delegation after rendering products
+            setupGridDelegation();
+        } else {
+            targetGrid.innerHTML = '<p class="no-products" data-i18n="no_products">No products available.</p>';
+        }
+
+        updateCartCount();
+        updateCart();
+
+    } catch (err) {
+        console.error(`Failed to load products for ${gridId}:`, err);
+        const targetGrid = document.querySelector(gridId);
+        if (targetGrid) {
+            targetGrid.innerHTML = '<p class="no-products" data-i18n="no_products">Failed to load products. Please try again later.</p>';
+        }
+    }
+}
+
+// --- Fetch & Render All Products (Orchestrator) ---
+async function fetchAndRenderAllShopProducts() {
+    console.log('Fetching and rendering all shop products (orchestrator).');
+    
+    // Fetch adult products
+    await fetchAndRenderProductsForGrid('#adult-products-grid', 'adult');
+    
+    // Fetch kids products with proper sub-subcategory identifiers
+    await fetchAndRenderProductsForGrid('#girls-fashion-grid', 'kids', 'girls', 'girls-fashion');
+    await fetchAndRenderProductsForGrid('#boys-fashion-grid', 'kids', 'boys', 'boys-fashion');
+    await fetchAndRenderProductsForGrid('#boys-toys-grid', 'kids', 'boys', 'boys-toys');
+    await fetchAndRenderProductsForGrid('#girls-toys-grid', 'kids', 'girls', 'girls-toys');
+    await fetchAndRenderProductsForGrid('#feeding-grid', 'kids', 'feeding');
+    await fetchAndRenderProductsForGrid('#health-grid', 'kids', 'health');
+}
+
+// --- Main Shop Initialization ---
+async function initializeShopPage() {
+    console.log('Initializing shop page');
+    
+    // Re-query all necessary DOM elements on initialization
+    categoryButtons = document.querySelectorAll('.category-button');
+    subcategoryButtons = document.querySelectorAll('.subcategory-button');
+    subSubcategoryButtons = document.querySelectorAll('.sub-subcategory-button');
+
+    // Initialize cart elements immediately
+    cartContainer = document.querySelector('.cart-container');
+    cartIcon = document.querySelector('.cart-icon');
+    closeCart = document.querySelector('.close-cart');
+    cartItemsContainer = document.querySelector('.cart-items');
+    totalPriceElement = document.querySelector('.total-price');
+    
+    // Get all cart count elements
+    const cartCountElements = document.querySelectorAll('.cart-count');
+    console.log('Found cart count elements:', cartCountElements.length);
+
+    // Debug logging for cart elements
+    console.log('Cart elements found:', {
+        cartContainer: !!cartContainer,
+        cartIcon: !!cartIcon,
+        closeCart: !!closeCart,
+        cartItemsContainer: !!cartItemsContainer,
+        totalPriceElement: !!totalPriceElement,
+        cartCountElements: cartCountElements.length
+    });
+
+    // Initialize cart UI
+    initializeCart();
+    updateCart(); // This will also update the cart count
+
+    // Listen for cart opened event
+    document.addEventListener('cartOpened', () => {
+        console.log('Cart opened event received');
+        if (cartContainer) {
+            cartContainer.classList.add('active');
+            // Reset payment method to cash and hide credit card fields
+            const cashPayment = document.querySelector('input[name="payment"][value="cash"]');
+            const creditCardFields = document.querySelector('.credit-card-fields');
+            if (cashPayment) cashPayment.checked = true;
+            if (creditCardFields) creditCardFields.style.display = 'none';
         }
     });
 
-    // Listen for input on credit card fields to clear error messages
-    document.getElementById('cardNumber').addEventListener('input', () => {
-        document.getElementById('cardNumberError').textContent = '';
-        document.getElementById('cardNumberError').style.display = 'none';
-    });
+    // Setup cart modal toggle listeners
+    if (cartIcon && cartContainer) {
+        console.log('Setting up cart icon click listener in shop');
+        cartIcon.addEventListener('click', () => {
+            console.log('Cart icon clicked in shop');
+            cartContainer.classList.add('active');
+            // Dispatch cart opened event
+            document.dispatchEvent(new CustomEvent('cartOpened'));
+        });
 
-    document.getElementById('cardName').addEventListener('input', () => {
-        document.getElementById('cardNameError').textContent = '';
-        document.getElementById('cardNameError').style.display = 'none';
-    });
+        // Add click outside listener
+        document.addEventListener('click', handleClickOutside);
+    } else {
+        console.error('Cart icon or container not found:', { cartIcon: !!cartIcon, cartContainer: !!cartContainer });
+    }
 
-    document.getElementById('expiryDate').addEventListener('input', () => {
-        document.getElementById('expiryDateError').textContent = '';
-        document.getElementById('expiryDateError').style.display = 'none';
-    });
+    if (closeCart && cartContainer) {
+        closeCart.addEventListener('click', () => {
+            cartContainer.classList.remove('active');
+        });
+    }
 
-    document.getElementById('cvv').addEventListener('input', () => {
-        document.getElementById('cvvError').textContent = '';
-        document.getElementById('cvvError').style.display = 'none';
-    });
-
-    // Listen for input on the phone field to clear error messages
-    phoneInput.addEventListener('input', () => {
-        if (phoneInput.value.length === 11) {
-            phoneError.textContent = '';
-            phoneError.style.display = 'none';
+    // Listen for navigation loaded event
+    document.addEventListener('navigationLoaded', () => {
+        console.log('Navigation loaded event received in shop');
+        // Re-initialize cart elements after navigation is loaded
+        cartIcon = document.querySelector('.cart-icon');
+        cartContainer = document.querySelector('.cart-container');
+        
+        // Update cart count after navigation is loaded
+        updateCartCount();
+        
+        if (cartIcon && cartContainer) {
+            console.log('Re-setting up cart icon click listener after navigation load');
+            cartIcon.addEventListener('click', () => {
+                console.log('Cart icon clicked after navigation load');
+                cartContainer.classList.add('active');
+                document.dispatchEvent(new CustomEvent('cartOpened'));
+            });
         }
     });
 
-    // Listen for input on the apartment field to clear error messages
-    apartmentInput.addEventListener('input', () => {
-        if (/^[0-9]*$/.test(apartmentInput.value)) {
-            apartmentError.textContent = '';
-            apartmentError.style.display = 'none';
+    // Initial setup to clear all states and explicitly set default Adult Products as active
+    resetAllStates(); // Hide all sections and deactivate all buttons/items
+
+    // Explicitly activate Adult Products as default
+    const defaultCategoryButton = document.querySelector('.category-button[data-category="adult"]');
+    const defaultCategoryItem = document.querySelector('.category-item[data-category="adult"]');
+    const defaultSection = document.getElementById('adult-products');
+
+    if (defaultCategoryButton) {
+        defaultCategoryButton.classList.add('active');
+    }
+    if (defaultCategoryItem) {
+        defaultCategoryItem.classList.add('active');
+    }
+    if (defaultSection) {
+        defaultSection.classList.add('active');
+        defaultSection.style.display = 'block';
+        await fetchAndRenderProductsForGrid('#adult-products-grid', 'adult');
+    }
+
+    // Set up all other listeners
+    setupCategoryListeners();
+    setupSubcategoryListeners();
+    setupSubSubcategoryListeners();
+    setupGridDelegation(); // Initial setup for product grids
+    
+    // Check URL for direct category/subcategory links and activate them
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    const subcategoryParam = urlParams.get('subcategory');
+    const subSubcategoryParam = urlParams.get('subSubcategory');
+
+    if (categoryParam) {
+        const targetCategoryButton = document.querySelector(`.category-button[data-category="${categoryParam}"]`);
+        if (targetCategoryButton) {
+            // Simulate a click on the category button to trigger its logic
+            targetCategoryButton.click();
         }
-    });
+        if (subcategoryParam) {
+            const targetSubcategoryButton = document.querySelector(`.subcategory-button[data-subcategory="${subcategoryParam}"]`);
+            if (targetSubcategoryButton) {
+                targetSubcategoryButton.click();
+            }
+            if (subSubcategoryParam) {
+                const targetSubSubcategoryButton = document.querySelector(`.sub-subcategory-button[data-sub-subcategory="${subSubcategoryParam}"]`);
+                if (targetSubSubcategoryButton) {
+                    targetSubSubcategoryButton.click();
+                }
+            }
+        }
+    }
+
+    // Initialize checkout elements
+    apartmentInput = document.getElementById('apartment');
+    cardNumber = document.getElementById('cardNumber');
+    expiryDate = document.getElementById('expiryDate');
+    cvv = document.getElementById('cvv');
+    checkoutBtn = document.querySelector('.checkout-btn');
+    checkoutModal = document.querySelector('.checkout-modal');
+    closeCheckout = document.querySelector('.close-checkout');
+    checkoutForm = document.getElementById('checkout-form');
+    orderSuccessMessage = document.getElementById('orderSuccessMessage');
+    phoneInput = document.getElementById('phone');
+    phoneError = document.getElementById('phoneError');
 
     // Add validation for apartment number
     if (apartmentInput) {
@@ -613,527 +604,453 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to initialize cart
-    function initializeCart() {
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        updateCartUI();
-        updateCartStorage();
-    }
-
-    // Function to save cart to localStorage
-    function saveCart() {
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    // Function to update stock
-    async function updateStock(productId, newStock) {
-        try {
-            const response = await fetch(`/api/v1/products/${productId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ stock: newStock }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update stock');
-            }
-        } catch (error) {
-            console.error('Error updating stock:', error);
-            showNotification(translate('error_updating_stock'));
-        }
-    }
-
-    // Function to update cart
-    function updateCart() {
-        updateCartUI();
-        updateCartStorage();
-    }
-
-    // Initialize cart
-    initializeCart();
-
-    // Add event listeners for cart functionality
-    document.querySelector('.close-cart').addEventListener('click', () => {
-        document.querySelector('.cart-container').classList.remove('active');
-    });
-
-    document.querySelector('.checkout-btn').addEventListener('click', () => {
-        if (cart.length === 0) {
-            showNotification(translate('cart_empty'));
-            return;
-        }
-        document.querySelector('.checkout-modal').classList.add('active');
-    });
-
-    document.querySelector('.close-checkout').addEventListener('click', () => {
-        document.querySelector('.checkout-modal').classList.remove('active');
-    });
-
-    // Handle payment method change
-    document.querySelectorAll('input[name="payment"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            const creditCardFields = document.querySelector('.credit-card-fields');
-            if (e.target.value === 'card') {
-                creditCardFields.style.display = 'block';
-            } else {
-                creditCardFields.style.display = 'none';
-            }
+    // Formatting for card number and expiry date
+    if(cardNumber) {
+        cardNumber.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{4})/g, '$1 ').trim();
+            e.target.value = value;
         });
-    });
-});
-
-// Listen for navigation updates
-window.addEventListener('navigationUpdated', function() {
-    initializeCart();
-});
-
-function initializeCart() {
-    // Initialize cart count from localStorage if it exists
-    const cartCount = document.querySelector('.cart-count');
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-        const cart = JSON.parse(savedCart);
-        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
     }
-
-    // Initialize stock from localStorage or set initial values
-    const productCards = document.querySelectorAll('.product-card');
-    productCards.forEach(card => {
-        const stockInfoElement = card.querySelector('.stock-info');
-        const productId = card.getAttribute('data-product-id');
-        const savedStock = localStorage.getItem(`stock_${productId}`);
-        
-        if (savedStock !== null) {
-            stockInfoElement.textContent = `In Stock: ${savedStock}`;
-            const addToCartButton = card.querySelector('.add-to-cart');
-            if (parseInt(savedStock) === 0) {
-                addToCartButton.textContent = 'Out of Stock';
-                addToCartButton.disabled = true;
-                addToCartButton.style.backgroundColor = '#ccc';
-                addToCartButton.style.cursor = 'not-allowed';
+    if(expiryDate) {
+        expiryDate.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2);
             }
-        } else {
-            // If no saved stock, save the initial stock value
-            const initialStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-            localStorage.setItem(`stock_${productId}`, initialStock.toString());
-        }
-    });
-
-    // Cart functionality
-    const cartContainer = document.querySelector('.cart-container');
-    const cartIcon = document.querySelector('.cart-icon');
-    const closeCart = document.querySelector('.close-cart');
-    const cartItems = document.querySelector('.cart-items');
-    const totalPrice = document.querySelector('.total-price');
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
-
-    // Initialize cart from localStorage or empty array
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    // Function to save cart to localStorage
-    function saveCart() {
-        localStorage.setItem('cart', JSON.stringify(cart));
-        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+            e.target.value = value;
+        });
+    }
+    if(cvv) {
+        cvv.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
     }
 
-    // Function to update stock in localStorage
-    function updateStock(productId, newStock) {
-        localStorage.setItem(`stock_${productId}`, newStock.toString());
-    }
-
-    // Toggle cart visibility
-    cartIcon.addEventListener('click', () => {
-        cartContainer.classList.add('active');
-        // Reset payment method to cash and hide credit card fields
-        document.querySelector('input[name="payment"][value="cash"]').checked = true;
-        document.querySelector('.credit-card-fields').style.display = 'none';
-    });
-
-    closeCart.addEventListener('click', () => {
-        cartContainer.classList.remove('active');
-    });
-
-    // Add to cart functionality
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const productCard = button.closest('.product-card');
-            const stockInfoElement = productCard.querySelector('.stock-info');
-            const productId = productCard.getAttribute('data-product-id');
-            let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-
-            if (currentStock <= 0) {
-                alert('This item is out of stock!');
+    // Checkout form submission
+    if (checkoutBtn && checkoutModal && closeCheckout && checkoutForm && orderSuccessMessage && phoneInput && phoneError) {
+        checkoutBtn.addEventListener('click', () => {
+            // Check if cart is empty
+            cart = JSON.parse(localStorage.getItem('cart')) || []; // Ensure cart is fresh
+            if (cart.length === 0) {
+                alert(getTranslation('cart_empty'));
                 return;
             }
-
-            // Decrease stock and update display
-            currentStock--;
-            stockInfoElement.textContent = `In Stock: ${currentStock}`;
-            updateStock(productId, currentStock);
-
-            if (currentStock === 0) {
-                button.textContent = 'Out of Stock';
-                button.disabled = true;
-                button.style.backgroundColor = '#ccc';
-                button.style.cursor = 'not-allowed';
-            }
-
-            const product = {
-                id: productId,
-                title: productCard.querySelector('.product-title').textContent,
-                price: parseFloat(productCard.querySelector('.product-price').textContent.replace('EGP ', '')),
-                image: productCard.querySelector('.product-image').src,
-                quantity: 1
-            };
-
-            // Check if product already exists in cart
-            const existingItem = cart.find(item => item.id === product.id);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push(product);
-            }
-
-            // Save cart to localStorage
-            saveCart();
             
-            // Update cart display
-            updateCart();
-            cartContainer.classList.add('active');
-        });
-    });
-
-    // Function to update cart display
-    function updateCart() {
-        cartItems.innerHTML = '';
-        let total = 0;
-        let count = 0;
-
-        cart.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            total += itemTotal;
-            count += item.quantity;
-
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item';
-            cartItem.innerHTML = `
-                <img src="${item.image}" alt="${item.title}" class="cart-item-image">
-                <div class="cart-item-details">
-                    <h3 class="cart-item-title">${item.title}</h3>
-                    <p class="cart-item-price">EGP ${item.price.toFixed(2)}</p>
-                    <div class="cart-item-quantity">
-                        <button class="quantity-btn decrease">-</button>
-                        <span>${item.quantity}</span>
-                        <button class="quantity-btn increase">+</button>
-                        <button class="remove-item">Remove</button>
-                    </div>
-                </div>
-            `;
-
-            // Add event listeners for quantity buttons
-            const decreaseBtn = cartItem.querySelector('.decrease');
-            const increaseBtn = cartItem.querySelector('.increase');
-            const removeBtn = cartItem.querySelector('.remove-item');
-
-            decreaseBtn.addEventListener('click', () => {
-                if (item.quantity > 1) {
-                    item.quantity -= 1;
-                    // Increase stock on product card
-                    const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
-                    if (productCard) {
-                        const stockInfoElement = productCard.querySelector('.stock-info');
-                        let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-                        currentStock++;
-                        stockInfoElement.textContent = `In Stock: ${currentStock}`;
-
-                        const addToCartButton = productCard.querySelector('.add-to-cart');
-                        if (addToCartButton) {
-                            addToCartButton.textContent = 'Add to Cart';
-                            addToCartButton.disabled = false;
-                            addToCartButton.style.backgroundColor = '';
-                            addToCartButton.style.cursor = '';
-                        }
-                    }
-                    saveCart();
-                    updateCart();
-                }
-            });
-
-            increaseBtn.addEventListener('click', () => {
-                // Check if there is enough stock before increasing quantity in cart
-                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
-                const stockInfoElement = productCard.querySelector('.stock-info');
-                let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-
-                if (currentStock > 0) {
-                    item.quantity += 1;
-                    // Decrease stock on product card
-                    currentStock--;
-                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
-
-                    if (currentStock === 0) {
-                        const addToCartButton = productCard.querySelector('.add-to-cart');
-                        if (addToCartButton) {
-                            addToCartButton.textContent = 'Out of Stock';
-                            addToCartButton.disabled = true;
-                            addToCartButton.style.backgroundColor = '#ccc';
-                            addToCartButton.style.cursor = 'not-allowed';
-                        }
-                    }
-                    saveCart();
-                    updateCart();
-                } else {
-                    alert('Not enough stock available!');
-                }
-            });
-
-            removeBtn.addEventListener('click', () => {
-                // Increase stock on product card by the quantity removed
-                const productCard = document.querySelector(`[data-product-id="${item.id}"]`);
-                if (productCard) {
-                    const stockInfoElement = productCard.querySelector('.stock-info');
-                    let currentStock = parseInt(stockInfoElement.textContent.replace('In Stock: ', ''));
-                    currentStock += item.quantity;
-                    stockInfoElement.textContent = `In Stock: ${currentStock}`;
-
-                    const addToCartButton = productCard.querySelector('.add-to-cart');
-                    if (addToCartButton) {
-                        addToCartButton.textContent = 'Add to Cart';
-                        addToCartButton.disabled = false;
-                        addToCartButton.style.backgroundColor = '';
-                        addToCartButton.style.cursor = '';
-                    }
-                }
-                cart = cart.filter(cartItem => cartItem.id !== item.id);
-                saveCart();
-                updateCart();
-            });
-
-            cartItems.appendChild(cartItem);
-        });
-
-        // Update cart count and total
-        cartCount.textContent = count;
-        totalPrice.textContent = `EGP ${total.toFixed(2)}`;
-
-        // Calculate and display estimated delivery date
-        const deliveryDate = new Date();
-        deliveryDate.setDate(deliveryDate.getDate() + 3); // Add 3 days
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.querySelector('.delivery-date').textContent = deliveryDate.toLocaleDateString('en-US', options);
-    }
-
-    // Initial cart update
-    updateCart();
-
-    // Checkout functionality
-    const checkoutBtn = document.querySelector('.checkout-btn');
-    const checkoutModal = document.querySelector('.checkout-modal');
-    const closeCheckout = document.querySelector('.close-checkout');
-    const checkoutForm = document.getElementById('checkout-form');
-    const orderSuccessMessage = document.getElementById('orderSuccessMessage');
-
-    checkoutBtn.addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        
-        // Check if user is logged in
-        const token = localStorage.getItem('token');
-        if (!token) {
-            // Redirect to login page if not logged in
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        checkoutModal.classList.add('active');
-    });
-
-    closeCheckout.addEventListener('click', () => {
-        checkoutModal.classList.remove('active');
-    });
-
-    // Close modal when clicking outside
-    checkoutModal.addEventListener('click', (e) => {
-        if (e.target === checkoutModal) {
-            checkoutModal.classList.remove('active');
-        }
-    });
-
-    // Handle payment method selection
-    const paymentOptions = document.querySelectorAll('input[name="payment"]');
-    const creditCardFields = document.querySelector('.credit-card-fields');
-    const phoneInput = document.getElementById('phone');
-    const phoneError = document.getElementById('phoneError');
-    const apartmentInput = document.getElementById('apartment');
-    const apartmentError = document.getElementById('apartmentError');
-
-    paymentOptions.forEach(option => {
-        option.addEventListener('change', (e) => {
-            if (e.target.value === 'card') {
-                creditCardFields.style.display = 'block';
-                // Make credit card fields required
-                document.getElementById('cardNumber').required = true;
-                document.getElementById('cardName').required = true;
-                document.getElementById('expiryDate').required = true;
-                document.getElementById('cvv').required = true;
-            } else {
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // If cart is not empty and user is logged in, open the checkout modal
+            checkoutModal.classList.add('active');
+            // Reset payment method to cash and hide credit card fields when opening modal
+            document.querySelector('input[name="payment"][value="cash"]').checked = true;
+            // Ensure credit card fields are hidden when opening the modal
+            const creditCardFields = document.querySelector('.credit-card-fields');
+            if (creditCardFields) {
                 creditCardFields.style.display = 'none';
-                // Remove required attribute
                 document.getElementById('cardNumber').required = false;
                 document.getElementById('cardName').required = false;
                 document.getElementById('expiryDate').required = false;
                 document.getElementById('cvv').required = false;
             }
         });
-    });
 
-    // Format card number with spaces
-    const cardNumber = document.getElementById('cardNumber');
-    cardNumber.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        value = value.replace(/(\d{4})/g, '$1 ').trim();
-        e.target.value = value;
-    });
+        closeCheckout.addEventListener('click', () => {
+            checkoutModal.classList.remove('active');
+        });
 
-    // Format expiry date
-    const expiryDate = document.getElementById('expiryDate');
-    expiryDate.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length >= 2) {
-            value = value.slice(0, 2) + '/' + value.slice(2);
-        }
-        e.target.value = value;
-    });
-
-    // Only allow numbers in CVV
-    const cvv = document.getElementById('cvv');
-    cvv.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/\D/g, '');
-    });
-
-    // Handle form submission
-    checkoutForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        // Clear previous error messages
-        phoneError.textContent = '';
-        phoneError.style.display = 'none';
-        document.getElementById('cardNumberError').textContent = '';
-        document.getElementById('cardNumberError').style.display = 'none';
-        document.getElementById('cardNameError').textContent = '';
-        document.getElementById('cardNameError').style.display = 'none';
-        document.getElementById('expiryDateError').textContent = '';
-        document.getElementById('expiryDateError').style.display = 'none';
-        document.getElementById('cvvError').textContent = '';
-        document.getElementById('cvvError').style.display = 'none';
-        apartmentError.textContent = '';
-        apartmentError.style.display = 'none';
-
-        // Basic phone number validation
-        const phone = phoneInput.value;
-        if (phone.length !== 11) {
-            phoneError.textContent = 'Please enter a valid 11-digit phone number.';
-            phoneError.style.display = 'block';
-            return;
-        }
-
-        // Apartment/Home Number validation (numbers only)
-        const apartment = apartmentInput.value;
-        if (apartment && !/^[0-9]+$/.test(apartment)) {
-            apartmentError.textContent = 'Invalid input. Please enter numbers only.';
-            apartmentError.style.display = 'block';
-            return;
-        }
-
-        // Validate credit card if selected
-        const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
-        if (selectedPayment === 'card') {
-            const cardNumberInput = document.getElementById('cardNumber');
-            const cardNameInput = document.getElementById('cardName');
-            const expiryDateInput = document.getElementById('expiryDate');
-            const cvvInput = document.getElementById('cvv');
-
-            const cardNumber = cardNumberInput.value.replace(/\s/g, '');
-            const expiryDate = expiryDateInput.value;
-            const cvv = cvvInput.value;
-
-            let hasCreditCardError = false;
-
-            // Basic validation
-            if (cardNumber.length !== 16) {
-                document.getElementById('cardNumberError').textContent = 'Please enter a valid 16-digit card number.';
-                document.getElementById('cardNumberError').style.display = 'block';
-                hasCreditCardError = true;
+        checkoutModal.addEventListener('click', (e) => {
+            if (e.target === checkoutModal) {
+                checkoutModal.classList.remove('active');
             }
-            if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
-                document.getElementById('expiryDateError').textContent = 'Please enter a valid expiry date (MM/YY).';
-                document.getElementById('expiryDateError').style.display = 'block';
-                hasCreditCardError = true;
+        });
+
+        const paymentOptions = document.querySelectorAll('input[name="payment"]');
+        const creditCardFields = document.querySelector('.credit-card-fields');
+        const apartmentError = document.getElementById('apartmentError');
+
+        paymentOptions.forEach(option => {
+            option.addEventListener('change', (e) => {
+                if (e.target.value === 'card') {
+                    creditCardFields.style.display = 'block';
+                    document.getElementById('cardNumber').required = true;
+                    document.getElementById('cardName').required = true;
+                    document.getElementById('expiryDate').required = true;
+                    document.getElementById('cvv').required = true;
+                } else {
+                    creditCardFields.style.display = 'none';
+                    document.getElementById('cardNumber').required = false;
+                    document.getElementById('cardName').required = false;
+                    document.getElementById('expiryDate').required = false;
+                    document.getElementById('cvv').required = false;
+                }
+            });
+        });
+
+        checkoutForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Checkout form submitted.'); // Debug log
+
+            phoneError.textContent = '';
+            phoneError.style.display = 'none';
+            document.getElementById('cardNumberError').textContent = '';
+            document.getElementById('cardNumberError').style.display = 'none';
+            document.getElementById('cardNameError').textContent = '';
+            document.getElementById('cardNameError').style.display = 'none';
+            document.getElementById('expiryDateError').textContent = '';
+            document.getElementById('expiryDateError').style.display = 'none';
+            document.getElementById('cvvError').textContent = '';
+            document.getElementById('cvvError').style.display = 'none';
+            apartmentError.textContent = '';
+            apartmentError.style.display = 'none';
+
+            const phone = phoneInput.value;
+            if (phone.length !== 11) {
+                phoneError.textContent = getTranslation('invalid_phone');
+                phoneError.style.display = 'block';
+                console.error('Phone number validation failed.'); // Debug log
+                return;
             }
-            if (cvv.length !== 3) {
-                document.getElementById('cvvError').textContent = 'Please enter a valid 3-digit CVV.';
-                document.getElementById('cvvError').style.display = 'block';
-                hasCreditCardError = true;
+
+            const apartment = apartmentInput ? apartmentInput.value : '';
+            if (apartment && (!/^[0-9]+$/.test(apartment) || parseInt(apartment) < 1 || parseInt(apartment) > 999)) {
+                apartmentError.textContent = getTranslation('invalid_apartment');
+                apartmentError.style.display = 'block';
+                console.error('Apartment number validation failed.'); // Debug log
+                return;
             }
+
+            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            if (selectedPayment === 'card') {
+                const cardNumberInput = document.getElementById('cardNumber');
+                const cardNameInput = document.getElementById('cardName');
+                const expiryDateInput = document.getElementById('expiryDate');
+                const cvvInput = document.getElementById('cvv');
+
+                if (!cardNumberInput?.value || cardNumberInput.value.replace(/\s/g, '').length !== 16) {
+                    document.getElementById('cardNumberError').textContent = 'Please enter a valid 16-digit card number.';
+                    document.getElementById('cardNumberError').style.display = 'block';
+                    console.error('Card number validation failed.'); // Debug log
+                    return;
+                }
+                if (!cardNameInput?.value.trim()) {
+                    document.getElementById('cardNameError').textContent = 'Card name cannot be empty.';
+                    document.getElementById('cardNameError').style.display = 'block';
+                    console.error('Card name validation failed.'); // Debug log
+                    return;
+                }
+                if (!expiryDateInput?.value || !/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(expiryDateInput.value)) {
+                    document.getElementById('expiryDateError').textContent = 'Please enter a valid expiry date (MM/YY).';
+                    document.getElementById('expiryDateError').style.display = 'block';
+                    console.error('Expiry date format validation failed.'); // Debug log
+                    return;
+                }
+                const [month, year] = expiryDateInput.value.split('/').map(Number);
+                const currentYear = new Date().getFullYear() % 100;
+                const currentMonth = new Date().getMonth() + 1;
+
+                if (year < currentYear || (year === currentYear && month < currentMonth)) {
+                    document.getElementById('expiryDateError').textContent = 'Expiry date cannot be in the past.';
+                    document.getElementById('expiryDateError').style.display = 'block';
+                    console.error('Expiry date in past validation failed.'); // Debug log
+                    return;
+                }
+
+                if (!cvvInput?.value || !/^[0-9]{3,4}$/.test(cvvInput.value)) {
+                    document.getElementById('cvvError').textContent = 'Please enter a valid 3 or 4-digit CVV.';
+                    document.getElementById('cvvError').style.display = 'block';
+                    console.error('CVV validation failed.'); // Debug log
+                    return;
+                }
+            }
+
+            // --- Start Frontend-Only Order Simulation ---
+            console.log('Simulating successful order placement (frontend-only).');
             
-            if (hasCreditCardError) {
-                return; // Stop form submission if there are credit card errors
-            }
-        }
+            // Display success message
+            checkoutModal.classList.remove('active');
+            orderSuccessMessage.classList.add('active');
+            setTimeout(() => {
+                orderSuccessMessage.classList.remove('active');
+            }, 5000);
 
-        console.log('Attempting to place order...');
+            // Frontend-only: Clear cart and update UI AFTER simulated success message
+            cart = [];
+            saveCart();
+            updateCart();
+            updateCartCount();
 
-        // Get form data
-        const formData = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
-            apartment: document.getElementById('apartment').value,
-            payment: selectedPayment,
-            items: cart,
-            total: parseFloat(totalPrice.textContent.replace('EGP ', ''))
-        };
-
-        // Add credit card data if selected
-        if (selectedPayment === 'card') {
-            formData.cardDetails = {
-                cardNumber: document.getElementById('cardNumber').value,
-                cardName: document.getElementById('cardName').value,
-                expiryDate: document.getElementById('expiryDate').value,
-                cvv: document.getElementById('cvv').value
+            // Optional: You can log the orderData here if you want to see what WOULD have been sent
+            /*
+            const orderData = {
+                items: cart.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                totalPrice: parseFloat(totalPriceElement.textContent.replace('EGP ', '')),
+                shippingAddress: document.getElementById('address').value,
+                apartmentNumber: apartment,
+                phoneNumber: phone,
+                paymentMethod: document.querySelector('input[name="payment"]:checked').value, // Corrected to use :checked
+                // These would be included if sending to a backend, but are not needed for frontend simulation
+                // cardNumber: selectedPayment === 'card' ? (cardNumberInput ? cardNumberInput.value.replace(/\s/g, '') : undefined) : undefined,
+                // cardName: selectedPayment === 'card' ? (cardNameInput ? cardNameInput.value : undefined) : undefined,
+                // expiryDate: selectedPayment === 'card' ? (expiryDateInput ? expiryDateInput.value : undefined) : undefined,
+                // cvv: selectedPayment === 'card' ? (cvvInput ? cvvInput.value : undefined) : undefined,
             };
-        }
+            console.log('Simulated order data:', orderData);
+            */
+            // --- End Frontend-Only Order Simulation ---
 
-        // Here you would typically send this data to your server
-        console.log('Order details:', formData);
+        });
+    }
+}
 
-        // Show success message
-        console.log('Displaying success message...');
-        orderSuccessMessage.style.display = 'flex';
-        
-        // Clear cart and close modals
-        cart = [];
-        saveCart();
-        updateCart();
-        checkoutModal.classList.remove('active');
-        cartContainer.classList.remove('active');
-        
-        // Reset form and hide success message after a few seconds
-        checkoutForm.reset();
-        setTimeout(() => {
-            console.log('Hiding success message...');
-            orderSuccessMessage.style.display = 'none';
-        }, 3000);
+// --- Event Listeners for Category Navigation ---
+function setupCategoryListeners() {
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const category = this.getAttribute('data-category');
+            console.log(`Category button clicked: ${category}`); // Debug log
+
+            // Reset all states first
+            resetAllStates();
+
+            // Activate clicked category
+            this.classList.add('active');
+            this.closest('.category-item')?.classList.add('active');
+
+            // Special handling for 'kids' category to display all kids products
+            if (category === 'kids') {
+                // Show the kids section
+                const kidsSection = document.getElementById('kids-section');
+                if (kidsSection) {
+                    kidsSection.classList.add('active');
+                    kidsSection.style.display = 'block';
+                }
+
+                // Show all subcategory sections
+                const subcategorySections = [
+                    'boys-products',
+                    'girls-products',
+                    'feeding-section',
+                    'health-section'
+                ];
+
+                subcategorySections.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.classList.add('active');
+                        section.style.display = 'block';
+                    }
+                });
+
+                // Show all sub-subcategory sections
+                const subSubcategorySections = [
+                    'boys-fashion-section',
+                    'boys-toys-section',
+                    'girls-fashion-section',
+                    'girls-toys-section'
+                ];
+
+                subSubcategorySections.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.classList.add('active');
+                        section.style.display = 'block';
+                    }
+                });
+
+                // Fetch all kids products
+                await Promise.all([
+                    // Boys products
+                    fetchAndRenderProductsForGrid('#boys-fashion-grid', 'kids', 'boys', 'boys-fashion'),
+                    fetchAndRenderProductsForGrid('#boys-toys-grid', 'kids', 'boys', 'boys-toys'),
+                    // Girls products
+                    fetchAndRenderProductsForGrid('#girls-fashion-grid', 'kids', 'girls', 'girls-fashion'),
+                    fetchAndRenderProductsForGrid('#girls-toys-grid', 'kids', 'girls', 'girls-toys'),
+                    // Other categories
+                    fetchAndRenderProductsForGrid('#feeding-grid', 'kids', 'feeding'),
+                    fetchAndRenderProductsForGrid('#health-grid', 'kids', 'health')
+                ]);
+
+            } else if (category === 'adult') {
+                // For adult category, explicitly show the adult section and fetch products
+                const adultSection = document.getElementById('adult-products');
+                if (adultSection) {
+                    adultSection.classList.add('active');
+                    adultSection.style.display = 'block';
+                    console.log('Adult section display style:', window.getComputedStyle(adultSection).display);
+                }
+                await fetchAndRenderProductsForGrid('#adult-products-grid', 'adult');
+            }
+        });
     });
 }
 
-// Initialize cart when DOM is loaded
-document.addEventListener('DOMContentLoaded', initializeCart);
+// Handle subcategory button clicks
+function setupSubcategoryListeners() {
+    subcategoryButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            // Clear all active classes from buttons and items
+            document.querySelectorAll('.category-button, .subcategory-button, .sub-subcategory-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.category-item, .subcategory-item, .sub-subcategory-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.subcategory').forEach(sub => {
+                sub.classList.remove('active');
+            });
 
-// Listen for navigation updates
-window.addEventListener('navigationUpdated', initializeCart);
+            // Hide all subcategory and sub-subcategory sections
+            document.querySelectorAll('.subcategory-section, .sub-subcategory-section').forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            });
+
+            const subcategory = this.getAttribute('data-subcategory');
+            const parentCategoryButton = document.querySelector('.category-button[data-category="kids"]');
+            if (parentCategoryButton) {
+                parentCategoryButton.classList.add('active');
+                parentCategoryButton.closest('.category-item')?.classList.add('active');
+                document.getElementById('kids-section')?.classList.add('active');
+                document.getElementById('kids-section').style.display = 'block';
+            }
+
+            this.classList.add('active');
+            this.closest('.subcategory-item')?.classList.add('active');
+
+            // Show the specific subcategory products section
+            if (subcategory === 'girls') {
+                // Show girls products section
+                const girlsProductsSection = document.getElementById('girls-products');
+                if (girlsProductsSection) {
+                    girlsProductsSection.classList.add('active');
+                    girlsProductsSection.style.display = 'block';
+                }
+
+                // Hide both girls fashion and toys sections initially
+                const girlsFashionSection = document.getElementById('girls-fashion-section');
+                const girlsToysSection = document.getElementById('girls-toys-section');
+                if (girlsFashionSection) {
+                    girlsFashionSection.classList.remove('active');
+                    girlsFashionSection.style.display = 'none';
+                }
+                if (girlsToysSection) {
+                    girlsToysSection.classList.remove('active');
+                    girlsToysSection.style.display = 'none';
+                }
+
+                // Don't fetch any products here - they will be fetched when clicking sub-subcategory buttons
+            } else if (subcategory === 'boys') {
+                // Show boys products section
+                const boysProductsSection = document.getElementById('boys-products');
+                if (boysProductsSection) {
+                    boysProductsSection.classList.add('active');
+                    boysProductsSection.style.display = 'block';
+                }
+
+                // Hide both boys fashion and toys sections initially
+                const boysFashionSection = document.getElementById('boys-fashion-section');
+                const boysToysSection = document.getElementById('boys-toys-section');
+                if (boysFashionSection) {
+                    boysFashionSection.classList.remove('active');
+                    boysFashionSection.style.display = 'none';
+                }
+                if (boysToysSection) {
+                    boysToysSection.classList.remove('active');
+                    boysToysSection.style.display = 'none';
+                }
+
+                // Don't fetch any products here - they will be fetched when clicking sub-subcategory buttons
+            } else if (subcategory === 'feeding') {
+                await fetchAndRenderProductsForGrid('#feeding-grid', 'kids', 'feeding');
+            } else if (subcategory === 'health') {
+                await fetchAndRenderProductsForGrid('#health-grid', 'kids', 'health');
+            }
+        });
+    });
+}
+
+// Handle sub-subcategory button clicks
+function setupSubSubcategoryListeners() {
+    subSubcategoryButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            // Clear all active classes from buttons and items
+            document.querySelectorAll('.category-button, .subcategory-button, .sub-subcategory-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.category-item, .subcategory-item, .sub-subcategory-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.subcategory').forEach(sub => {
+                sub.classList.remove('active');
+            });
+
+            // Hide all sub-subcategory sections first
+            document.querySelectorAll('.sub-subcategory-section').forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            });
+
+            const subSubcategory = this.getAttribute('data-sub-subcategory');
+            const parentSubcategoryButton = this.closest('.subcategory-item')?.querySelector('.subcategory-button');
+            const parentCategoryButton = document.querySelector('.category-button[data-category="kids"]');
+
+            // Activate parent category and subcategory
+            if (parentCategoryButton) {
+                parentCategoryButton.classList.add('active');
+                parentCategoryButton.closest('.category-item')?.classList.add('active');
+                document.getElementById('kids-section')?.classList.add('active');
+                document.getElementById('kids-section').style.display = 'block';
+            }
+
+            if (parentSubcategoryButton) {
+                parentSubcategoryButton.classList.add('active');
+                parentSubcategoryButton.closest('.subcategory-item')?.classList.add('active');
+                
+                // Show the parent subcategory section
+                const parentSubcategory = parentSubcategoryButton.getAttribute('data-subcategory');
+                const parentSubcategorySection = document.getElementById(`${parentSubcategory}-products`);
+                if (parentSubcategorySection) {
+                    parentSubcategorySection.classList.add('active');
+                    parentSubcategorySection.style.display = 'block';
+                }
+            }
+
+            this.classList.add('active');
+            this.closest('.sub-subcategory-item')?.classList.add('active');
+
+            // Show only the specific sub-subcategory section
+            const activeSubSubcategorySection = document.getElementById(`${subSubcategory}-section`);
+            if (activeSubSubcategorySection) {
+                activeSubSubcategorySection.classList.add('active');
+                activeSubSubcategorySection.style.display = 'block';
+            }
+
+            // Extract subcategory from parent button's data-subcategory attribute
+            const subcategory = parentSubcategoryButton ? parentSubcategoryButton.getAttribute('data-subcategory') : null;
+
+            // Fetch and render products only for the clicked sub-subcategory
+            // Use the full sub-subcategory identifier (e.g., girls-fashion, boys-toys)
+            await fetchAndRenderProductsForGrid(`#${subSubcategory}-grid`, 'kids', subcategory, subSubcategory);
+        });
+    });
+}
+
+// Ensure initializeShopPage is called when the DOM is fully loaded or on navigation updates
+window.addEventListener('DOMContentLoaded', initializeShopPage);
+
+// Initial setup for translations (if i18n.js is loaded)
+if (window.initializeTranslations) {
+    window.initializeTranslations();
+} 

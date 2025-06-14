@@ -23,14 +23,17 @@ async function loadNavigation() {
             if (response.ok) {
                 userData = await response.json();
                 isLoggedIn = true;
-            } else {
-                // If token is invalid, remove it
+            } else if (response.status === 401 || response.status === 403) {
+                // If token is invalid or unauthorized, remove it
+                console.warn(`Token invalid or unauthorized (Status: ${response.status}). Removing token.`);
                 localStorage.removeItem('token');
+            } else {
+                // For other non-OK responses (e.g., network issues, server errors), log without removing token
+                console.error(`Error verifying token: Status ${response.status}. Token not removed.`);
             }
         } catch (error) {
-            console.error('Error verifying token:', error);
-            // If there's an error, remove the token
-            localStorage.removeItem('token');
+            console.error('Network error or unhandled exception during token verification:', error);
+            // Do NOT remove token for network errors, as it might be temporary
         }
     }
 
@@ -179,8 +182,8 @@ async function loadNavigation() {
                             <span class="cart-count">${cartCount}</span>
                         </div>
                     ` : ''}
-                    <a href="${pathPrefix}login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="login-btn" data-i18n="login">Login</a>
-                    <a href="${pathPrefix}login.html?redirect=${isShopPage ? 'shop.html' : 'homepage.html'}" class="signup-btn" data-i18n="signup">Sign Up</a>
+                    <a href="${pathPrefix}login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}" class="login-btn" data-i18n="login">Login</a>
+                    <a href="${pathPrefix}login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}" class="signup-btn" data-i18n="signup">Sign Up</a>
                 `}
                 <button class="lang-btn" onclick="window.setLanguage(localStorage.getItem('language') === 'en' ? 'ar' : 'en')">${currentLang === 'en' ? 'العربية' : 'English'}</button>
             </div>
@@ -205,7 +208,20 @@ async function loadNavigation() {
         });
     });
 
-    // Add event listener for profile dropdown
+    // Setup cart icon event listener
+    const cartIcon = document.querySelector('.cart-icon');
+    const cartContainer = document.querySelector('.cart-container');
+    if (cartIcon && cartContainer) {
+        console.log('Setting up cart icon click listener in navigation');
+        cartIcon.addEventListener('click', () => {
+            console.log('Cart icon clicked in navigation');
+            cartContainer.classList.add('active');
+            // Dispatch a custom event to notify that cart was opened
+            document.dispatchEvent(new CustomEvent('cartOpened'));
+        });
+    }
+
+    // Setup profile dropdown
     const profileBtn = document.querySelector('.profile-btn');
     if (profileBtn) {
         profileBtn.addEventListener('click', () => {
@@ -225,6 +241,14 @@ async function loadNavigation() {
         // Dispatch a custom event to notify shop.js that navigation has been updated
         window.dispatchEvent(new CustomEvent('navigationUpdated'));
     }
+
+    // Apply translations if available
+    if (window.applyTranslations) {
+        window.applyTranslations(currentLang);
+    }
+
+    // Dispatch event that navigation is loaded
+    document.dispatchEvent(new CustomEvent('navigationLoaded'));
 }
 
 async function loadFooter() {
@@ -292,4 +316,12 @@ window.handleLogout = async function(e) {
         // Still redirect even if server logout fails
         window.location.href = './homepage.html';
     }
-} 
+}
+
+// Listen for login state changes
+window.addEventListener('storage', function(e) {
+    if (e.key === 'token') {
+        console.log('Login state changed, reloading navigation');
+        loadNavigation();
+    }
+}); 

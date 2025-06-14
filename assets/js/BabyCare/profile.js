@@ -16,14 +16,17 @@ async function loadProfileContent() {
             if (response.ok) {
                 userData = await response.json();
                 isLoggedIn = true;
-            } else {
-                // If token is invalid, remove it
+            } else if (response.status === 401 || response.status === 403) {
+                // If token is invalid or unauthorized, remove it
+                console.warn(`Token invalid or unauthorized (Status: ${response.status}). Removing token.`);
                 localStorage.removeItem('token');
+            } else {
+                // For other non-OK responses (e.g., network issues, server errors), log without removing token
+                console.error(`Error verifying token: Status ${response.status}. Token not removed.`);
             }
         } catch (error) {
-            console.error('Error verifying token:', error);
-            // If there's an error, remove the token
-            localStorage.removeItem('token');
+            console.error('Network error or unhandled exception during token verification:', error);
+            // Do NOT remove token for network errors, as it might be temporary
         }
     }
 

@@ -628,7 +628,21 @@ const translations = {
         post_comment_success: "Comment posted successfully",
         post_comment_error: "Error posting comment",
         post_share_success: "Post shared successfully",
-        post_share_error: "Error sharing post"
+        post_share_error: "Error sharing post",
+
+        // DM Section
+        search_users: "Search users...",
+        loading_users: "Loading users...",
+        no_users_found: "No users found.",
+        error_searching_users: "Error searching users:",
+        network_error: "Network error. Please try again.",
+        select_user: "Select a user to start chatting",
+        no_messages: "No messages yet. Say hello!",
+        unauthorized_chat_history: "Unauthorized to view this chat history.",
+        error_loading_messages: "Error loading messages:",
+        
+        // Saved Posts Section
+        saved_posts: "Saved Posts"
     },
     ar: {
         // Navigation
@@ -1210,7 +1224,7 @@ const translations = {
         online: "متصل",
         last_seen: "آخر ظهور منذ {time}",
         search_users: "البحث عن المستخدمين...",
-        select_user: "اختر مستخدماً لبدء المحادثة",
+        select_user: "اختر مستخدمًا لبدء المحادثة",
         saved_posts: "المنشورات المحفوظة",
         expert_application: "طلب الخبراء",
         name: "الاسم",
@@ -1259,7 +1273,21 @@ const translations = {
         post_comment_success: "تم نشر التعليق بنجاح",
         post_comment_error: "خطأ في نشر التعليق",
         post_share_success: "تم مشاركة المنشور بنجاح",
-        post_share_error: "خطأ في مشاركة المنشور"
+        post_share_error: "خطأ في مشاركة المنشور",
+
+        // DM Section
+        search_users: "البحث عن مستخدمين...",
+        loading_users: "جارٍ تحميل المستخدمين...",
+        no_users_found: "لم يتم العثور على مستخدمين.",
+        error_searching_users: "خطأ في البحث عن المستخدمين:",
+        network_error: "خطأ في الشبكة. الرجاء المحاولة مرة أخرى.",
+        select_user: "اختر مستخدمًا لبدء الدردشة",
+        no_messages: "لا توجد رسائل حتى الآن. قل مرحبا!",
+        unauthorized_chat_history: "غير مصرح لك بمشاهدة سجل الدردشة هذا.",
+        error_loading_messages: "خطأ في تحميل الرسائل:",
+
+        // Saved Posts Section
+        saved_posts: "المنشورات المحفوظة"
     }
 };
 

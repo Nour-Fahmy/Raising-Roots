@@ -129,6 +129,20 @@
         <div class="nav-right">
             <button class="lang-btn" onclick="toggleLanguage()" data-i18n="language">English</button>
             <!-- Profile content will be loaded here by JavaScript -->
+            <div class="profile-dropdown">
+                <button class="profile-btn">
+                    <img src="../../images/default-avatar.png" 
+                         alt="Profile" 
+                         class="profile-img">
+                    <span>Profile</span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="../profile.html" data-i18n="view_profile">View Profile</a>
+                    <a href="../profile.html#baby-info" data-i18n="baby_profile">Baby's Profile</a>
+                    <a href="../shop.html" data-i18n="my_orders">My Orders</a>
+                    <a href="#" onclick="window.handleLogout(event)" data-i18n="logout">Logout</a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -207,5 +221,13 @@
 
     <script src="../../assets/js/BabyCare/profile.js"></script>
     <script src="sleep.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.applyTranslations) {
+                const currentLang = localStorage.getItem('language') || 'en';
+                window.applyTranslations(currentLang);
+            }
+        });
+    </script>
 </body>
 </html>

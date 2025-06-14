@@ -332,18 +332,33 @@ function getRedirectUrl() {
 
 // Function to handle successful login
 async function handleSuccessfulLogin(userData) {
-    // Store the token and user data in localStorage
-    localStorage.setItem('token', userData.token);
-    localStorage.setItem('user', JSON.stringify(userData.user));
-    
-    // If user is admin, redirect to admin dashboard
-    if (userData.user.role === 'admin') {
-        window.location.href = 'admin/index.html';
-        return;
+    try {
+        // Store the token and user data in localStorage
+        localStorage.setItem('token', userData.token);
+        localStorage.setItem('user', JSON.stringify(userData.user));
+        
+        // Preserve the cart data during login
+        const existingCart = localStorage.getItem('cart');
+        if (existingCart) {
+            // Keep the existing cart data
+            console.log('Preserving existing cart during login:', existingCart);
+        }
+        
+        // Get redirect URL
+        const redirectUrl = getRedirectUrl();
+        
+        // If user is admin, redirect to admin dashboard
+        if (userData.user.role === 'admin') {
+            window.location.href = 'admin/index.html';
+            return;
+        }
+        
+        // Redirect to the appropriate page for regular users
+        window.location.href = redirectUrl;
+    } catch (error) {
+        console.error('Error during login:', error);
+        showFormFeedback('login', 'An error occurred during login. Please try again.');
     }
-    
-    // For regular users, redirect to homepage
-    window.location.href = 'homepage.html';
 }
 
 // Login form submission
