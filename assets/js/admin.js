@@ -541,17 +541,32 @@ async function fetchApplications() {
             console.log('Raw app.cvFile from Backend:', app.cvFile);
             const filename = app.cvFile.split('/').pop();
             console.log('Extracted filename:', filename);
-
-            // Transform app object to match what createExpertCard expects (username instead of name)
-            const expertForCard = {
-                ...app,
-                username: app.name // Map 'name' to 'username'
-            };
-
-            // Use createExpertCard to generate the HTML for each expert
-            const cardElement = createExpertCard(expertForCard);
-            return cardElement.outerHTML; // Get the HTML string from the DOM element
-
+            return `
+            <div class="application-card" data-application-id="${app._id}">
+                <div class="application-header">
+                    <div class="expert-info">
+                        <div class="expert-details">
+                            <h3>${app.name}</h3>
+                            <p class="application-email">${app.email}</p>
+                            <p class="application-number">${app.number}</p>
+                        </div>
+                    </div>
+                    <div class="application-status ${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</div>
+                </div>
+                <div class="application-content">
+                    <div class="documents-section">
+                        <h4><i class="fas fa-file-alt"></i> Documents</h4>
+                        <div class="document-links">
+                            <a href="https://localhost:3000/uploads/cvs/${filename}" target="_blank" class="document-link"><i class="fas fa-file-pdf"></i> View CV</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="application-actions">
+                    <button class="btn approve-btn" onclick="handleApplicationAction(this, 'approved')" ${app.status !== 'pending' ? 'disabled' : ''}><i class="fas fa-check"></i> Approve</button>
+                    <button class="btn reject-btn" onclick="handleApplicationAction(this, 'rejected')" ${app.status !== 'pending' ? 'disabled' : ''}><i class="fas fa-times"></i> Reject</button>
+                </div>
+            </div>
+        `;
         }).join('');
 
     } catch (error) {
