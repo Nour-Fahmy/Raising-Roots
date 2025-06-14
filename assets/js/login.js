@@ -353,7 +353,7 @@ async function handleSuccessfulLogin(userData) {
             return;
         }
         
-        // Redirect to the appropriate page
+        // Redirect to the appropriate page for regular users
         window.location.href = redirectUrl;
     } catch (error) {
         console.error('Error during login:', error);

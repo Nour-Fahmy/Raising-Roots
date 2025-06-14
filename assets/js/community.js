@@ -47,14 +47,17 @@ async function loadProfileContent() {
       if (response.ok) {
         userData = await response.json();
         isLoggedIn = true;
-      } else {
-        // If token is invalid, remove it
+      } else if (response.status === 401 || response.status === 403) {
+        // If token is invalid or unauthorized, remove it
+        console.warn(`Token invalid or unauthorized (Status: ${response.status}). Removing token.`);
         localStorage.removeItem('token');
+      } else {
+        // For other non-OK responses (e.g., network issues, server errors), log without removing token
+        console.error(`Error verifying token: Status ${response.status}. Token not removed.`);
       }
     } catch (error) {
-      console.error('Error verifying token:', error);
-      // If there's an error, remove the token
-      localStorage.removeItem('token');
+      console.error('Network error or unhandled exception during token verification:', error);
+      // Do NOT remove token for network errors, as it might be temporary
     }
   }
 
@@ -93,9 +96,8 @@ async function loadProfileContent() {
     }
   } else {
     profileContainer.innerHTML = `
-      <div class="auth-buttons">
-        <a href="login.html?redirect=community.html" class="login-btn">Login</a>
-        <a href="login.html?redirect=community.html" class="signup-btn">Sign Up</a>
+      <div class="auth-message">
+        <p>Please use the navigation bar to log in or sign up</p>
       </div>
     `;
   }
@@ -569,21 +571,21 @@ function createPostElement(post) {
 async function likePost(button) {
   try {
     const postId = button.closest('.post-card').dataset.postId;
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
-    
-    if (!token) {
+  
+  if (!token) {
       showNotification('Please login to like posts', 'error');
-      return;
-    }
-    
+    return;
+  }
+
     const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}/like`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to like post');
     }
@@ -771,11 +773,80 @@ if (searchInput) {
 }
 
 // DM Functions
-let currentUser = null;
-const dmMessages = {};
+let currentUser = null; // Stores the currently selected user's info
+let authenticatedUserId = null; // Stores the ID of the logged-in user
 
-function selectUser(userElement, username) {
-  // Remove active class from all users
+// Initialize authenticatedUserId on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+      authenticatedUserId = payload.userId;
+    } catch (e) {
+      console.error('Error decoding token:', e);
+      localStorage.removeItem('token'); // Invalid token, remove it
+    }
+  }
+});
+
+async function searchUsers(query) {
+    const userList = document.querySelector('.users');
+    if (!userList) return;
+
+    if (!query.trim()) {
+        userList.innerHTML = '<div class="no-results">Start typing to search users</div>';
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showNotification('Please log in to search users', 'error');
+            return;
+        }
+
+        const response = await fetch(`https://localhost:3000/api/v1/users/search?query=${encodeURIComponent(query)}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const users = await response.json();
+            userList.innerHTML = '';
+            
+            if (users.length === 0) {
+                userList.innerHTML = '<div class="no-results">No users found</div>';
+                return;
+            }
+
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'user-item';
+                userElement.innerHTML = `
+                    <img src="${user.profilePicture || '../images/default-avatar.png'}" alt="${user.username}" class="user-avatar">
+                    <div class="user-info">
+                        <h4>${user.username}</h4>
+                        <p class="status">${user.status || 'Available'}</p>
+                    </div>
+                `;
+                userElement.onclick = () => selectUser(userElement, user.username, user._id);
+                userList.appendChild(userElement);
+            });
+        } else {
+            showNotification('Error searching users', 'error');
+            userList.innerHTML = '<div class="no-results">Error searching users</div>';
+        }
+    } catch (error) {
+        console.error('Error searching users:', error);
+        showNotification('Error searching users', 'error');
+        userList.innerHTML = '<div class="no-results">Error searching users</div>';
+    }
+}
+
+async function selectUser(userElement, username, userId) {
+    // Remove active class from all user items
   document.querySelectorAll('.user-item').forEach(item => {
     item.classList.remove('active');
   });
@@ -783,115 +854,138 @@ function selectUser(userElement, username) {
   // Add active class to selected user
   userElement.classList.add('active');
   
-  // Show chat messages
+    // Store the receiver ID in the dm-section dataset
+    const dmSection = document.getElementById('dm-section');
+    dmSection.dataset.receiverId = userId;
+
+    // Show chat interface
   document.querySelector('.chat-placeholder').classList.add('hidden');
   document.querySelector('.chat-messages').classList.remove('hidden');
   
-  // Load messages for this user
-  loadDMMessages(username);
+    // Load chat history
+    const token = localStorage.getItem('token');
+    if (!token) {
+        showNotification('Please log in to view messages', 'error');
+        return;
+    }
+
+    const currentUserId = JSON.parse(atob(token.split('.')[1])).userId;
+    await loadDMMessages(currentUserId, userId);
 }
 
-function searchUsers(query) {
-  const users = document.querySelectorAll('.user-item');
-  query = query.toLowerCase();
-  
-  users.forEach(user => {
-    const username = user.querySelector('h4').textContent.toLowerCase();
-    user.style.display = username.includes(query) ? 'flex' : 'none';
-  });
+async function loadDMMessages(user1Id, user2Id) {
+    const messagesContainer = document.getElementById('dm-messages');
+    messagesContainer.innerHTML = '<div class="loading">Loading messages...</div>';
+
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showNotification('Please log in to view messages', 'error');
+            return;
+        }
+
+        const response = await fetch(`https://localhost:3000/api/v1/messages/${user1Id}/${user2Id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            const messages = result.data;
+            messagesContainer.innerHTML = '';
+            
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = '<div class="no-messages">No messages yet. Start the conversation!</div>';
+                return;
+            }
+
+            const currentUserId = JSON.parse(atob(token.split('.')[1])).userId;
+            messages.forEach(message => {
+                messagesContainer.appendChild(createMessageElement(message, currentUserId));
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } else {
+            const errorData = await response.json();
+            console.error('Error loading messages (server response):', response.status, errorData);
+            showNotification(`Error loading messages: ${errorData.message || 'Unknown error'}`, 'error');
+            messagesContainer.innerHTML = `<div class="no-messages">Error loading messages: ${errorData.message || 'Please try again.'}</div>`;
+        }
+    } catch (error) {
+        console.error('Network error or unhandled exception during message load:', error);
+        showNotification('Network error loading messages. Please check your connection and try again.', 'error');
+        messagesContainer.innerHTML = '<div class="no-messages">Network error. Please try again.</div>';
+    }
 }
 
-function loadDMMessages(username) {
-  const container = document.getElementById('dm-messages');
-  container.innerHTML = ''; // Clear existing messages
-  
-  // Load messages from localStorage
-  const key = `dm-${username}`;
-  const stored = JSON.parse(localStorage.getItem(key)) || [];
-  
-  // Render messages
-  stored.forEach(msgHTML => {
-    const messageDiv = document.createElement("div");
-    messageDiv.classList.add("message");
-    messageDiv.innerHTML = msgHTML;
-    container.appendChild(messageDiv);
-  });
-  
-  // Scroll to bottom
-  container.scrollTop = container.scrollHeight;
-}
-
-function sendDMMessage() {
+async function sendDMMessage() {
   const input = document.getElementById('dm-input');
-  const text = input.value.trim();
-  if (text === '') return;
-  
-  const activeUser = document.querySelector('.user-item.active');
-  if (!activeUser) return;
-  
-  const username = activeUser.querySelector('h4').textContent;
-  const container = document.getElementById('dm-messages');
-  
-  // Create and append message
-  const messageDiv = createMessageElement({
-    content: text,
-    sender: 'You',
-    time: new Date().toLocaleTimeString()
-  });
-  container.appendChild(messageDiv);
-  
-  // Save message
-  const key = `dm-${username}`;
-  let stored = JSON.parse(localStorage.getItem(key)) || [];
-  stored.push(messageDiv.innerHTML);
-  localStorage.setItem(key, JSON.stringify(stored));
-  
-  // Clear input and scroll to bottom
+    const content = input.value.trim();
+    const receiverId = document.getElementById('dm-section').dataset.receiverId;
+
+    if (!content || !receiverId) return;
+
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showNotification('Please log in to send messages', 'error');
+            return;
+        }
+
+        const response = await fetch('https://localhost:3000/api/v1/messages/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                receiverId,
+                content
+            })
+        });
+
+        if (response.ok) {
   input.value = '';
-  container.scrollTop = container.scrollHeight;
-  
-  // Simulate reply after a delay
-  setTimeout(() => {
-    const reply = getRandomReply();
-    const replyDiv = createMessageElement({
-      content: reply,
-      sender: username,
-      time: new Date().toLocaleTimeString()
-    });
-    container.appendChild(replyDiv);
-    
-    // Save reply
-    stored.push(replyDiv.innerHTML);
-    localStorage.setItem(key, JSON.stringify(stored));
-    
-    container.scrollTop = container.scrollHeight;
-  }, 1000);
+            const result = await response.json();
+            const message = result.data;
+            const messagesContainer = document.getElementById('dm-messages');
+            const currentUserId = JSON.parse(atob(token.split('.')[1])).userId;
+            messagesContainer.appendChild(createMessageElement(message, currentUserId));
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } else {
+            const errorData = await response.json();
+            console.error('Error sending message (server response):', response.status, errorData);
+            showNotification(`Error sending message: ${errorData.message || 'Unknown error'}`, 'error');
+        }
+    } catch (error) {
+        console.error('Network error or unhandled exception during message send:', error);
+        showNotification('Network error sending message. Please check your connection and try again.', 'error');
+    }
 }
 
-function createMessageElement(message) {
+function createMessageElement(message, currentUserId) {
   const div = document.createElement('div');
   div.classList.add('message');
-  if (message.sender === 'You') div.classList.add('sent');
+
+  // Determine if the message was sent by the current user
+  const isSentByMe = message.sender._id === currentUserId; // Access _id from populated sender
+  if (isSentByMe) {
+    div.classList.add('sent');
+  } else {
+    div.classList.add('received');
+  }
+  
+  const senderUsername = message.sender.username; // Access username from populated sender
+  const messageTime = new Date(message.timestamp).toLocaleTimeString();
   
   div.innerHTML = `
     <div class="message-content">
-      <strong>${message.sender}:</strong> ${message.content}
-      <div class="message-time">${message.time}</div>
+      <strong>${senderUsername}:</strong> ${message.content}
+      <div class="message-time">${messageTime}</div>
     </div>
   `;
   
   return div;
-}
-
-function getRandomReply() {
-  const replies = [
-    "That's great to hear!",
-    "I understand how you feel.",
-    "Let me think about that...",
-    "Thanks for sharing!",
-    "I'm here to help!"
-  ];
-  return replies[Math.floor(Math.random() * replies.length)];
 }
 
 // Add event listener for DM input
@@ -904,12 +998,12 @@ document.getElementById('dm-input')?.addEventListener('keypress', function(e) {
 // Save/Unsave Post Functionality
 async function toggleSavePost(button) {
   try {
-    const postCard = button.closest('.post-card');
+  const postCard = button.closest('.post-card');
     if (!postCard) {
       throw new Error('Post card not found');
     }
 
-    const postId = postCard.dataset.postId;
+  const postId = postCard.dataset.postId;
     if (!postId) {
       throw new Error('Post ID not found');
     }
@@ -969,20 +1063,20 @@ async function showSavedPosts() {
       return;
     }
 
-    // Hide all sections
+  // Hide all sections
     document.querySelectorAll('section').forEach(section => {
       section.classList.add('hidden');
     });
-
-    // Show saved posts section
+  
+  // Show saved posts section
     const savedPostsSection = document.getElementById('saved-posts-section');
     savedPostsSection.classList.remove('hidden');
-
-    // Update active state in sidebar
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.remove('active');
-    });
-    document.querySelector('.nav-item[onclick="showSavedPosts()"]').classList.add('active');
+  
+  // Update active state in sidebar
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector('.nav-item[onclick="showSavedPosts()"]').classList.add('active');
 
     // Fetch saved posts from server
     const response = await fetch('https://localhost:3000/api/v1/posts/saved', {
@@ -999,8 +1093,8 @@ async function showSavedPosts() {
     const savedPosts = result.data;
 
     // Clear existing posts
-    const container = document.getElementById('saved-posts-container');
-    container.innerHTML = '';
+  const container = document.getElementById('saved-posts-container');
+  container.innerHTML = '';
 
     if (savedPosts.length === 0) {
       container.innerHTML = '<p class="no-posts">No saved posts yet</p>';
@@ -1029,6 +1123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
 // Show Expert Application Section
 function showExpertApplicationSection() {
   // Hide all sections
