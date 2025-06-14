@@ -48,6 +48,9 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Get all orders
+router.get('/', orderController.getAllOrders);
+
 // Route to get the total count of orders
 router.get('/count', orderController.getOrderCount);
 

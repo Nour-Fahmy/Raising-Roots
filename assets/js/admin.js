@@ -215,23 +215,31 @@ async function updateStatistics() {
 
         // Fetch Orders Count
         const ordersResponse = await fetch('https://localhost:3000/api/v1/orders/count', { headers });
+        console.log('Orders API response status:', ordersResponse.status);
         const ordersData = await ordersResponse.json();
+        console.log('Orders API response data:', ordersData);
         const ordersCount = ordersData.success ? ordersData.count : 0;
 
         // Fetch Users Count
         const usersResponse = await fetch('https://localhost:3000/api/v1/users/count', { headers });
+        console.log('Users API response status:', usersResponse.status);
         const usersData = await usersResponse.json();
+        console.log('Users API response data:', usersData);
         const usersCount = usersData.success ? usersData.count : 0;
 
         // Fetch Approved Experts Count
         const expertsResponse = await fetch('https://localhost:3000/api/v1/experts?status=approved', { headers });
+        console.log('Experts API response status:', expertsResponse.status);
         const expertsData = await expertsResponse.json();
+        console.log('Experts API response data:', expertsData);
         const expertsCount = Array.isArray(expertsData) ? expertsData.length : 0;
 
         // Fetch Posts Count
         const postsResponse = await fetch('https://localhost:3000/api/v1/posts/count', { headers });
+        console.log('Posts API response status:', postsResponse.status);
         const postsData = await postsResponse.json();
-        const postsCount = postsData.success && postsData.totalPosts !== undefined ? postsData.totalPosts : 0; // Assuming getPostStats returns totalPosts
+        console.log('Posts API response data:', postsData);
+        const postsCount = postsData.success && postsData.totalPosts !== undefined ? postsData.totalPosts : 0;
 
         const stats = {
             orders: ordersCount,

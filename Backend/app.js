@@ -82,6 +82,6 @@ const messageRoutes = require('./routes/messages');
 app.use('/api/v1/messages', messageRoutes);
 
 const orderRoutes = require('./routes/orders');
-app.use(`${process.env.API_URL}/orders`, orderRoutes);
+app.use(`${API_URL}/orders`, orderRoutes);
 
 module.exports = app;

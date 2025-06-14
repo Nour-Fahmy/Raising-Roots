@@ -73,26 +73,27 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Function to hide all content sections and deactivate all sidebar items
-function resetAllStates() {
-    document.querySelectorAll('.category-section, .subcategory-section, .sub-subcategory-section').forEach(section => {
-        section.classList.remove('active');
+    // Function to hide all content sections and deactivate all sidebar items
+    function resetAllStates() {
+        document.querySelectorAll('.category-section, .subcategory-section, .sub-subcategory-section').forEach(section => {
+            section.classList.remove('active');
         section.style.display = 'none'; // Explicitly hide sections
-    });
-    document.querySelectorAll('.category-button, .subcategory-button, .sub-subcategory-button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelectorAll('.category-item, .subcategory-item, .sub-subcategory-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    document.querySelectorAll('.subcategory').forEach(sub => {
-        sub.classList.remove('active');
-    });
-}
+        });
+        document.querySelectorAll('.category-button, .subcategory-button, .sub-subcategory-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelectorAll('.category-item, .subcategory-item, .sub-subcategory-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelectorAll('.subcategory').forEach(sub => {
+            sub.classList.remove('active');
+        });
+    }
 
 // --- Product Card Rendering ---
 function renderShopProductCard(product) {
-    const pid = product.productId || product._id;
+    const pid = product._id; // Ensure we always use MongoDB's _id
+    console.log('Rendering product card with pid:', pid, 'for product:', product); // DIAGNOSTIC
     // Get stock from localStorage; if not present, use product.stock from DB
     let stock = localStorage.getItem(`stock_${pid}`);
     if (stock === null) {
@@ -116,8 +117,8 @@ function renderShopProductCard(product) {
                     ${stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
                 </button>
             </div>
-        </div>
-    `;
+            </div>
+        `;
 }
 
 // --- Cart Logic ---
@@ -133,8 +134,8 @@ function updateCartCount() {
     const cartCountElements = document.querySelectorAll('.cart-count');
     if (!cartCountElements.length) {
         console.warn('No cart count elements found');
-        return;
-    }
+            return;
+        }
 
     // Calculate total items in cart
     const totalItems = cart.reduce((total, item) => total + (item.quantity || 0), 0);
@@ -172,8 +173,8 @@ function updateCart() {
         // Add validation for cart item structure
         if (!item.id || !item.title || !item.price || !item.image) {
             console.error('Invalid cart item detected:', item);
-            return;
-        }
+                return;
+            }
 
         const itemTotal = item.price * (item.quantity || 0);
         total += itemTotal;
@@ -280,6 +281,31 @@ function updateCart() {
 
     totalPriceElement.textContent = `EGP ${total.toFixed(2)}`;
     updateCartCount(); // Update count after cart update
+    updateDeliveryTimeDisplay(); // Update delivery time after cart update
+}
+
+function updateDeliveryTimeDisplay() {
+    const deliveryDateElement = document.querySelector('.delivery-date');
+    if (!deliveryDateElement) {
+        console.warn('Delivery date element not found');
+        return;
+    }
+
+    const today = new Date();
+    const deliveryMinDays = 3;
+    const deliveryMaxDays = 5;
+
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + deliveryMinDays);
+
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + deliveryMaxDays);
+
+    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+    const minDateFormatted = minDate.toLocaleDateString(undefined, options);
+    const maxDateFormatted = maxDate.toLocaleDateString(undefined, options);
+
+    deliveryDateElement.textContent = `${minDateFormatted} - ${maxDateFormatted}`;
 }
 
 // --- Event Delegation for Product Grids ---
@@ -316,19 +342,19 @@ function setupGridDelegation() {
                     }
 
                     // Check if product is already in cart
-                    const existingItem = cart.find(item => item.id === productId);
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        cart.push({
-                            id: productId,
+        const existingItem = cart.find(item => item.id === productId);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                id: productId,
                             title: productTitle,
                             price: productPrice,
                             image: productImage,
-                            quantity: 1
-                        });
-                    }
-
+                quantity: 1
+            });
+        }
+        
                     // Update stock
                     currentStock--;
                     stockInfo.textContent = `In Stock: ${currentStock}`;
@@ -385,7 +411,7 @@ async function fetchAndRenderProductsForGrid(gridId, category, subcategory = nul
             console.error(`Target grid not found: ${gridId}`);
             return;
         }
-
+        
         // Ensure the parent section is visible
         const parentSection = targetGrid.closest('.category-section, .subcategory-section, .sub-subcategory-section');
         if (parentSection) {
@@ -398,7 +424,7 @@ async function fetchAndRenderProductsForGrid(gridId, category, subcategory = nul
             console.log(`Rendered ${products.length} products in ${gridId}`);
             // Setup event delegation after rendering products
             setupGridDelegation();
-        } else {
+            } else {
             targetGrid.innerHTML = '<p class="no-products" data-i18n="no_products">No products available.</p>';
         }
 
@@ -422,12 +448,14 @@ async function fetchAndRenderAllShopProducts() {
     await fetchAndRenderProductsForGrid('#adult-products-grid', 'adult');
     
     // Fetch kids products with proper sub-subcategory identifiers
-    await fetchAndRenderProductsForGrid('#girls-fashion-grid', 'kids', 'girls', 'girls-fashion');
-    await fetchAndRenderProductsForGrid('#boys-fashion-grid', 'kids', 'boys', 'boys-fashion');
-    await fetchAndRenderProductsForGrid('#boys-toys-grid', 'kids', 'boys', 'boys-toys');
-    await fetchAndRenderProductsForGrid('#girls-toys-grid', 'kids', 'girls', 'girls-toys');
-    await fetchAndRenderProductsForGrid('#feeding-grid', 'kids', 'feeding');
-    await fetchAndRenderProductsForGrid('#health-grid', 'kids', 'health');
+    await Promise.all([
+        fetchAndRenderProductsForGrid('#girls-fashion-grid', 'kids', 'girls', 'girls-fashion'),
+        fetchAndRenderProductsForGrid('#boys-fashion-grid', 'kids', 'boys', 'boys-fashion'),
+        fetchAndRenderProductsForGrid('#boys-toys-grid', 'kids', 'boys', 'boys-toys'),
+        fetchAndRenderProductsForGrid('#girls-toys-grid', 'kids', 'girls', 'girls-toys'),
+        fetchAndRenderProductsForGrid('#feeding-grid', 'kids', 'feeding'),
+        fetchAndRenderProductsForGrid('#health-grid', 'kids', 'health')
+    ]);
 }
 
 // --- Main Shop Initialization ---
@@ -489,7 +517,7 @@ async function initializeShopPage() {
 
         // Add click outside listener
         document.addEventListener('click', handleClickOutside);
-    } else {
+            } else {
         console.error('Cart icon or container not found:', { cartIcon: !!cartIcon, cartContainer: !!cartContainer });
     }
 
@@ -629,23 +657,23 @@ async function initializeShopPage() {
 
     // Checkout form submission
     if (checkoutBtn && checkoutModal && closeCheckout && checkoutForm && orderSuccessMessage && phoneInput && phoneError) {
-        checkoutBtn.addEventListener('click', () => {
+    checkoutBtn.addEventListener('click', () => {
             // Check if cart is empty
             cart = JSON.parse(localStorage.getItem('cart')) || []; // Ensure cart is fresh
-            if (cart.length === 0) {
+        if (cart.length === 0) {
                 alert(getTranslation('cart_empty'));
-                return;
-            }
-            
-            // Check if user is logged in
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
-            }
-            
+            return;
+        }
+        
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
             // If cart is not empty and user is logged in, open the checkout modal
-            checkoutModal.classList.add('active');
+        checkoutModal.classList.add('active');
             // Reset payment method to cash and hide credit card fields when opening modal
             document.querySelector('input[name="payment"][value="cash"]').checked = true;
             // Ensure credit card fields are hidden when opening the modal
@@ -657,44 +685,60 @@ async function initializeShopPage() {
                 document.getElementById('expiryDate').required = false;
                 document.getElementById('cvv').required = false;
             }
-        });
+    });
 
-        closeCheckout.addEventListener('click', () => {
+    closeCheckout.addEventListener('click', () => {
+        checkoutModal.classList.remove('active');
+    });
+
+    checkoutModal.addEventListener('click', (e) => {
+        if (e.target === checkoutModal) {
             checkoutModal.classList.remove('active');
-        });
+        }
+    });
 
-        checkoutModal.addEventListener('click', (e) => {
-            if (e.target === checkoutModal) {
-                checkoutModal.classList.remove('active');
+    const paymentOptions = document.querySelectorAll('input[name="payment"]');
+    const creditCardFields = document.querySelector('.credit-card-fields');
+    const apartmentError = document.getElementById('apartmentError');
+
+    paymentOptions.forEach(option => {
+        option.addEventListener('change', (e) => {
+            if (e.target.value === 'card') {
+                creditCardFields.style.display = 'block';
+                document.getElementById('cardNumber').required = true;
+                document.getElementById('cardName').required = true;
+                document.getElementById('expiryDate').required = true;
+                document.getElementById('cvv').required = true;
+            } else {
+                creditCardFields.style.display = 'none';
+                document.getElementById('cardNumber').required = false;
+                document.getElementById('cardName').required = false;
+                document.getElementById('expiryDate').required = false;
+                document.getElementById('cvv').required = false;
             }
         });
+    });
 
-        const paymentOptions = document.querySelectorAll('input[name="payment"]');
-        const creditCardFields = document.querySelector('.credit-card-fields');
-        const apartmentError = document.getElementById('apartmentError');
+        checkoutForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            console.log('Checkout form submitted. Current cart state at start:', cart); // DIAGNOSTIC 1
 
-        paymentOptions.forEach(option => {
-            option.addEventListener('change', (e) => {
-                if (e.target.value === 'card') {
-                    creditCardFields.style.display = 'block';
-                    document.getElementById('cardNumber').required = true;
-                    document.getElementById('cardName').required = true;
-                    document.getElementById('expiryDate').required = true;
-                    document.getElementById('cvv').required = true;
-                } else {
-                    creditCardFields.style.display = 'none';
-                    document.getElementById('cardNumber').required = false;
-                    document.getElementById('cardName').required = false;
-                    document.getElementById('expiryDate').required = false;
-                    document.getElementById('cvv').required = false;
+            // Get user info and form data
+            const userString = localStorage.getItem('user');
+            let userId = null;
+            if (userString) {
+                try {
+                    const userObject = JSON.parse(userString);
+                    userId = userObject.id;
+                } catch (e) {
+                    console.error('Error parsing user data from localStorage:', e);
                 }
-            });
-        });
+            }
+            const token = localStorage.getItem('token');
+            console.log('User info (after parsing):', { userId, token });
+            console.log('Cart state before userId/token check:', cart); // DIAGNOSTIC 2
 
-        checkoutForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            console.log('Checkout form submitted.'); // Debug log
-
+            // Clear previous error messages
             phoneError.textContent = '';
             phoneError.style.display = 'none';
             document.getElementById('cardNumberError').textContent = '';
@@ -708,23 +752,33 @@ async function initializeShopPage() {
             apartmentError.textContent = '';
             apartmentError.style.display = 'none';
 
+            // Validate form fields
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
             const phone = phoneInput.value;
+            const address = document.getElementById('address').value.trim();
+            const apartment = apartmentInput ? apartmentInput.value : '';
+            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+
+            console.log('Form data:', { firstName, lastName, phone, address, apartment, selectedPayment });
+
+            // Validate phone number
             if (phone.length !== 11) {
                 phoneError.textContent = getTranslation('invalid_phone');
                 phoneError.style.display = 'block';
-                console.error('Phone number validation failed.'); // Debug log
+                console.error('Phone number validation failed.');
                 return;
             }
 
-            const apartment = apartmentInput ? apartmentInput.value : '';
+            // Validate apartment number
             if (apartment && (!/^[0-9]+$/.test(apartment) || parseInt(apartment) < 1 || parseInt(apartment) > 999)) {
                 apartmentError.textContent = getTranslation('invalid_apartment');
                 apartmentError.style.display = 'block';
-                console.error('Apartment number validation failed.'); // Debug log
+                console.error('Apartment number validation failed.');
                 return;
             }
 
-            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            // Validate credit card fields if card payment is selected
             if (selectedPayment === 'card') {
                 const cardNumberInput = document.getElementById('cardNumber');
                 const cardNameInput = document.getElementById('cardName');
@@ -732,21 +786,21 @@ async function initializeShopPage() {
                 const cvvInput = document.getElementById('cvv');
 
                 if (!cardNumberInput?.value || cardNumberInput.value.replace(/\s/g, '').length !== 16) {
-                    document.getElementById('cardNumberError').textContent = 'Please enter a valid 16-digit card number.';
+                    document.getElementById('cardNumberError').textContent = getTranslation('invalid_card_number') || 'Please enter a valid 16-digit card number.';
                     document.getElementById('cardNumberError').style.display = 'block';
-                    console.error('Card number validation failed.'); // Debug log
+                    console.error('Card number validation failed.');
                     return;
                 }
                 if (!cardNameInput?.value.trim()) {
-                    document.getElementById('cardNameError').textContent = 'Card name cannot be empty.';
+                    document.getElementById('cardNameError').textContent = getTranslation('invalid_card_name') || 'Card name cannot be empty.';
                     document.getElementById('cardNameError').style.display = 'block';
-                    console.error('Card name validation failed.'); // Debug log
+                    console.error('Card name validation failed.');
                     return;
                 }
                 if (!expiryDateInput?.value || !/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(expiryDateInput.value)) {
-                    document.getElementById('expiryDateError').textContent = 'Please enter a valid expiry date (MM/YY).';
+                    document.getElementById('expiryDateError').textContent = getTranslation('invalid_expiry_date') || 'Please enter a valid expiry date (MM/YY).';
                     document.getElementById('expiryDateError').style.display = 'block';
-                    console.error('Expiry date format validation failed.'); // Debug log
+                    console.error('Expiry date format validation failed.');
                     return;
                 }
                 const [month, year] = expiryDateInput.value.split('/').map(Number);
@@ -754,59 +808,107 @@ async function initializeShopPage() {
                 const currentMonth = new Date().getMonth() + 1;
 
                 if (year < currentYear || (year === currentYear && month < currentMonth)) {
-                    document.getElementById('expiryDateError').textContent = 'Expiry date cannot be in the past.';
+                    document.getElementById('expiryDateError').textContent = getTranslation('expiry_date_past') || 'Expiry date cannot be in the past.';
                     document.getElementById('expiryDateError').style.display = 'block';
-                    console.error('Expiry date in past validation failed.'); // Debug log
+                    console.error('Expiry date in past validation failed.');
                     return;
                 }
 
                 if (!cvvInput?.value || !/^[0-9]{3,4}$/.test(cvvInput.value)) {
-                    document.getElementById('cvvError').textContent = 'Please enter a valid 3 or 4-digit CVV.';
+                    document.getElementById('cvvError').textContent = getTranslation('invalid_cvv') || 'Please enter a valid 3 or 4-digit CVV.';
                     document.getElementById('cvvError').style.display = 'block';
-                    console.error('CVV validation failed.'); // Debug log
+                    console.error('CVV validation failed.');
                     return;
                 }
             }
 
-            // --- Start Frontend-Only Order Simulation ---
-            console.log('Simulating successful order placement (frontend-only).');
-            
-            // Display success message
-            checkoutModal.classList.remove('active');
-            orderSuccessMessage.classList.add('active');
-            setTimeout(() => {
-                orderSuccessMessage.classList.remove('active');
-            }, 5000);
+            // Ensure cart is not empty
+            if (!cart || cart.length === 0) {
+                alert(getTranslation('cart_empty'));
+                console.error('Cart is empty, cannot proceed with order.');
+                return;
+            }
 
-            // Frontend-only: Clear cart and update UI AFTER simulated success message
-            cart = [];
-            saveCart();
-            updateCart();
-            updateCartCount();
+            // --- ACTUAL ORDER SUBMISSION TO BACKEND AND UI UPDATE ---
+            try {
+                // IMPORTANT: Check for userId/token before attempting database save
+                if (!userId || !token) {
+                    console.log('Cart state inside userId/token check (should not be here if logged in):', cart); // DIAGNOSTIC (if hit)
+                    console.warn('No user ID or token found in localStorage. Skipping database order save.');
+                    // Still show frontend success as we agreed, even if no user for DB save.
+                    checkoutModal.classList.remove('active');
+                    orderSuccessMessage.classList.add('active');
+                    setTimeout(() => {
+                        orderSuccessMessage.classList.remove('active');
+                    }, 5000);
 
-            // Optional: You can log the orderData here if you want to see what WOULD have been sent
-            /*
-            const orderData = {
-                items: cart.map(item => ({
-                    productId: item.id,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
-                totalPrice: parseFloat(totalPriceElement.textContent.replace('EGP ', '')),
-                shippingAddress: document.getElementById('address').value,
-                apartmentNumber: apartment,
-                phoneNumber: phone,
-                paymentMethod: document.querySelector('input[name="payment"]:checked').value, // Corrected to use :checked
-                // These would be included if sending to a backend, but are not needed for frontend simulation
-                // cardNumber: selectedPayment === 'card' ? (cardNumberInput ? cardNumberInput.value.replace(/\s/g, '') : undefined) : undefined,
-                // cardName: selectedPayment === 'card' ? (cardNameInput ? cardNameInput.value : undefined) : undefined,
-                // expiryDate: selectedPayment === 'card' ? (expiryDateInput ? expiryDateInput.value : undefined) : undefined,
-                // cvv: selectedPayment === 'card' ? (cvvInput ? cvvInput.value : undefined) : undefined,
-            };
-            console.log('Simulated order data:', orderData);
-            */
-            // --- End Frontend-Only Order Simulation ---
+                    cart = [];
+                    saveCart();
+                    updateCart();
+                    updateCartCount();
+                    return; // Skip backend save if user is not logged in
+                }
+                console.log('Cart state after userId/token check (should be full if logged in):', cart); // DIAGNOSTIC 3
 
+                // Prepare order data according to our backend schema (order.js)
+                // THIS MUST BE DONE BEFORE CLEARING CART
+                console.log('Cart state immediately before orderData construction:', cart); // DIAGNOSTIC 4
+                const orderData = {
+                    user: userId,
+                    products: cart.map(item => ({
+                        product: item.id, // Assuming item.id is the product _id from MongoDB
+                        quantity: item.quantity
+                    })),
+                    shippingAddress: {
+                        firstName,
+                        lastName,
+                        phone,
+                        address,
+                        apartment: parseInt(apartment)
+                    },
+                    paymentMethod: selectedPayment
+                };
+
+                console.log('Attempting to send order data to backend:', orderData);
+                
+                // Send order to backend
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // Include token for authentication
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                console.log('Backend response status for order save:', response.status);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Backend error saving order:', errorData);
+                    alert(getTranslation('error_creating_order') || 'Error creating order. Please try again.');
+                    return; // Stop if backend save failed
+                }
+
+                const orderResult = await response.json();
+                console.log('Order successfully saved to database:', orderResult);
+
+                // Display success message and clear cart ONLY AFTER successful backend save
+                checkoutModal.classList.remove('active');
+                orderSuccessMessage.classList.add('active');
+                setTimeout(() => {
+                    orderSuccessMessage.classList.remove('active');
+                }, 5000);
+
+                cart = [];
+                saveCart();
+                updateCart();
+                updateCartCount();
+
+            } catch (error) {
+                console.error('Network or unexpected error during order creation:', error);
+                alert(getTranslation('error_creating_order') || 'Error creating order. Please try again.');
+            }
         });
     }
 }

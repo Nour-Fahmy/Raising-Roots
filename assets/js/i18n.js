@@ -1343,6 +1343,13 @@ function applyTranslations(lang) {
 window.initializeTranslations = initializeTranslations;
 window.setLanguage = setLanguage;
 window.applyTranslations = applyTranslations;
+window.getTranslation = getTranslation; // Add this line
 
 // Initialize translations when the script loads
-document.addEventListener('DOMContentLoaded', initializeTranslations); 
+document.addEventListener('DOMContentLoaded', initializeTranslations);
+
+// Function to get a specific translation string
+function getTranslation(key) {
+    const currentLang = localStorage.getItem('language') || 'en';
+    return (translations[currentLang] && translations[currentLang][key]) ? translations[currentLang][key] : `$\{key}`;
+} 

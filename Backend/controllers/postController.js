@@ -226,12 +226,14 @@ exports.addComment = catchAsync(async (req, res) => {
 
 // Get total posts count for dashboard
 exports.getPostsCount = async (req, res) => {
+  console.log('Attempting to get posts count...');
   try {
     const count = await Post.countDocuments();
-    res.status(200).json({ success: true, count });
+    console.log('Posts count fetched:', count);
+    res.status(200).json({ success: true, count, totalPosts: count });
   } catch (error) {
-    console.error('Error in getPostsCount:', error);
-    res.status(500).json({ success: false, message: 'Error fetching post count.' });
+    console.error('Error in getPostsCount:', error.message);
+    res.status(500).json({ success: false, message: 'Error fetching post count.', error: error.message });
   }
 };
 
