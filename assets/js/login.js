@@ -347,15 +347,9 @@ async function handleSuccessfulLogin(userData) {
         // Get redirect URL
         const redirectUrl = getRedirectUrl();
         
-        // If user is admin and trying to access admin panel, redirect there
-        if (userData.user.role === 'admin' && redirectUrl.includes('admin')) {
-            window.location.href = redirectUrl;
-            return;
-        }
-        
-        // For non-admin users trying to access admin panel, show error
-        if (redirectUrl.includes('admin') && userData.user.role !== 'admin') {
-            showFormFeedback('login', 'Access denied. Admin privileges required.');
+        // If user is admin, redirect to admin dashboard
+        if (userData.user.role === 'admin') {
+            window.location.href = 'admin/index.html';
             return;
         }
         
