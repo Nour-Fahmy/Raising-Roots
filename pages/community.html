@@ -1,18 +1,20 @@
 <!-- =================== community.html =================== -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Raising Roots - Community</title>
+  <title data-i18n="community_title">Raising Roots - Community</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/community.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../assets/js/i18n.js"></script>
 </head>
 <body>
   <header class="main-header">
     <div class="header-content">
-      <button class="mobile-nav-toggle" aria-label="Toggle Navigation">
+      <button class="mobile-nav-toggle" aria-label="Toggle Navigation" data-i18n="toggle_navigation">
         <i class="fas fa-bars"></i>
       </button>
       <a href="homepage.html" class="logo">
@@ -20,10 +22,10 @@
       </a>
       <div class="search-bar">
         <i class="fas fa-search"></i>
-        <input type="text" placeholder="Search in Raising Roots...">
+        <input type="text" data-i18n-placeholder="search_placeholder" placeholder="Search in Raising Roots...">
       </div>
       <div class="header-actions">
-        <button id="theme-toggle" aria-label="Toggle Theme">��</button>
+        <button id="theme-toggle" aria-label="Toggle Theme" data-i18n="toggle_theme">🌙</button>
         <div id="profile-container">
           <!-- Profile content will be loaded here by JavaScript -->
         </div>
@@ -37,27 +39,27 @@
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" onclick="showCommunityPosts()">
           <i class="fas fa-home"></i>
-          <span>Home</span>
+          <span data-i18n="home">Home</span>
         </a>
         <a href="#" class="nav-item" onclick="selectChannel('community')">
           <i class="fas fa-users"></i>
-          <span>Community Chat</span>
+          <span data-i18n="community_chat">Community Chat</span>
         </a>
         <a href="#" class="nav-item" onclick="selectChannel('expert')">
           <i class="fas fa-user-md"></i>
-          <span>Expert Advice</span>
+          <span data-i18n="expert_advice">Expert Advice</span>
         </a>
         <a href="#" class="nav-item" onclick="selectChannel('dm')">
           <i class="fas fa-envelope"></i>
-          <span>Direct Message</span>
+          <span data-i18n="direct_message">Direct Message</span>
         </a>
         <a href="#" class="nav-item" onclick="showSavedPosts()">
           <i class="fas fa-bookmark"></i>
-          <span>Saved</span>
+          <span data-i18n="saved">Saved</span>
         </a>
         <a href="#" class="nav-item" onclick="showExpertApplicationSection()">
           <i class="fas fa-user-plus"></i>
-          <span>Apply as Expert</span>
+          <span data-i18n="apply_expert">Apply as Expert</span>
         </a>
       </nav>
     </aside>
@@ -67,9 +69,9 @@
       <!-- Community Posts Section (Default View) -->
       <section id="community-posts" class="posts-section">
         <div class="posts-header">
-          <h2>Community Posts 📝</h2>
+          <h2 data-i18n="community_posts">Community Posts 📝</h2>
           <button class="create-post-btn" onclick="showCreatePostForm()">
-            <i class="fas fa-plus"></i> Create Post
+            <i class="fas fa-plus"></i> <span data-i18n="create_post">Create Post</span>
           </button>
         </div>
 
@@ -77,26 +79,26 @@
         <div id="create-post-form" class="create-post-form hidden">
           <form onsubmit="submitPost(event)">
             <div class="form-group">
-              <label for="post-title">Title</label>
-              <input type="text" id="post-title" required placeholder="Enter post title">
+              <label for="post-title" data-i18n="title">Title</label>
+              <input type="text" id="post-title" required data-i18n-placeholder="enter_title" placeholder="Enter post title">
             </div>
             <div class="form-group">
-              <label for="post-content">Content</label>
-              <textarea id="post-content" required placeholder="Share your thoughts..."></textarea>
+              <label for="post-content" data-i18n="content">Content</label>
+              <textarea id="post-content" required data-i18n-placeholder="share_thoughts" placeholder="Share your thoughts..."></textarea>
             </div>
             <div class="form-group">
-              <label for="post-category">Category</label>
+              <label for="post-category" data-i18n="category">Category</label>
               <select id="post-category" required>
-                <option value="">Select a category</option>
-                <option value="parenting-tips">Parenting Tips</option>
-                <option value="questions">Questions</option>
-                <option value="experiences">Experiences</option>
-                <option value="advice">Advice</option>
+                <option value="" data-i18n="select_category">Select a category</option>
+                <option value="parenting-tips" data-i18n="parenting_tips">Parenting Tips</option>
+                <option value="questions" data-i18n="questions">Questions</option>
+                <option value="experiences" data-i18n="experiences">Experiences</option>
+                <option value="advice" data-i18n="advice">Advice</option>
               </select>
             </div>
             <div class="form-actions">
-              <button type="submit" class="submit-btn">Post</button>
-              <button type="button" class="cancel-btn" onclick="hideCreatePostForm()">Cancel</button>
+              <button type="submit" class="submit-btn" data-i18n="post">Post</button>
+              <button type="button" class="cancel-btn" onclick="hideCreatePostForm()" data-i18n="cancel">Cancel</button>
             </div>
           </form>
         </div>
@@ -110,13 +112,13 @@
       <!-- Community Chat Section -->
       <section id="community-section" class="chat-section hidden">
         <div class="chat-header">
-          <h2>🌱 Community Chat</h2>
+          <h2 data-i18n="community_chat_title">🌱 Community Chat</h2>
         </div>
         <div class="chat-box">
           <div class="messages" id="community-messages"></div>
           <div class="chat-input">
-            <input type="text" id="community-input" placeholder="Type your message..." />
-            <button onclick="sendMessage('community')">Send</button>
+            <input type="text" id="community-input" data-i18n-placeholder="type_message" placeholder="Type your message..." />
+            <button onclick="sendMessage('community')" data-i18n="send">Send</button>
           </div>
         </div>
       </section>
@@ -124,13 +126,13 @@
       <!-- Expert Chat Section -->
       <section id="expert-section" class="expert-section hidden">
         <div class="chat-header">
-          <h2>👩‍⚕️ Expert Advice</h2>
+          <h2 data-i18n="expert_advice_title">👩‍⚕️ Expert Advice</h2>
         </div>
         <div class="expert-box">
           <div class="messages" id="expert-messages"></div>
           <div class="chat-input">
-            <input type="text" id="expert-input" placeholder="Ask an expert..." />
-            <button onclick="sendMessage('expert')">Send</button>
+            <input type="text" id="expert-input" data-i18n-placeholder="ask_expert" placeholder="Ask an expert..." />
+            <button onclick="sendMessage('expert')" data-i18n="send">Send</button>
           </div>
         </div>
       </section>
@@ -138,34 +140,34 @@
       <!-- DM Section -->
       <section id="dm-section" class="chat-section hidden">
         <div class="chat-header">
-          <h2>💌 Direct Message</h2>
+          <h2 data-i18n="direct_message_title">💌 Direct Message</h2>
         </div>
         <div class="dm-container">
           <!-- User List -->
           <div class="user-list">
             <div class="search-users">
-              <input type="text" placeholder="Search users..." onkeyup="searchUsers(this.value)">
+              <input type="text" data-i18n-placeholder="search_users" placeholder="Search users..." onkeyup="searchUsers(this.value)">
             </div>
             <div class="users">
               <div class="user-item active" onclick="selectUser(this, 'Sarah Johnson')">
                 <img src="../images/default-avatar.png" alt="Sarah Johnson">
                 <div class="user-info">
                   <h4>Sarah Johnson</h4>
-                  <p class="status online">Online</p>
+                  <p class="status online" data-i18n="online">Online</p>
                 </div>
               </div>
               <div class="user-item" onclick="selectUser(this, 'Dr. Emily Chen')">
                 <img src="../images/default-avatar.png" alt="Dr. Emily Chen">
                 <div class="user-info">
                   <h4>Dr. Emily Chen</h4>
-                  <p class="status">Last seen 5m ago</p>
+                  <p class="status" data-i18n="last_seen">Last seen 5m ago</p>
                 </div>
               </div>
               <div class="user-item" onclick="selectUser(this, 'Mike Wilson')">
                 <img src="../images/default-avatar.png" alt="Mike Wilson">
                 <div class="user-info">
                   <h4>Mike Wilson</h4>
-                  <p class="status">Last seen 1h ago</p>
+                  <p class="status" data-i18n="last_seen">Last seen 1h ago</p>
                 </div>
               </div>
             </div>
@@ -174,13 +176,13 @@
           <div class="dm-chat">
             <div class="chat-placeholder">
               <i class="fas fa-comments"></i>
-              <p>Select a user to start chatting</p>
+              <p data-i18n="select_user">Select a user to start chatting</p>
             </div>
             <div class="chat-messages hidden">
               <div class="messages" id="dm-messages"></div>
               <div class="chat-input">
-                <input type="text" id="dm-input" placeholder="Type your message..." />
-                <button onclick="sendDMMessage()">Send</button>
+                <input type="text" id="dm-input" data-i18n-placeholder="type_message" placeholder="Type your message..." />
+                <button onclick="sendDMMessage()" data-i18n="send">Send</button>
               </div>
             </div>
           </div>
@@ -190,7 +192,7 @@
       <!-- Saved Posts Section -->
       <section id="saved-posts-section" class="posts-section hidden">
         <div class="posts-header">
-          <h2>Saved Posts <i class="fas fa-bookmark"></i></h2>
+          <h2 data-i18n="saved_posts">Saved Posts <i class="fas fa-bookmark"></i></h2>
         </div>
         <div class="posts-grid" id="saved-posts-container">
           <!-- Saved posts will be loaded here by JS -->
@@ -200,31 +202,31 @@
       <!-- Expert Application Section -->
       <section id="expert-application-section" class="expert-application-section hidden">
         <div class="form-header">
-          <h2><i class="fas fa-user-plus"></i> Expert Application</h2>
+          <h2><i class="fas fa-user-plus"></i> <span data-i18n="expert_application">Expert Application</span></h2>
         </div>
         <form id="expert-application-form" enctype="multipart/form-data">
           <div class="form-group">
-            <label for="expert-name">Name</label>
-            <input type="text" id="expert-name" name="name" required placeholder="Enter your name">
+            <label for="expert-name" data-i18n="name">Name</label>
+            <input type="text" id="expert-name" name="name" required data-i18n-placeholder="enter_name" placeholder="Enter your name">
           </div>
           <div class="form-group">
-            <label for="expert-email">Email</label>
-            <input type="email" id="expert-email" name="email" required placeholder="Enter your email">
+            <label for="expert-email" data-i18n="email">Email</label>
+            <input type="email" id="expert-email" name="email" required data-i18n-placeholder="enter_email" placeholder="Enter your email">
           </div>
           <div class="form-group">
-            <label for="expert-number">Phone Number</label>
-            <input type="text" id="expert-number" name="number" required placeholder="Enter your phone number">
+            <label for="expert-number" data-i18n="phone_number">Phone Number</label>
+            <input type="text" id="expert-number" name="number" required data-i18n-placeholder="enter_phone" placeholder="Enter your phone number">
           </div>
           <div class="form-group">
-            <label for="expert-cv">CV (PDF)</label>
+            <label for="expert-cv" data-i18n="cv">CV (PDF)</label>
             <input type="file" id="expert-cv" name="cv" accept="application/pdf" required>
           </div>
           <div class="form-actions">
-            <button type="submit" class="submit-btn">Submit Application</button>
+            <button type="submit" class="submit-btn" data-i18n="submit_application">Submit Application</button>
           </div>
         </form>
         <div id="expert-application-success" class="success-message hidden">
-          <p>Your application has been submitted successfully!</p>
+          <p data-i18n="application_success">Your application has been submitted successfully!</p>
         </div>
       </section>
     </div>
@@ -237,12 +239,12 @@
         <div class="post-author">
           <img src="" alt="Author" class="author-avatar">
           <div class="author-info">
-            <h3 class="author-name"></h3>
-            <span class="post-date"></span>
+            <h3 class="author-name" data-i18n="post_author">Author</h3>
+            <span class="post-date" data-i18n="post_date">Posted on</span>
           </div>
         </div>
         <div class="post-actions">
-          <button class="report-btn" title="Report Post">
+          <button class="report-btn" title="Report Post" data-i18n="report_post">
             <i class="fas fa-flag"></i>
           </button>
         </div>
@@ -252,17 +254,22 @@
         <p class="post-text"></p>
       </div>
       <div class="post-footer">
-        <div class="post-category"></div>
-        <div class="post-engagement">
-          <button class="like-btn">
-            <i class="far fa-heart"></i>
+        <div class="post-stats">
+          <button class="like-btn" data-i18n="like_post">
+            <i class="fas fa-heart"></i>
             <span class="likes-count">0</span>
           </button>
-          <button class="comment-btn">
-            <i class="far fa-comment"></i>
+          <button class="comment-btn" data-i18n="comment_post">
+            <i class="fas fa-comment"></i>
             <span class="comments-count">0</span>
           </button>
+          <button class="share-btn" data-i18n="share_post">
+            <i class="fas fa-share"></i>
+          </button>
         </div>
+        <button class="save-btn" title="Save Post" data-i18n="save_post">
+          <i class="fas fa-bookmark"></i>
+        </button>
       </div>
     </article>
   </template>

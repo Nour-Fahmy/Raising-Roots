@@ -189,6 +189,11 @@ async function loadNavigation() {
 
     navPlaceholder.innerHTML = navHtml;
 
+    // Ensure translations are applied after navigation is loaded
+    if (window.applyTranslations) {
+        window.applyTranslations(currentLang);
+    }
+
     // Add event listeners for dropdowns
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {

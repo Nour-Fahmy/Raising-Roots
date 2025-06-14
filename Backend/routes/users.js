@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { User } = require('../models/user');
+const { Admin } = require('../models/admin');
 const { validateLogin } = require('../middleware/validation');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const jwt = require('jsonwebtoken');
@@ -59,7 +60,36 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // 1. Find the user by email
+        // First check if it's an admin login
+        const admin = await Admin.findOne({ email });
+        if (admin) {
+            const isPasswordValid = await bcrypt.compare(password, admin.passwordHash);
+            if (isPasswordValid) {
+                const token = jwt.sign(
+                    {
+                        userId: admin._id,
+                        isAdmin: true,
+                        role: 'admin'
+                    },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '1d' }
+                );
+
+                return res.status(200).json({
+                    message: 'Admin login successful!',
+                    token,
+                    user: {
+                        id: admin._id,
+                        username: admin.username,
+                        email: admin.email,
+                        role: 'admin',
+                        isAdmin: true
+                    }
+                });
+            }
+        }
+
+        // If not admin or admin password incorrect, check regular users
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ 
@@ -71,7 +101,6 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
             });
         }
 
-        // 2. Check the password
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
             return res.status(401).json({ 
@@ -83,18 +112,16 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
             });
         }
 
-        // 3. Generate a JWT token
         const token = jwt.sign(
             {
                 userId: user._id,
-                isAdmin: user.role === 'admin',
-                role: user.role
+                isAdmin: false,
+                role: 'user'
             },
             process.env.JWT_SECRET,
-            { expiresIn: '1d' } // Token lasts for 1 day
+            { expiresIn: '1d' }
         );
 
-        // 4. Send token and basic user info
         res.status(200).json({
             message: 'Login successful!',
             token,
@@ -102,8 +129,8 @@ router.post('/login', loginLimiter, validateLogin, async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                role: user.role,
-                isAdmin: user.role === 'admin'
+                role: 'user',
+                isAdmin: false
             }
         });
     } catch (err) {
