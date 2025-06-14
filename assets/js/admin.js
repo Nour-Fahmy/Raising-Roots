@@ -70,11 +70,18 @@ function setupEventListeners() {
     const addProductBtn = document.getElementById('addProductBtn');
     const productForm = document.querySelector('.product-form');
     const cancelAddBtn = document.getElementById('cancelAddBtn');
+    const addItemForm = document.getElementById('addItemForm');
+    const productFormTitle = document.getElementById('productFormTitle');
     
     if (addProductBtn && productForm) {
         addProductBtn.addEventListener('click', () => {
             productForm.style.display = 'block';
             addProductBtn.style.display = 'none';
+            addItemForm.reset();
+            addItemForm.removeAttribute('data-editing-product-id');
+            if (productFormTitle) productFormTitle.textContent = 'Add New Product';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('productImage').value = '';
         });
     }
     
@@ -82,6 +89,11 @@ function setupEventListeners() {
         cancelAddBtn.addEventListener('click', () => {
             productForm.style.display = 'none';
             addProductBtn.style.display = 'flex';
+            addItemForm.reset();
+            addItemForm.removeAttribute('data-editing-product-id');
+            if (productFormTitle) productFormTitle.textContent = 'Add New Product';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('productImage').value = '';
         });
     }
     
@@ -172,6 +184,8 @@ function navigateToSection(sectionId) {
             initExpertApplications();
         } else if (sectionId === 'products') {
             loadProducts(); // Load products when products section is shown
+        } else if (sectionId === 'orders') {
+            loadOrders(); // Load orders when orders section is shown
         }
     }
     
@@ -957,26 +971,26 @@ function createPostCard(post) {
     card.innerHTML = `
         <div class="post-header">
             <div class="post-author">
-                <img src="${post.author?.avatar || '../../images/default-avatar.png'}" alt="${post.author?.username || 'Unknown User'}" class="author-avatar">
+                <img src="${post.user?.avatar || '../../images/default-avatar.png'}" alt="${post.user?.username || 'Unknown User'}" class="author-avatar">
                 <div class="post-author-info">
-                    <h4>${post.author?.username || 'Unknown User'}</h4>
+                    <h4>${post.user?.username || 'Unknown User'}</h4>
                     <p>${postDate}</p>
                 </div>
             </div>
             <div class="post-status ${post.status}">${post.status}</div>
         </div>
         <div class="post-content">
-            <h3>${post.title}</h3>
-            <p>${post.content}</p>
+            <h3 class="post-title">${post.title}</h3>
+            <p class="post-content">${post.content}</p>
         </div>
         <div class="post-stats">
             <span><i class="fas fa-heart"></i> ${post.likes?.length || 0}</span>
             <span><i class="fas fa-comment"></i> ${post.comments?.length || 0}</span>
         </div>
-        ${commentsHtml}
         <div class="post-actions">
             ${actionButtons}
         </div>
+        ${commentsHtml}
     `;
 
     return card;
@@ -1382,15 +1396,14 @@ async function handleMemberAction(button, memberId, action, type = 'user') {
     }
 }
 
-// Function to search community members
+// Search community functionality
 function searchCommunity(searchTerm) {
-    const memberCards = document.querySelectorAll('.member-card');
+    const memberCards = document.querySelectorAll('.community-section .member-card');
     memberCards.forEach(card => {
-        const username = card.querySelector('h4').textContent.toLowerCase();
-        const email = card.querySelector('.member-email').textContent.toLowerCase();
+        const name = card.querySelector('.member-info h4').textContent.toLowerCase();
         const role = card.querySelector('.member-role').textContent.toLowerCase();
-        
-        if (username.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm)) {
+
+        if (name.includes(searchTerm) || role.includes(searchTerm)) {
             card.style.display = 'block';
         } else {
             card.style.display = 'none';
@@ -1407,8 +1420,9 @@ document.getElementById('searchCommunity')?.addEventListener('input', (e) => {
 document.addEventListener('DOMContentLoaded', function() {
     const addProductBtn = document.getElementById('addProductBtn');
     const productForm = document.querySelector('.product-form');
-    const addItemForm = document.getElementById('addItemForm');
     const cancelAddBtn = document.getElementById('cancelAddBtn');
+    const addItemForm = document.getElementById('addItemForm');
+    const productFormTitle = document.getElementById('productFormTitle');
     const productCategory = document.getElementById('productCategory');
     const subcategoryGroup = document.getElementById('subcategoryGroup');
     const subSubcategoryGroup = document.getElementById('subSubcategoryGroup');
@@ -1422,7 +1436,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cancelAddBtn.addEventListener('click', () => {
         productForm.style.display = 'none';
+        addProductBtn.style.display = 'flex';
         addItemForm.reset();
+        addItemForm.removeAttribute('data-editing-product-id');
+        if (productFormTitle) productFormTitle.textContent = 'Add New Product';
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('productImage').value = '';
     });
 
     // Handle main category selection
@@ -1486,6 +1505,10 @@ document.addEventListener('DOMContentLoaded', function() {
     addItemForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const productId = addItemForm.getAttribute('data-editing-product-id');
+        const method = productId ? 'PUT' : 'POST';
+        const url = productId ? `/api/v1/products/${productId}` : '/api/v1/products';
+        
         const formData = new FormData();
         formData.append('name', document.getElementById('productName').value);
         formData.append('description', document.getElementById('productDescription').value);
@@ -1502,23 +1525,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch('/api/v1/products', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 body: formData // FormData will automatically set the correct Content-Type
             });
 
             if (!response.ok) {
-                throw new Error('Failed to add product');
+                throw new Error(`Failed to ${productId ? 'update' : 'add'} product`);
             }
 
             const result = await response.json();
-            alert('Product added successfully!');
+            alert(`Product ${productId ? 'updated' : 'added'} successfully!`);
             productForm.style.display = 'none';
             addItemForm.reset();
+            addItemForm.removeAttribute('data-editing-product-id');
+            if (productFormTitle) productFormTitle.textContent = 'Add New Product';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('productImage').value = '';
             loadProducts(); // Refresh the product list
         } catch (error) {
-            console.error('Error adding product:', error);
-            alert('Failed to add product. Please try again.');
+            console.error(`Error ${productId ? 'updating' : 'adding'} product:`, error);
+            alert(`Failed to ${productId ? 'update' : 'add'} product. Please try again.`);
         }
     });
 });
@@ -1592,6 +1619,10 @@ async function editProduct(productId) {
         document.getElementById('productSubcategory').value = product.subcategory || '';
         document.getElementById('productSubSubcategory').value = product.subSubcategory || '';
         
+        // Set the editing product ID on the form
+        const addItemForm = document.getElementById('addItemForm');
+        addItemForm.setAttribute('data-editing-product-id', productId);
+
         // Show current image preview if exists
         const imagePreview = document.getElementById('imagePreview');
         if (imagePreview) {
@@ -1603,6 +1634,10 @@ async function editProduct(productId) {
         const subcategoryGroup = document.getElementById('subcategoryGroup');
         const subSubcategoryGroup = document.getElementById('subSubcategoryGroup');
         
+        // Reset display for subcategories first
+        subcategoryGroup.style.display = 'none';
+        subSubcategoryGroup.style.display = 'none';
+
         if (product.category === 'kids') {
             subcategoryGroup.style.display = 'block';
             if (product.subcategory === 'boys' || product.subcategory === 'girls') {
@@ -1610,48 +1645,17 @@ async function editProduct(productId) {
             }
         }
 
-        // Show the form
+        // Show the form and update title
         document.querySelector('.product-form').style.display = 'block';
+        const productFormTitle = document.getElementById('productFormTitle');
+        if (productFormTitle) productFormTitle.textContent = 'Edit Product';
         
-        // Update form submission to handle edit
-        const form = document.getElementById('addItemForm');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData();
-            formData.append('name', document.getElementById('productName').value);
-            formData.append('description', document.getElementById('productDescription').value);
-            formData.append('price', document.getElementById('productPrice').value);
-            formData.append('stock', document.getElementById('productStock').value);
-            formData.append('category', document.getElementById('productCategory').value);
-            formData.append('subcategory', document.getElementById('productSubcategory').value);
-            formData.append('subSubcategory', document.getElementById('productSubSubcategory').value);
+        // Scroll to the top of the form for better UX
+        window.scrollTo({
+            top: document.querySelector('.product-form').offsetTop,
+            behavior: 'smooth'
+        });
 
-            // Handle image file
-            const imageInput = document.getElementById('productImage');
-            if (imageInput.files.length > 0) {
-                formData.append('image', imageInput.files[0]);
-            }
-
-            try {
-                const updateResponse = await fetch(`/api/v1/products/${productId}`, {
-                    method: 'PUT',
-                    body: formData
-                });
-
-                if (!updateResponse.ok) {
-                    throw new Error('Failed to update product');
-                }
-
-                alert('Product updated successfully!');
-                document.querySelector('.product-form').style.display = 'none';
-                form.reset();
-                loadProducts(); // Refresh the product list
-            } catch (error) {
-                console.error('Error updating product:', error);
-                alert('Failed to update product. Please try again.');
-            }
-        };
     } catch (error) {
         console.error('Error loading product for edit:', error);
         alert('Failed to load product details. Please try again.');
@@ -1679,5 +1683,142 @@ async function deleteProduct(productId) {
     }
 }
 
+// Search products functionality
+function searchProducts(searchTerm) {
+    const productCards = document.querySelectorAll('#productsGrid .product-card');
+    productCards.forEach(card => {
+        const name = card.querySelector('.product-title').textContent.toLowerCase();
+        const description = card.querySelector('.product-description').textContent.toLowerCase();
+        if (name.includes(searchTerm) || description.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Filter products functionality
+function filterProducts(filterValue) {
+    const productCards = document.querySelectorAll('#productsGrid .product-card');
+    productCards.forEach(card => {
+        const category = card.querySelector('.category-tag:nth-child(1)')?.textContent.toLowerCase();
+        const subcategory = card.querySelector('.category-tag:nth-child(2)')?.textContent.toLowerCase();
+        const subSubcategory = card.querySelector('.category-tag:nth-child(3)')?.textContent.toLowerCase();
+
+        if (filterValue === 'all' || 
+            category === filterValue || 
+            subcategory === filterValue || 
+            subSubcategory === filterValue) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
 // Load products when the page loads
 document.addEventListener('DOMContentLoaded', loadProducts);
+
+// Load and display orders
+async function loadOrders() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error('No token found for fetching orders.');
+        showNotification('Please login to view orders', 'error');
+        window.location.href = '../login.html?redirect=admin/index.html';
+        return;
+    }
+
+    const ordersTableBody = document.querySelector('#orders .orders-table tbody');
+    if (!ordersTableBody) {
+        console.error('Orders table body not found.');
+        return;
+    }
+
+    ordersTableBody.innerHTML = '<tr><td colspan="6">Loading orders...</td></tr>'; // Loading message
+
+    try {
+        const response = await fetch('https://localhost:3000/api/v1/orders', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to fetch orders');
+        }
+
+        const orders = await response.json();
+        ordersTableBody.innerHTML = ''; // Clear loading message
+
+        if (orders.length === 0) {
+            ordersTableBody.innerHTML = '<tr><td colspan="6">No orders found.</td></tr>';
+            return;
+        }
+
+        orders.forEach(order => {
+            const row = ordersTableBody.insertRow();
+            row.insertCell().textContent = order._id;
+            row.insertCell().textContent = order.user?.username || 'N/A';
+            row.insertCell().textContent = formatDate(order.orderDate);
+            row.insertCell().textContent = `EGP ${order.totalAmount.toFixed(2)}`;
+            row.insertCell().textContent = order.status;
+            
+            // Actions cell
+            const actionsCell = row.insertCell();
+            actionsCell.innerHTML = `
+                <button class="btn primary-btn view-btn" data-order-id="${order._id}">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn success-btn update-status-btn" data-order-id="${order._id}" data-current-status="${order.status}">
+                    <i class="fas fa-sync-alt"></i> Update Status
+                </button>
+            `;
+        });
+
+        // Add event listeners for view and update status buttons
+        ordersTableBody.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', (e) => viewOrderDetails(e.currentTarget.dataset.orderId));
+        });
+        ordersTableBody.querySelectorAll('.update-status-btn').forEach(button => {
+            button.addEventListener('click', (e) => updateOrderStatus(e.currentTarget.dataset.orderId, e.currentTarget.dataset.currentStatus));
+        });
+
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        ordersTableBody.innerHTML = `<tr><td colspan="6" class="error-message">Failed to load orders: ${error.message}</td></tr>`;
+        showNotification(`Failed to load orders: ${error.message}`, 'error');
+    }
+}
+
+// Placeholder for viewOrderDetails (to be implemented later if needed)
+function viewOrderDetails(orderId) {
+    console.log(`View details for order: ${orderId}`);
+    // Implement modal or new page to show full order details
+    showNotification(`Showing details for order ${orderId} (feature coming soon)`, 'info');
+}
+
+// Placeholder for updateOrderStatus (to be implemented later if needed)
+function updateOrderStatus(orderId, currentStatus) {
+    console.log(`Update status for order: ${orderId}, current status: ${currentStatus}`);
+    // Implement a modal or dropdown to change status
+    showNotification(`Updating status for order ${orderId} (feature coming soon)`, 'info');
+}
+
+// Search posts functionality
+function searchPosts(searchTerm) {
+    const postCards = document.querySelectorAll('.posts-section .post-card');
+    postCards.forEach(card => {
+        const title = card.querySelector('.post-title').textContent.toLowerCase();
+        const content = card.querySelector('.post-content')?.textContent.toLowerCase() || '';
+
+        if (title.includes(searchTerm) || content.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
