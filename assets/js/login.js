@@ -332,27 +332,39 @@ function getRedirectUrl() {
 
 // Function to handle successful login
 async function handleSuccessfulLogin(userData) {
-    // Store the token and user data in localStorage
-    localStorage.setItem('token', userData.token);
-    localStorage.setItem('user', JSON.stringify(userData.user));
-    
-    // Get redirect URL
-    const redirectUrl = getRedirectUrl();
-    
-    // If user is admin and trying to access admin panel, redirect there
-    if (userData.user.role === 'admin' && redirectUrl.includes('admin')) {
+    try {
+        // Store the token and user data in localStorage
+        localStorage.setItem('token', userData.token);
+        localStorage.setItem('user', JSON.stringify(userData.user));
+        
+        // Preserve the cart data during login
+        const existingCart = localStorage.getItem('cart');
+        if (existingCart) {
+            // Keep the existing cart data
+            console.log('Preserving existing cart during login:', existingCart);
+        }
+        
+        // Get redirect URL
+        const redirectUrl = getRedirectUrl();
+        
+        // If user is admin and trying to access admin panel, redirect there
+        if (userData.user.role === 'admin' && redirectUrl.includes('admin')) {
+            window.location.href = redirectUrl;
+            return;
+        }
+        
+        // For non-admin users trying to access admin panel, show error
+        if (redirectUrl.includes('admin') && userData.user.role !== 'admin') {
+            showFormFeedback('login', 'Access denied. Admin privileges required.');
+            return;
+        }
+        
+        // Redirect to the appropriate page
         window.location.href = redirectUrl;
-        return;
+    } catch (error) {
+        console.error('Error during login:', error);
+        showFormFeedback('login', 'An error occurred during login. Please try again.');
     }
-    
-    // For non-admin users trying to access admin panel, show error
-    if (redirectUrl.includes('admin') && userData.user.role !== 'admin') {
-        showFormFeedback('login', 'Access denied. Admin privileges required.');
-        return;
-    }
-    
-    // Redirect to the appropriate page
-    window.location.href = redirectUrl;
 }
 
 // Login form submission

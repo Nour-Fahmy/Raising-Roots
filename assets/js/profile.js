@@ -4,8 +4,12 @@ window.handleLogout = async function(e) {
     console.log('Logout button clicked');
     
     try {
-        // Clear the token first to ensure immediate logout
+        // Save the current cart data temporarily
+        const currentCart = localStorage.getItem('cart');
+        
+        // Clear all user-related data
         localStorage.removeItem('token');
+        localStorage.removeItem('cart'); // Clear the cart
         
         // Then try to notify the server
         const response = await fetch('https://localhost:3000/api/v1/users/logout', {
@@ -14,6 +18,14 @@ window.handleLogout = async function(e) {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
+
+        // If we're on the shop page, restore the cart data
+        // This allows users to keep their cart items even after logout
+        if (window.location.pathname.includes('shop.html')) {
+            if (currentCart) {
+                localStorage.setItem('cart', currentCart);
+            }
+        }
 
         // Even if server logout fails, we've already cleared the token
         // so we can proceed with redirect

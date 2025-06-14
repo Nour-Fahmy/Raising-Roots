@@ -200,7 +200,20 @@ async function loadNavigation() {
         });
     });
 
-    // Add event listener for profile dropdown
+    // Setup cart icon event listener
+    const cartIcon = document.querySelector('.cart-icon');
+    const cartContainer = document.querySelector('.cart-container');
+    if (cartIcon && cartContainer) {
+        console.log('Setting up cart icon click listener in navigation');
+        cartIcon.addEventListener('click', () => {
+            console.log('Cart icon clicked in navigation');
+            cartContainer.classList.add('active');
+            // Dispatch a custom event to notify that cart was opened
+            document.dispatchEvent(new CustomEvent('cartOpened'));
+        });
+    }
+
+    // Setup profile dropdown
     const profileBtn = document.querySelector('.profile-btn');
     if (profileBtn) {
         profileBtn.addEventListener('click', () => {
@@ -225,6 +238,9 @@ async function loadNavigation() {
     if (window.applyTranslations) {
         window.applyTranslations(currentLang);
     }
+
+    // Dispatch event that navigation is loaded
+    document.dispatchEvent(new CustomEvent('navigationLoaded'));
 }
 
 async function loadFooter() {
@@ -292,4 +308,12 @@ window.handleLogout = async function(e) {
         // Still redirect even if server logout fails
         window.location.href = './homepage.html';
     }
-} 
+}
+
+// Listen for login state changes
+window.addEventListener('storage', function(e) {
+    if (e.key === 'token') {
+        console.log('Login state changed, reloading navigation');
+        loadNavigation();
+    }
+}); 
