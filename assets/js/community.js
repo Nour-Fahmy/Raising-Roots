@@ -188,6 +188,7 @@ async function showCommunityPosts(page = 1) {
   document.querySelector('#expert-section').classList.add('hidden');
   document.querySelector('#dm-section').classList.add('hidden');
   document.querySelector('#saved-posts-section').classList.add('hidden');
+  document.querySelector('#expert-application-section').classList.add('hidden');
   
   // Show community posts
   document.querySelector('#community-posts').classList.remove('hidden');
@@ -283,6 +284,10 @@ function selectChannel(channel) {
     if (channel === ch) {
       // Show the selected channel
       channelSection.classList.remove('hidden');
+      // Load users if DM section is selected
+      if (ch === 'dm') {
+        loadAllUsers();
+      }
     } else {
       // Hide other channels
       channelSection.classList.add('hidden');
@@ -294,6 +299,9 @@ function selectChannel(channel) {
     item.classList.remove('active');
   });
   document.querySelector(`.nav-item[onclick="selectChannel('${channel}')"]`).classList.add('active');
+
+  // Ensure expert application section is hidden
+  document.querySelector('#expert-application-section').classList.add('hidden');
 }
 
 // Function to send a message
@@ -495,62 +503,97 @@ function createPostElement(post) {
   const postCard = postElement.querySelector('.post-card');
   postCard.dataset.postId = post._id;
   
-  // Set author info
-  postElement.querySelector('.author-avatar').src = '../images/default-avatar.png';
-  postElement.querySelector('.author-name').textContent = post.author.username;
-  postElement.querySelector('.post-date').textContent = new Date(post.createdAt).toLocaleDateString();
+  // Set author info with fallback
+  const authorAvatar = postElement.querySelector('.author-avatar');
+  if (authorAvatar) {
+    authorAvatar.src = '../images/default-avatar.png';
+  }
+
+  const authorName = postElement.querySelector('.author-name');
+  if (authorName) {
+    authorName.textContent = post.author?.username || 'Anonymous';
+  }
+
+  const postDate = postElement.querySelector('.post-date');
+  if (postDate) {
+    postDate.textContent = new Date(post.createdAt).toLocaleDateString();
+  }
   
   // Set post content
-  postElement.querySelector('.post-title').textContent = post.title;
-  postElement.querySelector('.post-text').textContent = post.content;
-  postElement.querySelector('.post-category').textContent = post.category;
+  const postTitle = postElement.querySelector('.post-title');
+  if (postTitle) {
+    postTitle.textContent = post.title;
+  }
+
+  const postText = postElement.querySelector('.post-text');
+  if (postText) {
+    postText.textContent = post.content;
+  }
+
+  const postCategory = postElement.querySelector('.post-category');
+  if (postCategory) {
+    postCategory.textContent = post.category;
+  }
   
   // Set likes and comments count
   const likesCount = postElement.querySelector('.likes-count');
-  likesCount.textContent = post.likes.length;
+  if (likesCount) {
+    likesCount.textContent = post.likes?.length || 0;
+  }
   
   const commentsCount = postElement.querySelector('.comments-count');
-  commentsCount.textContent = post.comments.length;
-
-  // Add save button to post footer
-  const postFooter = postElement.querySelector('.post-footer');
-  const saveButton = document.createElement('button');
-  saveButton.className = 'save-btn';
-  saveButton.innerHTML = '<i class="far fa-bookmark"></i>';
-  
-  // Check if post is saved by current user
-  const userId = localStorage.getItem('userId');
-  const isSaved = post.savedBy && post.savedBy.includes(userId);
-  if (isSaved) {
-    saveButton.classList.add('saved');
-    saveButton.querySelector('i').classList.remove('far');
-    saveButton.querySelector('i').classList.add('fas');
+  if (commentsCount) {
+    commentsCount.textContent = post.comments?.length || 0;
   }
-  
-  saveButton.onclick = () => toggleSavePost(saveButton);
-  postFooter.querySelector('.post-engagement').appendChild(saveButton);
-  
+
+  // Get current user ID from localStorage
+  const currentUserId = localStorage.getItem('userId');
+
   // Set up like button
   const likeButton = postElement.querySelector('.like-btn');
-  const isLiked = post.likes.includes(userId);
-  
-  if (isLiked) {
-    likeButton.classList.add('liked');
-    const icon = likeButton.querySelector('i');
-    icon.classList.remove('far');
-    icon.classList.add('fas');
-    icon.style.setProperty('color', '#e74c3c', 'important');
+  if (likeButton) {
+    // Check if the post is already liked by the current user
+    const isLiked = post.likes && post.likes.some(likeId => likeId.toString() === currentUserId);
+    
+    if (isLiked) {
+      likeButton.classList.add('liked');
+      const icon = likeButton.querySelector('i');
+      icon.classList.remove('far');
+      icon.classList.add('fas');
+      icon.style.setProperty('color', '#e74c3c', 'important');
+    }
+    
+    // Attach like function to button with proper event handling
+    likeButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      likePost(this);
+    });
   }
-  
-  // Attach like function to button with proper event handling
-  likeButton.addEventListener('click', function(e) {
-    e.preventDefault();
-    likePost(this);
-  });
   
   // Set up comment button
   const commentButton = postElement.querySelector('.comment-btn');
-  commentButton.onclick = () => showComments(commentButton);
+  if (commentButton) {
+    commentButton.onclick = () => showComments(commentButton);
+  }
+
+  // Set up save button
+  const saveButton = postElement.querySelector('.save-btn');
+  if (saveButton) {
+    const isSaved = post.savedBy && post.savedBy.includes(currentUserId);
+    if (isSaved) {
+      saveButton.classList.add('saved');
+      const icon = saveButton.querySelector('i');
+      icon.classList.remove('far');
+      icon.classList.add('fas');
+    }
+    saveButton.onclick = () => toggleSavePost(saveButton);
+  }
+  
+  // Set up report button
+  const reportButton = postElement.querySelector('.report-btn');
+  if (reportButton) {
+    reportButton.onclick = () => reportPost(post._id);
+  }
   
   // Add comments section
   const commentsSection = document.createElement('div');
@@ -571,13 +614,15 @@ function createPostElement(post) {
 async function likePost(button) {
   try {
     const postId = button.closest('.post-card').dataset.postId;
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
   
-  if (!token) {
-      showNotification('Please login to like posts', 'error');
-    return;
-  }
+    if (!token) {
+      return;
+    }
+
+    // Check if the post is already liked by the user
+    const isCurrentlyLiked = button.classList.contains('liked');
 
     const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}/like`, {
       method: 'POST',
@@ -601,8 +646,8 @@ async function likePost(button) {
     
     likesCount.textContent = likes.length;
     
-    // Toggle like state
-    const isLiked = likes.includes(userId);
+    // Convert all IDs to strings for comparison
+    const isLiked = likes.some(likeId => likeId.toString() === userId);
     
     // Update button and icon classes
     if (isLiked) {
@@ -628,7 +673,6 @@ async function likePost(button) {
     
   } catch (error) {
     console.error('Error liking post:', error);
-    showNotification('Failed to like post', 'error');
   }
 }
 
@@ -790,59 +834,77 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Function to load all users
+async function loadAllUsers() {
+  const userList = document.querySelector('.users');
+  if (!userList) return;
+
+  // Show a simple message to search for users
+  userList.innerHTML = `
+    <div class="no-results">
+      <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px;"></i>
+      <p>Search for a user to start chatting</p>
+    </div>
+  `;
+}
+
+// Update searchUsers function to use the API
 async function searchUsers(query) {
-    const userList = document.querySelector('.users');
-    if (!userList) return;
+  const userList = document.querySelector('.users');
+  if (!userList) return;
 
-    if (!query.trim()) {
-        userList.innerHTML = '<div class="no-results">Start typing to search users</div>';
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification('Please log in to search users', 'error');
+      return;
+    }
+
+    // Only add query parameter if there's actually a search term
+    const url = query.trim() 
+      ? `https://localhost:3000/api/v1/users/search?query=${encodeURIComponent(query)}`
+      : 'https://localhost:3000/api/v1/users/search';
+
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      const users = await response.json();
+      userList.innerHTML = '';
+      
+      if (users.length === 0) {
+        userList.innerHTML = '<div class="no-results">No users found</div>';
         return;
+      }
+
+      users.forEach(user => {
+        // Don't show the current user in the list
+        if (user._id === localStorage.getItem('userId')) return;
+
+        const userElement = document.createElement('div');
+        userElement.className = 'user-item';
+        userElement.innerHTML = `
+          <img src="${user.profilePicture || '../images/default-avatar.png'}" alt="${user.username}" class="user-avatar">
+          <div class="user-info">
+            <h4>${user.username}</h4>
+            <p class="status">${user.status || 'Available'}</p>
+          </div>
+        `;
+        userElement.onclick = () => selectUser(userElement, user.username, user._id);
+        userList.appendChild(userElement);
+      });
+    } else {
+      showNotification('Error searching users', 'error');
+      userList.innerHTML = '<div class="no-results">Error searching users</div>';
     }
-
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            showNotification('Please log in to search users', 'error');
-            return;
-        }
-
-        const response = await fetch(`https://localhost:3000/api/v1/users/search?query=${encodeURIComponent(query)}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.ok) {
-            const users = await response.json();
-            userList.innerHTML = '';
-            
-            if (users.length === 0) {
-                userList.innerHTML = '<div class="no-results">No users found</div>';
-                return;
-            }
-
-            users.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.className = 'user-item';
-                userElement.innerHTML = `
-                    <img src="${user.profilePicture || '../images/default-avatar.png'}" alt="${user.username}" class="user-avatar">
-                    <div class="user-info">
-                        <h4>${user.username}</h4>
-                        <p class="status">${user.status || 'Available'}</p>
-                    </div>
-                `;
-                userElement.onclick = () => selectUser(userElement, user.username, user._id);
-                userList.appendChild(userElement);
-            });
-        } else {
-            showNotification('Error searching users', 'error');
-            userList.innerHTML = '<div class="no-results">Error searching users</div>';
-        }
-    } catch (error) {
-        console.error('Error searching users:', error);
-        showNotification('Error searching users', 'error');
-        userList.innerHTML = '<div class="no-results">Error searching users</div>';
-    }
+  } catch (error) {
+    console.error('Error searching users:', error);
+    showNotification('Error searching users', 'error');
+    userList.innerHTML = '<div class="no-results">Error searching users</div>';
+  }
 }
 
 async function selectUser(userElement, username, userId) {
@@ -998,12 +1060,12 @@ document.getElementById('dm-input')?.addEventListener('keypress', function(e) {
 // Save/Unsave Post Functionality
 async function toggleSavePost(button) {
   try {
-  const postCard = button.closest('.post-card');
+    const postCard = button.closest('.post-card');
     if (!postCard) {
       throw new Error('Post card not found');
     }
 
-  const postId = postCard.dataset.postId;
+    const postId = postCard.dataset.postId;
     if (!postId) {
       throw new Error('Post ID not found');
     }
@@ -1012,7 +1074,6 @@ async function toggleSavePost(button) {
     const userId = localStorage.getItem('userId');
     
     if (!token) {
-      showNotification('Please login to save posts', 'error');
       return;
     }
     
@@ -1051,7 +1112,6 @@ async function toggleSavePost(button) {
     
   } catch (error) {
     console.error('Error saving post:', error);
-    showNotification('Failed to save post', 'error');
   }
 }
 
@@ -1151,23 +1211,118 @@ function handleHeaderSearch(event) {
   
   // Search through posts
   posts.forEach(post => {
-    const title = post.querySelector('h3').textContent.toLowerCase();
-    const content = post.querySelector('.post-content p').textContent.toLowerCase();
-    const author = post.querySelector('.author').textContent.toLowerCase();
-    const category = post.querySelector('.category').textContent.toLowerCase();
+    const title = post.querySelector('.post-title')?.textContent.toLowerCase() || '';
+    const content = post.querySelector('.post-text')?.textContent.toLowerCase() || '';
+    const author = post.querySelector('.author-name')?.textContent.toLowerCase() || '';
     
     const isVisible = title.includes(searchTerm) || 
                      content.includes(searchTerm) || 
-                     author.includes(searchTerm) || 
-                     category.includes(searchTerm);
+                     author.includes(searchTerm);
     
     post.style.display = isVisible ? 'block' : 'none';
   });
   
   // Search through users in DM section
   users.forEach(user => {
-    const username = user.querySelector('h4').textContent.toLowerCase();
+    const username = user.querySelector('h4')?.textContent.toLowerCase() || '';
     const isVisible = username.includes(searchTerm);
     user.style.display = isVisible ? 'flex' : 'none';
   });
+}
+
+// Function to report a post
+async function reportPost(postId) {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification('Please login to report posts', 'error');
+      return;
+    }
+
+    const reason = prompt('Please enter the reason for reporting this post:');
+    if (!reason) return; // User cancelled the prompt
+
+    const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}/report`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ 
+        reason,
+        status: 'pending' // Initial status of the report
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to report post');
+    }
+
+    const result = await response.json();
+    
+    // Check if we have a valid report ID in the response
+    if (result.data && result.data._id) {
+      // Store report ID for tracking
+      localStorage.setItem(`report_${postId}`, result.data._id);
+      showNotification('Post reported successfully. Our moderators will review it shortly.', 'success');
+      // Start polling for report status
+      checkReportStatus(postId, result.data._id);
+    } else {
+      showNotification('Post reported successfully.', 'success');
+    }
+  } catch (error) {
+    console.error('Error reporting post:', error);
+    showNotification('Failed to report post', 'error');
+  }
+}
+
+// Function to check report status
+async function checkReportStatus(postId, reportId) {
+  // Don't proceed if we don't have a valid report ID
+  if (!reportId) {
+    console.warn('No report ID provided for status check');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const response = await fetch(`https://localhost:3000/api/v1/posts/${postId}/report/${reportId}/status`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      console.warn('Failed to fetch report status:', response.status);
+      return;
+    }
+
+    const result = await response.json();
+    const status = result.data?.status;
+
+    if (!status) {
+      console.warn('No status found in response');
+      return;
+    }
+
+    switch (status) {
+      case 'reviewed':
+        showNotification('Your report has been reviewed by our moderators.', 'info');
+        break;
+      case 'action_taken':
+        showNotification('Action has been taken based on your report.', 'success');
+        break;
+      case 'dismissed':
+        showNotification('After review, no action was needed for this post.', 'info');
+        break;
+      case 'pending':
+        // If the report is still pending, check again in 5 minutes
+        setTimeout(() => checkReportStatus(postId, reportId), 5 * 60 * 1000);
+        break;
+    }
+  } catch (error) {
+    console.error('Error checking report status:', error);
+  }
 }

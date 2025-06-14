@@ -1382,75 +1382,7 @@ body.dark-theme .profile-menu-options a:hover {
 
 /* Notification Styles */
 .notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 1rem 1.5rem;
-  border-radius: var(--border-radius);
-  background: white;
-  box-shadow: var(--box-shadow);
-  z-index: 9999;
-  transform: translateX(120%);
-  transition: transform 0.3s ease;
-  max-width: 350px;
-}
-
-.notification.show {
-  transform: translateX(0);
-}
-
-.notification-content {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.notification i {
-  font-size: 1.2rem;
-}
-
-.notification.success {
-  background: #e8f5e9;
-  border-left: 4px solid #4caf50;
-}
-
-.notification.success i {
-  color: #4caf50;
-}
-
-.notification.error {
-  background: #ffebee;
-  border-left: 4px solid #f44336;
-}
-
-.notification.error i {
-  color: #f44336;
-}
-
-.notification.info {
-  background: #e3f2fd;
-  border-left: 4px solid #2196f3;
-}
-
-.notification.info i {
-  color: #2196f3;
-}
-
-/* Dark theme notifications */
-body.dark-theme .notification {
-  background: var(--secondary-color);
-}
-
-body.dark-theme .notification.success {
-  background: rgba(76, 175, 80, 0.1);
-}
-
-body.dark-theme .notification.error {
-  background: rgba(244, 67, 54, 0.1);
-}
-
-body.dark-theme .notification.info {
-  background: rgba(33, 150, 243, 0.1);
+  display: none;
 }
 
 /* Saved Posts Section */
@@ -1906,33 +1838,41 @@ body.dark-theme .like-btn.liked i.fa-heart {
 }
 
 .save-btn:hover {
-  color: var(--primary-color) !important;
+  color: var(--primary-color);
   background: var(--hover-bg);
   transform: translateY(-2px);
 }
 
 .save-btn.saved {
-  color: var(--primary-color) !important;
-  animation: savePulse 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--primary-color);
 }
 
 .save-btn.saved i {
   color: var(--primary-color) !important;
   font-weight: 900;
-  animation: bookmarkPop 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark theme overrides for save button */
+.save-btn i {
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.save-btn.saved i.fa-bookmark {
+  color: var(--primary-color) !important;
+}
+
+/* Dark theme overrides */
 body.dark-theme .save-btn {
   color: var(--text-muted);
 }
 
 body.dark-theme .save-btn:hover,
 body.dark-theme .save-btn.saved {
-  color: var(--primary-color) !important;
+  color: var(--primary-color);
 }
 
-body.dark-theme .save-btn.saved i {
+body.dark-theme .save-btn.saved i,
+body.dark-theme .save-btn.saved i.fa-bookmark {
   color: var(--primary-color) !important;
 }
 

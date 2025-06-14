@@ -149,27 +149,7 @@
               <input type="text" data-i18n-placeholder="search_users" placeholder="Search users..." onkeyup="searchUsers(this.value)">
             </div>
             <div class="users">
-              <div class="user-item active" onclick="selectUser(this, 'Sarah Johnson')">
-                <img src="../images/default-avatar.png" alt="Sarah Johnson">
-                <div class="user-info">
-                  <h4>Sarah Johnson</h4>
-                  <p class="status online" data-i18n="online">Online</p>
-                </div>
-              </div>
-              <div class="user-item" onclick="selectUser(this, 'Dr. Emily Chen')">
-                <img src="../images/default-avatar.png" alt="Dr. Emily Chen">
-                <div class="user-info">
-                  <h4>Dr. Emily Chen</h4>
-                  <p class="status" data-i18n="last_seen">Last seen 5m ago</p>
-                </div>
-              </div>
-              <div class="user-item" onclick="selectUser(this, 'Mike Wilson')">
-                <img src="../images/default-avatar.png" alt="Mike Wilson">
-                <div class="user-info">
-                  <h4>Mike Wilson</h4>
-                  <p class="status" data-i18n="last_seen">Last seen 1h ago</p>
-                </div>
-              </div>
+              <!-- Users will be loaded here dynamically -->
             </div>
           </div>
           <!-- Chat Area -->
@@ -253,22 +233,17 @@
         <h3 class="post-title"></h3>
         <p class="post-text"></p>
       </div>
-      <div class="post-footer">
-        <div class="post-stats">
-          <button class="like-btn" data-i18n="like_post">
-            <i class="fas fa-heart"></i>
-            <span class="likes-count">0</span>
-          </button>
-          <button class="comment-btn" data-i18n="comment_post">
-            <i class="fas fa-comment"></i>
-            <span class="comments-count">0</span>
-          </button>
-          <button class="share-btn" data-i18n="share_post">
-            <i class="fas fa-share"></i>
-          </button>
-        </div>
-        <button class="save-btn" title="Save Post" data-i18n="save_post">
-          <i class="fas fa-bookmark"></i>
+      <div class="post-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="like-btn" data-i18n="like_post">
+          <i class="far fa-heart"></i>
+          <span class="likes-count">0</span>
+        </button>
+        <button class="comment-btn" data-i18n="comment_post">
+          <i class="far fa-comment"></i>
+          <span class="comments-count">0</span>
+        </button>
+        <button class="save-btn" data-i18n="save_post">
+          <i class="far fa-bookmark"></i>
         </button>
       </div>
     </article>
