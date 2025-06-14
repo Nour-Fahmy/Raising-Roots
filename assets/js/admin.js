@@ -519,32 +519,17 @@ async function fetchApplications() {
             console.log('Raw app.cvFile from Backend:', app.cvFile);
             const filename = app.cvFile.split('/').pop();
             console.log('Extracted filename:', filename);
-            return `
-            <div class="application-card" data-application-id="${app._id}">
-                <div class="application-header">
-                    <div class="expert-info">
-                        <div class="expert-details">
-                            <h3>${app.name}</h3>
-                            <p class="application-email">${app.email}</p>
-                            <p class="application-number">${app.number}</p>
-                        </div>
-                    </div>
-                    <div class="application-status ${app.status}">${app.status.charAt(0).toUpperCase() + app.status.slice(1)}</div>
-                </div>
-                <div class="application-content">
-                    <div class="documents-section">
-                        <h4><i class="fas fa-file-alt"></i> Documents</h4>
-                        <div class="document-links">
-                            <a href="https://localhost:3000/uploads/cvs/${filename}" target="_blank" class="document-link"><i class="fas fa-file-pdf"></i> View CV</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="application-actions">
-                    <button class="btn approve-btn" onclick="handleApplicationAction(this, 'approved')" ${app.status !== 'pending' ? 'disabled' : ''}><i class="fas fa-check"></i> Approve</button>
-                    <button class="btn reject-btn" onclick="handleApplicationAction(this, 'rejected')" ${app.status !== 'pending' ? 'disabled' : ''}><i class="fas fa-times"></i> Reject</button>
-                </div>
-            </div>
-        `;
+
+            // Transform app object to match what createExpertCard expects (username instead of name)
+            const expertForCard = {
+                ...app,
+                username: app.name // Map 'name' to 'username'
+            };
+
+            // Use createExpertCard to generate the HTML for each expert
+            const cardElement = createExpertCard(expertForCard);
+            return cardElement.outerHTML; // Get the HTML string from the DOM element
+
         }).join('');
 
     } catch (error) {
@@ -1138,7 +1123,12 @@ async function fetchCommunity() {
             
             if (responseData && responseData.length > 0) {
                 responseData.forEach(expert => {
-                    targetContainer.appendChild(createExpertCard(expert));
+                    // Transform expert object to match what createExpertCard expects (username instead of name)
+                    const expertForCard = {
+                        ...expert,
+                        username: expert.name // Map 'name' to 'username'
+                    };
+                    targetContainer.appendChild(createExpertCard(expertForCard));
                 });
             } else {
                 targetContainer.innerHTML = `<p class="no-members">No approved experts found</p>`;
@@ -1207,8 +1197,11 @@ async function fetchCommunity() {
                 }
             }
             
+            console.log('Combined Data for All Members Tab:', combinedData);
+
             if (combinedData && combinedData.length > 0) {
                 combinedData.forEach(member => {
+                    console.log('Processing member:', member);
                     if (member.isExpertApplication) {
                         targetContainer.appendChild(createExpertCard(member));
                     } else {
@@ -1238,9 +1231,9 @@ function createExpertCard(expert) {
 
     card.innerHTML = `
         <div class="member-header">
-            <img src="../../images/default-avatar.png" alt="${expert.name}" class="member-avatar">
+            <img src="../../images/default-avatar.png" alt="${expert.username}" class="member-avatar">
             <div class="member-info">
-                <h4>${expert.name}</h4>
+                <h4>${expert.username}</h4>
                 <span class="member-role">Expert</span>
             </div>
         </div>

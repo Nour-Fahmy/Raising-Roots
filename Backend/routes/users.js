@@ -7,6 +7,7 @@ const { validateLogin } = require('../middleware/validation');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const jwt = require('jsonwebtoken');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
+const userController = require('../controllers/userController');
 
 // POST /api/v1/users/register
 router.post('/register', async (req, res) => {
@@ -249,5 +250,8 @@ router.get('/search', authenticateToken, async (req, res) => {
         res.status(500).json({ message: `Error searching users: ${process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'}` });
     }
 });
+
+// Route to get the total count of users
+router.get('/count', authenticateToken, isAdmin, userController.getUserCount);
 
 module.exports = router;
