@@ -1774,7 +1774,7 @@ async function loadOrders() {
             throw new Error(errorData.message || 'Failed to fetch orders');
         }
 
-        const orders = await response.json();
+        const {orders} = await response.json();
         ordersTableBody.innerHTML = ''; // Clear loading message
 
         if (orders.length === 0) {
@@ -1786,8 +1786,8 @@ async function loadOrders() {
             const row = ordersTableBody.insertRow();
             row.insertCell().textContent = order._id;
             row.insertCell().textContent = order.user?.username || 'N/A';
-            row.insertCell().textContent = formatDate(order.orderDate);
-            row.insertCell().textContent = `EGP ${order.totalAmount.toFixed(2)}`;
+            row.insertCell().textContent = formatDate(order.createdAt);
+            row.insertCell().textContent = `EGP ${order.total.toFixed(2)}`;
             row.insertCell().textContent = order.status;
             
             // Actions cell

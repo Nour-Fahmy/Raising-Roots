@@ -4,7 +4,7 @@ const Order = require('../models/order');
 exports.getAllOrders = async (req, res, next) => {
   try {
     const orders = await Order.find()
-      .populate('user', 'name email') // Populate user details
+      .populate('user', 'username email') // Populate user details
       .populate('products.product', 'name price image') // Populate product details
       .sort({ createdAt: -1 }); // Sort by newest first
 

@@ -872,7 +872,7 @@ async function initializeShopPage() {
                 console.log('Attempting to send order data to backend:', orderData);
                 
                 // Send order to backend
-                const response = await fetch('/api/orders', {
+                const response = await fetch('/api/v1/orders', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
